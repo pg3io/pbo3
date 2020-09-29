@@ -8,6 +8,8 @@ PBO3 (beta)
 # Introduction
 PBO3 est un outil d'inventaire de parc serveur, basé sur le Headless CMS [Strapi](https://github.com/strapi/strapi).
 
+![Image](screenshot.png)
+
 # Fonctions
 * Listing (exemple):
   * Serveur (ns1.pg3.xyz,ns2.pg3.xyz, ...)
