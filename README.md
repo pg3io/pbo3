@@ -1,4 +1,4 @@
-PBO3
+PBO3 (beta)
 ===
 
 [![langage](https://img.shields.io/badge/Langage-vue.js-green.svg)](https://vuejs.org/)
@@ -24,9 +24,10 @@ PBO3 est ou outils light d'inventaire de parc serveur, basé sur le Headless CMS
 * Script d'export inventory Ansible
 
 # Prérequis
-Strapi lancer avec le schéma de l'application => *A venir*
+* Strapi avec le schéma => [ici (wiki)](https://github.com/pg3io/pbo3/wiki/Strapi)
 
 # Démarrage rapide
+Déclarer l'url de votre API dans le docker-comose.yml => ``graphEndpoint``
 ```
 docker-compose up 
 ```
