@@ -21,7 +21,6 @@ PBO3 est un outil d'inventaire de parc serveur, basé sur le Headless CMS [Strap
   * Recherche
   * Ajoute
   * Suppression
-* Script d'export inventory Ansible
 
 # Prérequis
 * Strapi avec le schéma => [ici (wiki)](https://github.com/pg3io/pbo3/wiki/Strapi)
