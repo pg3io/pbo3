@@ -6,7 +6,7 @@ PBO3 (beta)
 [![Apache 2.0 Licence](https://img.shields.io/hexpm/l/plug.svg)](LICENCE)
 
 # Introduction
-PBO3 est ou outils light d'inventaire de parc serveur, basé sur le Headless CMS [Strapi](https://github.com/strapi/strapi).
+PBO3 est un outil d'inventaire de parc serveur, basé sur le Headless CMS [Strapi](https://github.com/strapi/strapi).
 
 # Fonctions
 * Listing (exemple):
