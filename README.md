@@ -25,6 +25,7 @@ PBO3 est un outil d'inventaire de parc serveur, basé sur le Headless CMS [Strap
 
 # Prérequis
 * Strapi avec le schéma => [ici (wiki)](https://github.com/pg3io/pbo3/wiki/Strapi)
+* Le module graphQL de Strapi
 
 # Démarrage rapide
 Déclarer l'url de votre API dans le docker-comose.yml => ``graphEndpoint``
