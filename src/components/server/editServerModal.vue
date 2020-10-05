@@ -8,7 +8,8 @@
             <b-form-input id="hostname-input-edit" name="hostname-input" v-model="$v.editInfos.hostname.$model" :state="validateEdit('hostname')" aria-describedby="input-hostname-edit-feedback" autocomplete="off">
             </b-form-input>
             <b-form-invalid-feedback id="input-hostname-edit-feedback">
-              Hostname can't be blank.
+              <span v-if="validHostname == false">Hostname already exists!</span>
+              <span v-else>Hostname can't be blank!</span>
             </b-form-invalid-feedback>
           </b-form-group>
         </div>
@@ -17,7 +18,9 @@
             <b-form-input id="ip-input-edit" name="ip-input" v-model="$v.editInfos.ip.$model" :state="validateEdit('ip')" aria-describedby="input-ip-edit-feedback" autocomplete="off">
             </b-form-input>
             <b-form-invalid-feedback id="input-ip-edit-feedback">
-              Ip address can't be blank. (Example: 127.0.0.1)
+              <span v-if="validIp == false">Ip address already exists!</span>
+              <span v-else-if="validFormat == false">Wrong IPv4 format - (Example: 255.255.255.255)</span>
+              <span v-else>Ip address can't be blank!</span>
             </b-form-invalid-feedback>
           </b-form-group>
         </div>
@@ -210,15 +213,45 @@ export default {
   },
   validations: {
     editInfos: {
-      hostname: {required},
+      hostname: {
+        required,
+        check_hostname(hostname) {
+          for (let index = 0; index < this.servers.length; index++) {
+            if(hostname == this.servers[index].hostname && hostname != this.server.hostname) {
+              this.validHostname = false
+              return false
+            }       
+          }
+          this.validHostname = true
+          return true
+        },
+      },
       ip: {
         required,
         validIp(ip) {
+          if (this.editInfos.ip.length == 0) {
+            this.validFormat = true
+            return true
+          }
           const regex = /^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
-          return (
-            regex.test(ip)
-          );
-        }
+          if (regex.test(ip) == true) {
+            this.validFormat = true
+            return true
+          } else {
+            this.validFormat = false
+            return false
+          }
+        },
+        check_ip(ip) {
+          for (let index = 0; index < this.servers.length; index++) {
+            if(ip == this.servers[index].ip && ip != this.server.ip) {
+              this.validIp = false
+              return false
+            }       
+          }
+          this.validIp = true
+          return true
+        },
       },
       infos: {},
       offer: {},
@@ -262,7 +295,10 @@ export default {
       serverUsers: [],
       os: [],
       offers: [],
-      listServices: []
+      listServices: [],
+      validHostname: true,
+      validIp: true,
+      validFormat: true
     }
   },
   methods: {
@@ -282,7 +318,8 @@ export default {
       this.editServerUser = this.editInfos.server_user.id;
       this.editOs = this.editInfos.os.id;
       this.getOptions(this.$parent.server);
-      
+      this.hostname = this.editInfos.hostname;
+      this.ip = this.editInfos.ip;
     },
     editToList() {
       this.listServices = []
