@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  app-prod:
+    container_name: app-prod
+    build: .
+    ports:
+      - '80:80'  
+networks:
+  default:
+    external:
+      name: strapi
