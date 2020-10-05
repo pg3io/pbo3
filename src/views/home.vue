@@ -1,6 +1,6 @@
 <template>
   <div id='mainLinkDiv'>
-    <b-modal id="addModal" ref="add" hide-footer title="Add:" :no-close-on-backdrop=true :no-close-on-esc=true>>
+    <b-modal id="addModal" ref="add" hide-footer title="Add:" :no-close-on-backdrop=true :no-close-on-esc=true>
       <div class="addButton">
         <b-button class="addButton" v-b-modal.addServerModal variant="outline-dark" @click="hideModal('add')">
           Server
@@ -768,7 +768,7 @@
       },
       reset_infos() {
         this.addInfos.hostname = null
-        this.addInfos.ip = null
+        this.addInfos.ip = ''
         this.addInfos.id_host = null
         this.addInfos.raid = false
         this.addInfos.offer = null

@@ -8,7 +8,8 @@
             <b-form-input id="hostname-input" name="hostname-input" v-model="$v.addInfos.hostname.$model" :state="validateState('hostname')" aria-describedby="input-hostname-live-feedback" autocomplete="off">
             </b-form-input>
             <b-form-invalid-feedback id="input-hostname-live-feedback">
-              Hostname can't be blank.
+              <span v-if="validHostname == false">Hostname already exists!</span>
+              <span v-else>Hostname can't be blank</span>
             </b-form-invalid-feedback>
           </b-form-group>
         </div>
@@ -17,7 +18,9 @@
             <b-form-input id="ip-input" name="ip-input" v-model="$v.addInfos.ip.$model" :state="validateState('ip')" aria-describedby="input-ip-live-feedback" autocomplete="off">
             </b-form-input>
             <b-form-invalid-feedback id="input-ip-live-feedback">
-              Wrong IPv4 format - (Example: 255.255.255.255)
+              <span v-if="validIp == false">Ip address already exists!</span>
+              <span v-else-if="validFormat == false">Wrong IPv4 format - (Example: 255.255.255.255)</span>
+              <span v-else>Ip address can't be blank!</span>
             </b-form-invalid-feedback>
           </b-form-group>
         </div>
@@ -181,15 +184,45 @@ export default {
   },
   validations: {
     addInfos: {
-      hostname: {required},
+      hostname: {
+        required,
+        check_hostname(hostname) {
+          for (let index = 0; index < this.servers.length; index++) {
+            if(hostname == this.servers[index].hostname) {
+              this.validHostname = false
+              return false
+            }       
+          }
+          this.validHostname = true
+          return true
+        },
+      },
       ip: {
         required,
         validIp(ip) {
+          if (this.addInfos.ip.length == 0) {
+            this.validFormat = true
+            return true
+          }
           const regex = /^((\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
-          return (
-            regex.test(ip)
-          );
-        }
+          if (regex.test(ip) == true) {
+            this.validFormat = true
+            return true
+          } else {
+            this.validFormat = false
+            return false
+          }
+        },
+        check_ip(ip) {
+          for (let index = 0; index < this.servers.length; index++) {
+            if(ip == this.servers[index].ip) {
+              this.validIp = false
+              return false
+            }       
+          }
+          this.validIp = true
+          return true
+        },
       },
       infos: {},
       offer: {},
@@ -222,13 +255,16 @@ export default {
       dcs: {},
       server_user: {},
       profile: {},
-      os: {}
+      os: {},
+      validHostname: true,
+      validIp: true,
+      validFormat: true
     }
   },
   methods: {
     reset_infos() {
       this.addInfos.hostname = null
-      this.addInfos.ip = null
+      this.addInfos.ip = ''
       this.addInfos.raid = false
       this.addInfos.offer = null
       this.addInfos.services = null
@@ -287,6 +323,7 @@ export default {
       if (this.$v.addInfos.$anyError) {
         return;
       }
+
       this.addServer();
     },
   },
