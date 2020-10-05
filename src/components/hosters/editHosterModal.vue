@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="get_hoster()">
       <b-form @submit.stop.prevent="onSubmit">          
         <div>
           <div class="inputLine">
@@ -9,7 +9,8 @@
                 <b-form-input id="hoster-edit-name-input" name="hoster-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-hoster-edit-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-hoster-edit-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Hoster already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -20,7 +21,8 @@
                 <b-form-input id="hoster-edit-url_admin-input" name="hoster-edit-name-input" v-model="$v.editInfos.url_admin.$model" :state="validateState('url_admin')" aria-describedby="feedback-hoster-edit-url_admin" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-hoster-edit-url_admin">
-                  Url Admin can't be blank.
+                  <span v-if="validUrl == false">Url already exists!</span>
+                  <span v-else>Url can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -38,23 +40,60 @@
 <script>
 import { updateHoster } from '@/assets/js/updateMutations/updateHoster'
 import { required } from "vuelidate/lib/validators";
+import { HOSTERS_QUERY } from '@/assets/js/query/graphql'
+
 
 export default {
   name: 'EditHoster',
   validations: {
     editInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.hosters.length; index++) {
+            if(name == this.hosters[index].name && name != this.hoster.name) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       url_admin: {
-        required
+        required,
+        check_url_admin(url_admin) {
+          for (let index = 0; index < this.hosters.length; index++) {
+            if(url_admin == this.hosters[index].url_admin && url_admin != this.hoster.url_admin) {
+              this.validUrl = false
+              return false
+            }       
+          }
+          this.validUrl = true
+          return true
+        },
       }
     },
   },
   props: {
     editInfos: Object
   },
+  data() {
+    return {
+      hosters: [],
+      hoster: {
+        name: '',
+        url_admin: ''
+      },
+      validName: true,
+      validUrl: true
+    }
+  },
   methods: {
+    get_hoster() {
+      this.hoster.name = this.editInfos.name
+      this.hoster.url_admin = this.editInfos.url_admin
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -81,6 +120,11 @@ export default {
       this.editHoster();
     },
   },
+  apollo: {
+    hosters: {
+      query: HOSTERS_QUERY
+    }
+  }
 }
 </script>
 
