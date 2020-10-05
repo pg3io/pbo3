@@ -1,0 +1,191 @@
+body {
+  background-color: #f3f3f3;
+}
+
+.modalRightButton {
+  float: right;
+  margin-right: 53px;
+}
+
+.modalLeftButton {
+  float: left;
+  margin-right: 20px;
+}
+
+.inputField {
+  width: 500px;
+  margin-right: 5px;
+  margin-left: 5px;
+  float: left;
+
+}
+
+.inputField1 {
+  width: 500px;
+  margin-right: 5px;
+  margin-left: 5px;
+  float: right;
+}
+
+.inputSubmit {
+  float: left;
+}
+
+.inputServices {
+  width: 400px;
+  float: left;
+}
+.inputLine {
+  width: 1055px;
+}
+
+.inputOffer {
+  width: 1055px;
+  margin-bottom: 20px;
+}
+
+.inputConfirm {
+  float: right;
+}
+
+.labelRaid {
+  margin-left: 6px;
+  margin-right: 15px;
+  float: left;
+}
+
+.add_server {
+  margin-left: 15px;
+}
+.addButton {
+  width: 468px;
+  margin-bottom: 10px;
+}
+
+.buttonGroupLeft {
+  width: 224px;
+  float: left;
+  margin-bottom: 20px;
+  margin-right: 10px;
+}
+.buttonGroupRight {
+  width: 224px;
+  float: left;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+.centerDiv {
+  margin: 100px auto;
+}
+
+#message {
+  margin-top: 100px;
+}
+
+#dropdownSuggest {
+  margin-left: 12px;
+  width: 1000px;
+  position: relative;
+  z-index: 9;
+  position: relative;
+}
+
+#suggestDiv {
+  width: 300px;
+  float: left;
+  text-decoration: none;
+  background-color: white;
+  border: solid;
+  border-width: 1px;
+  border-color: black;
+  border-radius: 0px;
+  border-top-width: 0;
+  cursor: pointer;
+
+
+}
+
+#hiddenButton {
+  float: left;
+}
+
+#hiddenDiv {
+  margin-left: 3px;
+}
+
+.suggestButton {
+  opacity: 1;
+  width: 300px;
+  text-align: left;
+  padding-left: 11px;
+}
+
+.suggestButton:hover {
+  background-color: slategray;
+}
+
+#buttonHover {
+  background-color: slategray;
+  width: 300px;
+  color: white;
+}
+
+#serverTable {
+  position: absolute;
+  top: 160px;
+  left: auto;
+}
+
+#searchEngine{
+  z-index: 9;
+  top: 20px;
+  left: auto;
+}
+
+.hideIt {
+  opacity: 0;
+}
+
+.raidButton {
+  float: left;
+}
+
+.test {
+  background-color: blue;
+}
+
+.loginAlert {
+  padding-left: 0px;
+  font-size: 12px;
+  margin-bottom: 0px;
+  margin-top: 15px;
+}
+
+.s-m-1 {
+  width: 6%;
+}
+
+.b-m-1 {
+  width: 88%;
+}
+
+.b-m-2 {
+  width: 40%;
+}
+
+.b-m-3 {
+  width: 25%;
+}
+
+.bigColumn {
+  width: 120px;
+}
+
+@media only screen and (max-width: 480px) {
+  /* horizontal scrollbar for tables if mobile screen */
+  .tablemobile {
+      overflow-x: auto;
+      display: block;
+  }
+}
