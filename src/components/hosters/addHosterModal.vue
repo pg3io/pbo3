@@ -91,8 +91,8 @@ export default {
       this.addInfos.url_admin = null
     },
     hideServerModal: function(modal) {
-      this.$refs[modal].hide();
       this.reset_infos()
+      this.$refs[modal].hide();
     },
     addHoster() {
       const name = this.addInfos.name,

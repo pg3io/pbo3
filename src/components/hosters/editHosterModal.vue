@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="get_hoster()">
+    <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
       <b-form @submit.stop.prevent="onSubmit">          
         <div>
           <div class="inputLine">
@@ -76,24 +76,31 @@ export default {
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    hoster: Object
   },
   data() {
     return {
-      hosters: [],
-      hoster: {
-        name: '',
-        url_admin: ''
-      },
       validName: true,
       validUrl: true
     }
   },
   methods: {
-    get_hoster() {
-      this.hoster.name = this.editInfos.name
-      this.hoster.url_admin = this.editInfos.url_admin
-    },
+    // get_hoster() {
+    //   console.log(this.editInfos.id)
+    //   console.log(this.hoster.name)
+    //   if (this.hoster == null) {
+    //     if (this.editInfos.id < 1) {
+    //       return (setTimeout(this.get_hoster(), 100))
+    //     } else {
+    //       this.hoster.name = this.editInfos.name
+    //       this.hoster.url_admin = this.editInfos.url_admin
+    //       return
+    //     }
+    //   } else {
+    //     return
+    //   }
+    // },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -109,8 +116,8 @@ export default {
       
     },
     validateState(name) {
-    const { $dirty, $error } = this.$v.editInfos[name];
-    return $dirty ? !$error : null;
+      const { $dirty, $error } = this.$v.editInfos[name];
+      return $dirty ? !$error : null;
     },
     onSubmit() {
       this.$v.editInfos.$touch();
