@@ -86,21 +86,6 @@ export default {
     }
   },
   methods: {
-    // get_hoster() {
-    //   console.log(this.editInfos.id)
-    //   console.log(this.hoster.name)
-    //   if (this.hoster == null) {
-    //     if (this.editInfos.id < 1) {
-    //       return (setTimeout(this.get_hoster(), 100))
-    //     } else {
-    //       this.hoster.name = this.editInfos.name
-    //       this.hoster.url_admin = this.editInfos.url_admin
-    //       return
-    //     }
-    //   } else {
-    //     return
-    //   }
-    // },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
