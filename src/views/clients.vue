@@ -1,3 +1,4 @@
+
 <template>
   <div >
     <div class="container-sm">
@@ -37,7 +38,7 @@
       <spinner v-else></spinner>
     </div>
     <add-client v-bind:addInfos="editInfos"></add-client>
-    <edit-client v-bind:editInfos="editInfos" ></edit-client>
+    <edit-client v-bind:editInfos="editInfos" :client='Client'></edit-client>
     <delete-client v-bind:editInfos="editInfos" ></delete-client>
   </div>
 </template>
@@ -63,6 +64,11 @@ export default {
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
+      Client: {
+        id: null,
+        name: null,
+        infos: null
+      },
       editInfos: {
         id: null,
         name: null,
@@ -115,6 +121,9 @@ export default {
       this.editInfos.id = client.id
       this.editInfos.name = client.name
       this.editInfos.infos = client.infos
+      this.Client.id = client.id
+      this.Client.name = client.name
+      this.Client.infos = client.infos
     },
   },
   computed: {

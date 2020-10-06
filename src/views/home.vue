@@ -45,7 +45,7 @@
     <add-service :addInfos='editAll'></add-service>
     <add-dc :addInfos='editAll'></add-dc>
     <edit-hoster :editInfos='editAll' :hoster='hoster'></edit-hoster>
-    <edit-client :editInfos='editAll'></edit-client>
+    <edit-client :editInfos='editAll' :client='client'></edit-client>
     <edit-os :editInfos='editAll'></edit-os>
     <edit-env :editInfos='editAll'></edit-env>
     <edit-type :editInfos='editAll'></edit-type>
@@ -214,7 +214,7 @@
                 </td>
               </tr>
             </tbody>
-            <tbody v-else-if="client() === true">
+            <tbody v-else-if="client_filter() === true">
               <tr v-for="server in servers" :key="server.id">
                 <td v-if="server.id">
                   {{server.id}}
@@ -543,6 +543,7 @@
         serverUsers: [],
         hoster: null,
         service: null,
+        client: null,
         services: [],
         options: [],
         os: [],
@@ -741,7 +742,7 @@
         else
           return false
       },
-      client: function() {
+      client_filter() {
         if (this.filter.toLowerCase().match("client"))
             return true
         else
@@ -972,6 +973,7 @@
           case "client":
             if ((check = this.filteredClient('name', temp)).length == 1) {
               this.editAll = {name: check[0].name, infos: check[0].infos, id: check[0].id};
+              this.client = check[0];
               this.$bvModal.show('editClientModal');
             }
             break;
