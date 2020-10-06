@@ -49,8 +49,8 @@
     <edit-os :editInfos='editAll'></edit-os>
     <edit-env :editInfos='editAll' :env='env'></edit-env>
     <edit-type :editInfos='editAll' :type='type'></edit-type>
-    <edit-profile :editInfos='editAll'></edit-profile>
-    <edit-serverUser :editInfos='editAll'></edit-serverUser>
+    <edit-profile :editInfos='editAll' :profile='profile'></edit-profile>
+    <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll'></edit-dc>
     <div class="container-sm linklist">
@@ -543,6 +543,8 @@
         serverUsers: [],
         hoster: null,
         service: null,
+        profile: null,
+        serverUser: null,
         client: null,
         env: null,
         type: null,
@@ -1003,12 +1005,14 @@
           case "profile":
             if ((check = this.filteredProfile('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name, infos: check[0].infos};
+              this.profile = check[0];
               this.$bvModal.show('editProfileModal');
             }
             break;
           case "serveruser":
             if ((check = this.filteredServerUser('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.serverUser = check[0];
               this.$bvModal.show('editServerUserModal');
             }
             break;
