@@ -8,7 +8,8 @@
               <b-form-input id="env-add-name-input" name="env-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-add-env-name" autocomplete="off">
               </b-form-input>
               <b-form-invalid-feedback id="feedback-add-env-name">
-                Name can't be blank.
+                <span v-if="validName == false">Env already exists!</span>
+                <span v-else>Name can't be blank</span>
               </b-form-invalid-feedback>
             </b-form-group>
           </div>
@@ -26,18 +27,35 @@
 
 import { createEnv } from '@/assets/js/createMutations/createEnv'
 import { required } from "vuelidate/lib/validators";
+import { ENV_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddEnv',
   validations: {
     addInfos: {
       name: {
-        required
-      }
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.envs.length; index++) {
+            if(name && name.toLowerCase() == this.envs[index].name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
+      },
     },
   },
   props: {
     addInfos: Object
+  },
+  data() {
+    return {
+      envs: [],
+      validName: true
+    }
   },
   methods: {
     reset_infos() {
@@ -67,6 +85,11 @@ export default {
       this.addEnv();
     },
   },
+  apollo: {
+    envs: {
+      query: ENV_QUERY
+    }
+  }
 }
 </script>
 

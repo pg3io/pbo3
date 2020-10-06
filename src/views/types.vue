@@ -37,7 +37,7 @@
       <spinner v-else></spinner>
     </div>
     <add-type :addInfos='addInfos'></add-type>
-    <edit-type v-bind:editInfos="editInfos" ></edit-type>
+    <edit-type v-bind:editInfos="editInfos" :type='Type'></edit-type>
     <delete-type v-bind:editInfos="editInfos" ></delete-type>
   </div>
 </template>
@@ -63,6 +63,10 @@ export default {
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
+      Type: {
+        id: null,
+        name: null,
+      },
       editInfos: {
         id: null,
         name: null,
@@ -112,6 +116,8 @@ export default {
     get_type: function(type) {
       this.editInfos.id = type.id
       this.editInfos.name = type.name
+      this.Type.id = type.id
+      this.Type.name = type.name
     },
   },
   computed: {

@@ -9,7 +9,8 @@
                 <b-form-input id="service-edit-name-input" name="service-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-edit-service-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-edit-service-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Hoster already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -27,18 +28,35 @@
 <script>
 import { updateService } from '@/assets/js/updateMutations/updateService'
 import { required } from "vuelidate/lib/validators";
+import { SERVICES_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'EditService',
   validations: {
     editInfos: {
       name: {
-        required
-      }
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.services.length; index++) {
+            if (name && name.toLowerCase() == this.services[index].name.toLowerCase() && name.toLowerCase() != this.service.name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
+      },
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    service: Object
+  },
+  data() {
+    return {
+      validName: true
+    }
   },
   methods: {
     hideServerModal: function(modal) {
@@ -65,6 +83,11 @@ export default {
       this.editService();
     },
   },
+  apollo: {
+    services: {
+      query: SERVICES_QUERY
+    }
+  }
 }
 </script>
 

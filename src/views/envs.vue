@@ -37,7 +37,7 @@
       <spinner v-else></spinner>
     </div>
     <add-env :addInfos='addInfos'></add-env>
-    <edit-env v-bind:editInfos="editInfos" ></edit-env>
+    <edit-env v-bind:editInfos="editInfos" :env='Env'></edit-env>
     <delete-env v-bind:editInfos="editInfos" ></delete-env>
   </div>
 </template>
@@ -63,6 +63,10 @@ export default {
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
+      Env: {
+        id: null,
+        name: null,
+      },
       editInfos: {
         id: null,
         name: null,
@@ -112,6 +116,8 @@ export default {
     get_env: function(env) {
       this.editInfos.id = env.id
       this.editInfos.name = env.name
+      this.Env.id = env.id
+      this.Env.name = env.name
     },
   },
   computed: {

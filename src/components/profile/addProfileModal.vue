@@ -9,7 +9,8 @@
                 <b-form-input id="profile-add-name-input" name="profile-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-add-profile-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-add-profile-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Profile already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -37,13 +38,24 @@
 
 import { createProfile } from '@/assets/js/createMutations/createProfile'
 import { required } from "vuelidate/lib/validators";
+import { PROFILE_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddProfile',
   validations: {
     addInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.profiles.length; index++) {
+            if(name && name.toLowerCase() == this.profiles[index].name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       infos: {
       }
@@ -52,14 +64,20 @@ export default {
   props: {
     addInfos: Object
   },
+  data() {
+    return {
+      profiles: [],
+      validName: true
+    }
+  },
   methods: {
     reset_infos() {
       this.addInfos.name = null,
       this.addInfos.infos = null
     },
     hideServerModal: function(modal) {
-      this.$refs[modal].hide();
       this.reset_infos()
+      this.$refs[modal].hide();
     },
     addProfile() {
       const name = this.addInfos.name,
@@ -82,6 +100,11 @@ export default {
       this.addProfile();
     },
   },
+  apollo: {
+    profiles: {
+      query: PROFILE_QUERY
+    }
+  }
 }
 </script>
 

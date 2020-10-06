@@ -9,7 +9,8 @@
                 <b-form-input id="client-add-name-input" name="client-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-add-client-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-add-client-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Client already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -37,13 +38,25 @@
 
 import { createClient } from '@/assets/js/createMutations/createClient'
 import { required } from "vuelidate/lib/validators";
+import { CLIENTS_QUERY } from '@/assets/js/query/graphql'
+
 
 export default {
   name: 'AddClient',
   validations: {
     addInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.clients.length; index++) {
+            if(name && name.toLowerCase() == this.clients[index].name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       infos: {
       }
@@ -51,6 +64,12 @@ export default {
   },
   props: {
     addInfos: Object,
+  },
+  data() {
+    return {
+      clients: [],
+      validName: true
+    }
   },
   methods: {
     reset_infos() {
@@ -82,6 +101,11 @@ export default {
       this.addClient();
     },
   },
+  apollo: {
+    clients: {
+      query: CLIENTS_QUERY
+    }
+  }
 }
 </script>
 

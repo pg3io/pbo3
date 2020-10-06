@@ -9,7 +9,8 @@
                 <b-form-input id="client-edit-name-input" name="client-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-edit-client-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-edit-client-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Client already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -37,20 +38,38 @@
 <script>
 import { updateClient } from '@/assets/js/updateMutations/updateClient'
 import { required } from "vuelidate/lib/validators";
+import {CLIENTS_QUERY} from '@/assets/js/query/graphql'
+
 
 export default {
   name: 'EditClient',
   validations: {
     editInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.clients.length; index++) {
+            if(name && name.toLowerCase() == this.clients[index].name.toLowerCase() && name.toLowerCase() != this.client.name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       infos: {
       }
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    client: Object
+  },
+  data() {
+    return {
+      validName: true
+    }
   },
   methods: {
     hideServerModal: function(modal) {
@@ -78,6 +97,11 @@ export default {
       this.editClient();
     },
   },
+  apollo: {
+    clients: {
+      query: CLIENTS_QUERY
+    }
+  }
 }
 </script>
 

@@ -40,7 +40,7 @@
       <spinner v-else></spinner>
     </div>
     <add-hoster :addInfos='addInfos'></add-hoster>
-    <edit-hoster v-bind:editInfos="editInfos" ></edit-hoster>
+    <edit-hoster :editInfos="editInfos" :hoster='Hoster'></edit-hoster>
     <delete-hoster v-bind:editInfos="editInfos" ></delete-hoster>
   </div>
 </template>
@@ -63,6 +63,11 @@ export default {
   data () {
     return {
       hosters: [],
+      Hoster: {
+        id: null,
+        name: null,
+        url_admin: null
+      },
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -112,6 +117,9 @@ export default {
       this.editInfos.id = hoster.id
       this.editInfos.name = hoster.name
       this.editInfos.url_admin = hoster.url_admin
+      this.Hoster.id = hoster.id
+      this.Hoster.name = hoster.name
+      this.Hoster.url_admin = hoster.url_admin
     },
   },
   computed: {

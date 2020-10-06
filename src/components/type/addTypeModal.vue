@@ -8,7 +8,8 @@
                 <b-form-input id="type-add-name-input" name="type-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-add-type-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-add-type-name">
-                  Type can't be blank.
+                  <span v-if="validName == false">Type already exists!</span>
+                  <span v-else>Type can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -26,26 +27,43 @@
 
 import { createType } from '@/assets/js/createMutations/createType'
 import { required } from "vuelidate/lib/validators";
+import { TYPE_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddType',
   validations: {
     addInfos: {
       name: {
-        required
-      }
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.types.length; index++) {
+            if(name && name.toLowerCase() == this.types[index].name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
+      },
     },
   },
   props: {
     addInfos: Object
+  },
+  data() {
+    return {
+      types: [],
+      validName: true
+    }
   },
   methods: {
     reset_infos() {
       this.addInfos.name = null
     },
     hideServerModal: function(modal) {
-      this.$refs[modal].hide();
       this.reset_infos()
+      this.$refs[modal].hide();
     },
     addType() {
       const name = this.addInfos.name;
@@ -67,6 +85,11 @@ export default {
       this.addType();
     },
   },
+  apollo: {
+    types: {
+      query: TYPE_QUERY
+    }
+  }
 }
 </script>
 

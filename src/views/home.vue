@@ -1,6 +1,6 @@
 <template>
   <div id='mainLinkDiv'>
-    <b-modal id="addModal" ref="add" hide-footer title="Add:" :no-close-on-backdrop=true :no-close-on-esc=true>>
+    <b-modal id="addModal" ref="add" hide-footer title="Add:" :no-close-on-backdrop=true :no-close-on-esc=true>
       <div class="addButton">
         <b-button class="addButton" v-b-modal.addServerModal variant="outline-dark" @click="hideModal('add')">
           Server
@@ -13,22 +13,22 @@
         <b-button class="buttonGroupRight" v-b-modal.addClientModal variant="outline-dark" @click="hideModal('add')">
           Client
         </b-button>
-        <b-button class="buttonGroupLeft" v-b-modal.addOs-modal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addOsModal variant="outline-dark" @click="hideModal('add')">
           Os
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addEnv-modal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addEnvModal variant="outline-dark" @click="hideModal('add')">
           Env
         </b-button>
-        <b-button class="buttonGroupLeft" v-b-modal.addType-modal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addTypeModal variant="outline-dark" @click="hideModal('add')">
           Type
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addProfile-modal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addProfileModal variant="outline-dark" @click="hideModal('add')">
           Profile
         </b-button>
-        <b-button class="buttonGroupLeft" v-b-modal.addServerUser-modal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addServerUserModal variant="outline-dark" @click="hideModal('add')">
           Server User
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addDc-modal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addDcModal variant="outline-dark" @click="hideModal('add')">
           Dc
         </b-button>
       </div>
@@ -44,15 +44,15 @@
     <add-serverUser :addInfos='editAll'></add-serverUser>
     <add-service :addInfos='editAll'></add-service>
     <add-dc :addInfos='editAll'></add-dc>
-    <edit-hoster :editInfos='editAll'></edit-hoster>
-    <edit-client :editInfos='editAll'></edit-client>
+    <edit-hoster :editInfos='editAll' :hoster='hoster'></edit-hoster>
+    <edit-client :editInfos='editAll' :client='client'></edit-client>
     <edit-os :editInfos='editAll'></edit-os>
-    <edit-env :editInfos='editAll'></edit-env>
-    <edit-type :editInfos='editAll'></edit-type>
-    <edit-profile :editInfos='editAll'></edit-profile>
-    <edit-serverUser :editInfos='editAll'></edit-serverUser>
-    <edit-service :editInfos='editAll'></edit-service>
-    <edit-dc :editInfos='editAll'></edit-dc>
+    <edit-env :editInfos='editAll' :env='env'></edit-env>
+    <edit-type :editInfos='editAll' :type='type'></edit-type>
+    <edit-profile :editInfos='editAll' :profile='profile'></edit-profile>
+    <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
+    <edit-service :editInfos='editAll' :service='service'></edit-service>
+    <edit-dc :editInfos='editAll' :dc='dc'></edit-dc>
     <div class="container-sm linklist">
       <div>
         <div id="searchEngine">
@@ -214,7 +214,7 @@
                 </td>
               </tr>
             </tbody>
-            <tbody v-else-if="client() === true">
+            <tbody v-else-if="client_filter() === true">
               <tr v-for="server in servers" :key="server.id">
                 <td v-if="server.id">
                   {{server.id}}
@@ -541,6 +541,14 @@
         dcs: [],
         profiles: [],
         serverUsers: [],
+        hoster: null,
+        service: null,
+        profile: null,
+        dc: null,
+        serverUser: null,
+        client: null,
+        env: null,
+        type: null,
         services: [],
         options: [],
         os: [],
@@ -739,7 +747,7 @@
         else
           return false
       },
-      client: function() {
+      client_filter() {
         if (this.filter.toLowerCase().match("client"))
             return true
         else
@@ -768,7 +776,7 @@
       },
       reset_infos() {
         this.addInfos.hostname = null
-        this.addInfos.ip = null
+        this.addInfos.ip = ''
         this.addInfos.id_host = null
         this.addInfos.raid = false
         this.addInfos.offer = null
@@ -787,7 +795,7 @@
 
       },
       hideModal: function(modal) {
-        this.editAll = this.addInfos;
+        this.editAll = this.addInfos
         this.$refs[modal].hide();
       },
       deleteServer() {
@@ -896,48 +904,49 @@
         this.reset_infos();
         switch (this.tags[1].toLowerCase()) {
           case "server":
-            this.addInfos.hostname = (this.tags[2]) ? this.tags[2] : null;
-            this.addInfos.ip = (this.tags[3]) ? this.tags[3] : null;
+            this.addInfos.hostname = (this.tags[2]) ? this.tags[2] : '';
+            this.addInfos.ip = (this.tags[3]) ? this.tags[3] : '';
             this.editAll = this.addInfos
             this.$bvModal.show('addServerModal');
             break;
           case "hoster":
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''}
             this.$bvModal.show('addHosterModal');
             break;
           case "client":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null,
-              infos: (this.tags[3] && this.tags[3].length) ? this.tags[3] : null}
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : '',
+              infos: (this.tags[3] && this.tags[3].length) ? this.tags[3] : ''}
             this.$bvModal.show('addClientModal');
             this.clients = {
               query: CLIENTS_QUERY
             }
             break;
           case "os":
-            this.editAll = {os_name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null}
+            this.editAll = {os_name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''}
             this.$bvModal.show('addOsModal');
             break;
           case "env":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null};
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addEnvModal');
             break;
           case "type":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null};
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addTypeModal');
             break;
           case "profile":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null};
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addProfileModal');
             break;
           case "serveruser":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null};
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addServerUserModal');
             break;
           case "dc":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null};
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addDcModal');
             break;
           case "service":
-            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : null};
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addServiceModal');
             break;
           default:
@@ -962,12 +971,14 @@
           case "hoster":
             if ((check = this.filteredHoster('name', temp)).length == 1) {
               this.editAll = {name: check[0].name, url_admin: check[0].url_admin, id: check[0].id};
+              this.hoster = check[0];
               this.$bvModal.show('editHosterModal');
             }
             break;
           case "client":
             if ((check = this.filteredClient('name', temp)).length == 1) {
               this.editAll = {name: check[0].name, infos: check[0].infos, id: check[0].id};
+              this.client = check[0];
               this.$bvModal.show('editClientModal');
             }
             break;
@@ -980,36 +991,43 @@
           case "env":
             if ((check = this.filteredEnv('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.env = check[0]
               this.$bvModal.show('editEnvModal');
             }
             break;
           case "type":
             if ((check = this.filteredType('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.type = check[0];
               this.$bvModal.show('editTypeModal');
             }
             break;
           case "profile":
             if ((check = this.filteredProfile('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name, infos: check[0].infos};
+              this.profile = check[0];
               this.$bvModal.show('editProfileModal');
             }
             break;
           case "serveruser":
             if ((check = this.filteredServerUser('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.serverUser = check[0];
               this.$bvModal.show('editServerUserModal');
             }
             break;
           case "dc":
             if ((check = this.filteredDc('name', temp)).length == 1) {
-              this.editAll = {hoster: (check[0].hoster && check[0].hoster.length) ? check[0].hoster.id : null,};
+              this.editAll = {hoster: check[0].hoster,
+              name: check[0].name, location: check[0].location};
+              this.dc = check[0];
               this.$bvModal.show('editDcModal');
             }
             break;
           case "service":
             if ((check = this.filteredService('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.service = check[0];
               this.$bvModal.show('editServiceModal');
             }
             break;
@@ -1437,13 +1455,13 @@
         var result = [], rank = 0;
         for (let i = 0; string && this.types[i]; i++)
           if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase() == string.toLowerCase() 
-          || (opt == "all" || opt == "id") && this.types[i].if && this.types[i].id.toLowerCase() == string.toLowerCase())
-            result[rank++] = this.types[rank];
+          || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase() == string.toLowerCase())
+            result[rank++] = this.types[i];
         if (!rank)
           for (let i = 0; string && this.types[i]; i++)
             if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase().match(string.toLowerCase()) 
-            || (opt == "all" || opt == "id") && this.types[i].if && this.types[i].id.toLowerCase().match(string.toLowerCase()))
-              result[rank++] = this.types[rank];
+            || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase().match(string.toLowerCase()))
+              result[rank++] = this.types[i];
         return result;
       },
       getId_of: function(ofWhat) {

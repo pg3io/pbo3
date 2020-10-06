@@ -9,7 +9,8 @@
                 <b-form-input id="service-add-name-input" name="service-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-add-service-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-add-service-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Service already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -28,26 +29,43 @@
 
 import { createService } from '@/assets/js/createMutations/createService'
 import { required } from "vuelidate/lib/validators";
+import { SERVICES_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddService',
   validations: {
     addInfos: {
       name: {
-        required
-      }
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.services.length; index++) {
+            if(name && name.toLowerCase() == this.services[index].name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
+      },
     },
   },
   props: {
     addInfos: Object
+  },
+  data() {
+    return {
+      services: [],
+      validName: true
+    }
   },
   methods: {
     reset_infos() {
       this.addInfos.name = null;
     },
     hideServerModal: function(modal) {
-      this.$refs[modal].hide();
       this.reset_infos()
+      this.$refs[modal].hide();
     },
     addService() {
       const name = this.addInfos.name;
@@ -69,6 +87,11 @@ export default {
       this.addService();
     },
   },
+  apollo: {
+    services: {
+      query: SERVICES_QUERY
+    }
+  }
 }
 </script>
 

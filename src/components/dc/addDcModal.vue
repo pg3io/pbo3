@@ -9,7 +9,8 @@
                 <b-form-input id="Dc-add-name-input" name="Dc-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-Dc-add-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-Dc-add-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Dc already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -50,14 +51,25 @@
 
 import { createDc } from '@/assets/js/createMutations/createDc'
 import { required } from "vuelidate/lib/validators";
-import {HOSTERS_QUERY} from '@/assets/js/query/graphql'
+import { HOSTERS_QUERY } from '@/assets/js/query/graphql'
+import { DC_QUERY_ } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddDc',
   validations: {
     addInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.dcs.length; index++) {
+            if(name && name.toLowerCase() == this.dcs[index].name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       location: {
       },
@@ -68,6 +80,13 @@ export default {
   },
   props: {
     addInfos: Object
+  },
+  data() {
+    return {
+      hosters: [],
+      dcs: [],
+      validName: true
+    }
   },
   methods: {
     reset_infos() {
@@ -103,6 +122,9 @@ export default {
   apollo: {
     hosters: {
       query: HOSTERS_QUERY
+    },
+    dcs: {
+      query: DC_QUERY_
     }
   }
 }
