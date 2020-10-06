@@ -47,7 +47,7 @@
     <edit-hoster :editInfos='editAll' :hoster='hoster'></edit-hoster>
     <edit-client :editInfos='editAll' :client='client'></edit-client>
     <edit-os :editInfos='editAll'></edit-os>
-    <edit-env :editInfos='editAll'></edit-env>
+    <edit-env :editInfos='editAll' :env='env'></edit-env>
     <edit-type :editInfos='editAll'></edit-type>
     <edit-profile :editInfos='editAll'></edit-profile>
     <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
@@ -545,6 +545,7 @@
         service: null,
         serverUser: null,
         client: null,
+        env: null,
         services: [],
         options: [],
         os: [],
@@ -987,6 +988,7 @@
           case "env":
             if ((check = this.filteredEnv('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.env = check[0]
               this.$bvModal.show('editEnvModal');
             }
             break;
