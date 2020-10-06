@@ -8,7 +8,8 @@
                 <b-form-input id="serverUser-add-name-input" name="serverUser-add-name-input" v-model="$v.addInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-add-serverUser-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-add-serverUser-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">serverUser already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -26,18 +27,35 @@
 
 import { createServerUser } from '@/assets/js/createMutations/createServerUser'
 import { required } from "vuelidate/lib/validators";
+import { SERVER_USER_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddServerUser',
   validations: {
     addInfos: {
       name: {
-        required
-      }
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.serverUsers.length; index++) {
+            if(name == this.serverUsers[index].name) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
+      },
     },
   },
   props: {
     addInfos: Object
+  },
+  data() {
+    return {
+      serverUsers: [],
+      validName: true
+    }
   },
   methods: {
     reset_infos() {
@@ -67,6 +85,11 @@ export default {
       this.addServerUser();
     },
   },
+  apollo: {
+    serverUsers: {
+      query: SERVER_USER_QUERY
+    }
+  }
 }
 </script>
 

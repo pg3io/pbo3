@@ -37,7 +37,7 @@
       <spinner v-else></spinner>
     </div>
     <add-server-user :addInfos='addInfos'></add-server-user>
-    <edit-server-user v-bind:editInfos="editInfos" ></edit-server-user>
+    <edit-server-user v-bind:editInfos="editInfos" :serverUser='ServerUser' ></edit-server-user>
     <delete-server-user v-bind:editInfos="editInfos" ></delete-server-user>
   </div>
 </template>
@@ -60,6 +60,10 @@ export default {
   data () {
     return {
       serverUsers: [],
+      ServerUser: {
+        id: null,
+        name: null,
+      },
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -112,6 +116,8 @@ export default {
     get_serverUser: function(serverUser) {
       this.editInfos.id = serverUser.id
       this.editInfos.name = serverUser.name
+      this.ServerUser.id = serverUser.id
+      this.ServerUser.name = serverUser.name
     },
   },
   computed: {

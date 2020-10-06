@@ -50,7 +50,7 @@
     <edit-env :editInfos='editAll'></edit-env>
     <edit-type :editInfos='editAll'></edit-type>
     <edit-profile :editInfos='editAll'></edit-profile>
-    <edit-serverUser :editInfos='editAll'></edit-serverUser>
+    <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll'></edit-dc>
     <div class="container-sm linklist">
@@ -543,6 +543,7 @@
         serverUsers: [],
         hoster: null,
         service: null,
+        serverUser: null,
         client: null,
         services: [],
         options: [],
@@ -1004,6 +1005,7 @@
           case "serveruser":
             if ((check = this.filteredServerUser('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.serverUser = check[0];
               this.$bvModal.show('editServerUserModal');
             }
             break;

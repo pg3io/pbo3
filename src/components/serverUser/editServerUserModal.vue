@@ -8,7 +8,8 @@
                 <b-form-input id="ServerUser-edit-name-input" name="ServerUser-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-edit-ServerUser-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-edit-ServerUser-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">serverUser already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -25,18 +26,35 @@
 <script>
 import { updateServerUser } from '@/assets/js/updateMutations/updateServerUser'
 import { required } from "vuelidate/lib/validators";
+import { SERVER_USER_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'EditServerUser',
   validations: {
     editInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.serverUsers.length; index++) {
+            if(name == this.serverUsers[index].name && name != this.serverUser.name) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    serverUser: Object
+  },
+  data() {
+    return {
+      validName: true
+    }
   },
   methods: {
     hideServerModal: function(modal) {
@@ -63,6 +81,11 @@ export default {
       this.editServerUser();
     },
   },
+  apollo: {
+    serverUsers: {
+      query: SERVER_USER_QUERY
+    }
+  }
 }
 </script>
 
