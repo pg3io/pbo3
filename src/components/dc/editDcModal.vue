@@ -9,7 +9,8 @@
                 <b-form-input id="Dc-edit-name-input" name="Dc-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-Dc-edit-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-Dc-edit-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Dc already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -52,28 +53,41 @@
 <script>
 import { updateDc } from '@/assets/js/updateMutations/updateDc'
 import { required } from "vuelidate/lib/validators";
-import {HOSTERS_QUERY} from '@/assets/js/query/graphql'
-
+import { HOSTERS_QUERY } from '@/assets/js/query/graphql'
+import { DC_QUERY_ } from '@/assets/js/query/graphql'
 
 export default {
   name: 'EditDc',
   data () {
     return {
       hosters: [],
+      dcs: [],
+      validName: true,
       editHoster: null
     }
   },
   validations: {
     editInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.dcs.length; index++) {
+            if(name && name.toLowerCase() == this.dcs[index].name.toLowerCase() && name.toLowerCase() != this.dc.name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       location: {},
       hoster: {}
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    dc: Object
   },
   methods: {
     hideServerModal: function(modal) {
@@ -106,6 +120,9 @@ export default {
   apollo: {
     hosters: {
       query: HOSTERS_QUERY
+    },
+    dcs: {
+      query: DC_QUERY_
     }
   }
 }
