@@ -38,7 +38,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.services.length; index++) {
-            if(name == this.services[index].name && name != this.service.name) {
+            if (name && name.toLowerCase() == this.services[index].name.toLowerCase() && name.toLowerCase() != this.service.name.toLowerCase()) {
               this.validName = false
               return false
             }       

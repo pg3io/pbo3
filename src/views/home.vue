@@ -49,7 +49,7 @@
     <edit-os :editInfos='editAll'></edit-os>
     <edit-env :editInfos='editAll' :env='env'></edit-env>
     <edit-type :editInfos='editAll'></edit-type>
-    <edit-profile :editInfos='editAll'></edit-profile>
+    <edit-profile :editInfos='editAll' :profile='profile'></edit-profile>
     <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll'></edit-dc>
@@ -543,6 +543,7 @@
         serverUsers: [],
         hoster: null,
         service: null,
+        profile: null,
         serverUser: null,
         client: null,
         env: null,
@@ -1001,6 +1002,7 @@
           case "profile":
             if ((check = this.filteredProfile('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name, infos: check[0].infos};
+              this.profile = check[0];
               this.$bvModal.show('editProfileModal');
             }
             break;

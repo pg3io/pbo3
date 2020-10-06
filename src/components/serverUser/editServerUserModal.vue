@@ -36,7 +36,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.serverUsers.length; index++) {
-            if(name == this.serverUsers[index].name && name != this.serverUser.name) {
+            if(name && name.toLowerCase() == this.serverUsers[index].name.toLowerCase() && name.toLowerCase() != this.serverUser.name.toLowerCase()) {
               this.validName = false
               return false
             }       

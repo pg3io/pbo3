@@ -37,7 +37,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.serverUsers.length; index++) {
-            if(name == this.serverUsers[index].name) {
+            if(name && name.toLowerCase() == this.serverUsers[index].name.toLowerCase()) {
               this.validName = false
               return false
             }       
@@ -62,8 +62,8 @@ export default {
       this.addInfos.name = null
     },
     hideServerModal: function(modal) {
-      this.$refs[modal].hide();
       this.reset_infos()
+      this.$refs[modal].hide();
     },
     addServerUser() {
       const name = this.addInfos.name;

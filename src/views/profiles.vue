@@ -37,7 +37,7 @@
       <spinner v-else></spinner>
     </div>
     <add-profile :addInfos='addInfos'></add-profile>
-    <edit-profile v-bind:editInfos="editInfos" ></edit-profile>
+    <edit-profile v-bind:editInfos="editInfos" :profile='Profile'></edit-profile>
     <delete-profile v-bind:editInfos="editInfos" ></delete-profile>
   </div>
 </template>
@@ -60,6 +60,11 @@ export default {
   data () {
     return {
       profiles: [],
+      Profile: {
+        id: null,
+        name: null,
+        infos: null
+      },
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -115,6 +120,9 @@ export default {
       this.editInfos.id = profile.id
       this.editInfos.name = profile.name
       this.editInfos.infos = profile.infos
+      this.Profile.id = profile.id
+      this.Profile.name = profile.name
+      this.Profile.infos = profile.infos
     },
   },
   computed: {

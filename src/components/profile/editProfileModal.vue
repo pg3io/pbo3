@@ -9,7 +9,8 @@
                 <b-form-input id="profile-edit-name-input" name="profile-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-edit-profile-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-edit-profile-name">
-                  Name can't be blank.
+                  <span v-if="validName == false">Profile already exists!</span>
+                  <span v-else>Name can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -37,20 +38,37 @@
 <script>
 import { updateProfile } from '@/assets/js/updateMutations/updateProfile'
 import { required } from "vuelidate/lib/validators";
+import { PROFILE_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'EditProfile',
   validations: {
     editInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.profiles.length; index++) {
+            if(name && name.toLowerCase() == this.profiles[index].name.toLowerCase() && name.toLowerCase() != this.profile.name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
       infos: {
       }
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    profile: Object
+  },
+  data(){
+    return {
+      validName: true
+    }
   },
   methods: {
     hideServerModal: function(modal) {
@@ -78,6 +96,11 @@ export default {
       this.editProfile();
     },
   },
+  apollo: {
+    profiles: {
+      query: PROFILE_QUERY
+    }
+  }
 }
 </script>
 

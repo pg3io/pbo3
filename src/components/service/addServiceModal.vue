@@ -39,7 +39,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.services.length; index++) {
-            if(name == this.services[index].name) {
+            if(name && name.toLowerCase() == this.services[index].name.toLowerCase()) {
               this.validName = false
               return false
             }       
@@ -64,8 +64,8 @@ export default {
       this.addInfos.name = null;
     },
     hideServerModal: function(modal) {
-      this.$refs[modal].hide();
       this.reset_infos()
+      this.$refs[modal].hide();
     },
     addService() {
       const name = this.addInfos.name;
