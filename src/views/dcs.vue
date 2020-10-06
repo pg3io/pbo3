@@ -44,8 +44,8 @@
       <spinner v-else></spinner>
     </div>
     <add-dc :addInfos="addInfos"></add-dc>
-    <edit-dc v-bind:editInfos="editInfos" ></edit-dc>
-    <delete-dc v-bind:editInfos="editInfos" ></delete-dc>
+    <edit-dc v-bind:editInfos="editInfos" :dc='Dc'></edit-dc>
+    <delete-dc v-bind:editInfos="editInfos"></delete-dc>
   </div>
 </template>
 
@@ -71,6 +71,12 @@ export default {
       currentSort:'id',
       currentSortDir:'asc',
       editInfos: {
+        id: null,
+        name: null,
+        location: null,
+        hoster: 0
+      },
+      Dc: {
         id: null,
         name: null,
         location: null,
@@ -136,10 +142,10 @@ export default {
       };
     },
     get_dc: function(dc) {
-      this.editInfos.id = dc.id
-      this.editInfos.name = dc.name
-      this.editInfos.location = dc.location
-      this.editInfos.hoster = dc.hoster
+      this.editInfos.id = this.Dc.id = dc.id
+      this.editInfos.name = this.Dc.name = dc.name
+      this.editInfos.location = this.Dc.location = dc.location
+      this.editInfos.hoster = this.Dc.hoster = dc.hoster
     },
   },
   

@@ -52,7 +52,7 @@
     <edit-profile :editInfos='editAll' :profile='profile'></edit-profile>
     <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
-    <edit-dc :editInfos='editAll'></edit-dc>
+    <edit-dc :editInfos='editAll' :dc='dc'></edit-dc>
     <div class="container-sm linklist">
       <div>
         <div id="searchEngine">
@@ -544,6 +544,7 @@
         hoster: null,
         service: null,
         profile: null,
+        dc: null,
         serverUser: null,
         client: null,
         env: null,
@@ -998,7 +999,6 @@
             if ((check = this.filteredType('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
               this.type = check[0];
-
               this.$bvModal.show('editTypeModal');
             }
             break;
@@ -1018,7 +1018,9 @@
             break;
           case "dc":
             if ((check = this.filteredDc('name', temp)).length == 1) {
-              this.editAll = {hoster: (check[0].hoster && check[0].hoster.length) ? check[0].hoster.id : null,};
+              this.editAll = {hoster: check[0].hoster,
+              name: check[0].name, location: check[0].location};
+              this.dc = check[0];
               this.$bvModal.show('editDcModal');
             }
             break;
