@@ -37,7 +37,7 @@
       <spinner v-else></spinner>
     </div>
     <add-service :addInfos='addInfos'></add-service>
-    <edit-service v-bind:editInfos="editInfos" ></edit-service>
+    <edit-service v-bind:editInfos="editInfos" :service='Service' ></edit-service>
     <delete-service v-bind:editInfos="editInfos" ></delete-service>
   </div>
 </template>
@@ -60,6 +60,10 @@ export default {
   data () {
     return {
       services: [],
+      Service: {
+        id: null,
+        name: null
+      },
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -112,6 +116,8 @@ export default {
     get_service: function(service) {
       this.editInfos.id = service.id
       this.editInfos.name = service.name
+      this.Service.id = service.id
+      this.Service.name = service.name
     },
   },
   computed: {

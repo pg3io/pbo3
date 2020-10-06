@@ -51,7 +51,7 @@
     <edit-type :editInfos='editAll'></edit-type>
     <edit-profile :editInfos='editAll'></edit-profile>
     <edit-serverUser :editInfos='editAll'></edit-serverUser>
-    <edit-service :editInfos='editAll'></edit-service>
+    <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll'></edit-dc>
     <div class="container-sm linklist">
       <div>
@@ -542,6 +542,7 @@
         profiles: [],
         serverUsers: [],
         hoster: null,
+        service: null,
         services: [],
         options: [],
         os: [],
@@ -1013,6 +1014,7 @@
           case "service":
             if ((check = this.filteredService('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.service = check[0];
               this.$bvModal.show('editServiceModal');
             }
             break;
