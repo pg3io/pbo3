@@ -37,7 +37,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.envs.length; index++) {
-            if(name == this.envs[index].name) {
+            if(name && name.toLowerCase() == this.envs[index].name.toLowerCase()) {
               this.validName = false
               return false
             }       

@@ -51,7 +51,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.hosters.length; index++) {
-            if(name == this.hosters[index].name) {
+            if(name && name.toLowerCase() == this.hosters[index].name.toLowerCase()) {
               this.validName = false
               return false
             }       

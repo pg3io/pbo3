@@ -8,7 +8,8 @@
                 <b-form-input id="type-edit-name-input" name="type-edit-name-input" v-model="$v.editInfos.name.$model" :state="validateState('name')" aria-describedby="feedback-edit-type-name" autocomplete="off">
                 </b-form-input>
                 <b-form-invalid-feedback id="feedback-edit-type-name">
-                  Type can't be blank.
+                  <span v-if="validName == false">Type already exists!</span>
+                  <span v-else>Type can't be blank</span>
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
@@ -25,18 +26,35 @@
 <script>
 import { updateType } from '@/assets/js/updateMutations/updateType'
 import { required } from "vuelidate/lib/validators";
+import { TYPE_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'EditType',
   validations: {
     editInfos: {
       name: {
-        required
+        required,
+        check_name(name) {
+          for (let index = 0; index < this.types.length; index++) {
+            if(name && name.toLowerCase() == this.types[index].name.toLowerCase() && name.toLowerCase() != this.type.name.toLowerCase()) {
+              this.validName = false
+              return false
+            }       
+          }
+          this.validName = true
+          return true
+        },
       },
     },
   },
   props: {
-    editInfos: Object
+    editInfos: Object,
+    type: Object
+  },
+  data() {
+    return {
+      validName: true
+    }
   },
   methods: {
     hideServerModal: function(modal) {
@@ -63,6 +81,11 @@ export default {
       this.editType();
     },
   },
+  apollo: {
+    types: {
+      query: TYPE_QUERY
+    }
+  }
 }
 </script>
 

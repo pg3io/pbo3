@@ -49,7 +49,7 @@ export default {
         required,
         check_name(name) {
           for (let index = 0; index < this.clients.length; index++) {
-            if(name == this.clients[index].name && name != this.client.name) {
+            if(name && name.toLowerCase() == this.clients[index].name.toLowerCase() && name.toLowerCase() != this.client.name.toLowerCase()) {
               this.validName = false
               return false
             }       

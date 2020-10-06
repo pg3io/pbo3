@@ -48,7 +48,7 @@
     <edit-client :editInfos='editAll' :client='client'></edit-client>
     <edit-os :editInfos='editAll'></edit-os>
     <edit-env :editInfos='editAll' :env='env'></edit-env>
-    <edit-type :editInfos='editAll'></edit-type>
+    <edit-type :editInfos='editAll' :type='type'></edit-type>
     <edit-profile :editInfos='editAll'></edit-profile>
     <edit-serverUser :editInfos='editAll'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
@@ -545,6 +545,7 @@
         service: null,
         client: null,
         env: null,
+        type: null,
         services: [],
         options: [],
         os: [],
@@ -994,6 +995,8 @@
           case "type":
             if ((check = this.filteredType('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
+              this.type = check[0];
+
               this.$bvModal.show('editTypeModal');
             }
             break;
@@ -1446,13 +1449,13 @@
         var result = [], rank = 0;
         for (let i = 0; string && this.types[i]; i++)
           if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase() == string.toLowerCase() 
-          || (opt == "all" || opt == "id") && this.types[i].if && this.types[i].id.toLowerCase() == string.toLowerCase())
-            result[rank++] = this.types[rank];
+          || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase() == string.toLowerCase())
+            result[rank++] = this.types[i];
         if (!rank)
           for (let i = 0; string && this.types[i]; i++)
             if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase().match(string.toLowerCase()) 
-            || (opt == "all" || opt == "id") && this.types[i].if && this.types[i].id.toLowerCase().match(string.toLowerCase()))
-              result[rank++] = this.types[rank];
+            || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase().match(string.toLowerCase()))
+              result[rank++] = this.types[i];
         return result;
       },
       getId_of: function(ofWhat) {
