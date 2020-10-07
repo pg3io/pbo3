@@ -1,5 +1,6 @@
 FROM node:lts-alpine as build-stage
 WORKDIR /app
+ENV VUE_APP_API_URL='http://localhost:1337/graphql'
 COPY package.json ./
 RUN npm install
 COPY . .
