@@ -10,8 +10,7 @@ Vue.use(VueApollo)
 const AUTH_TOKEN = 'apollo-token'
 
 // Http endpoint
-const httpEndpoint = process.env.VUE_APP_API_URL
-console.log(httpEndpoint)
+const httpEndpoint = process.env.VUE_APP_API_URL || 'http://localhost:1337/graphql'
 const authLink = setContext(async (_, { headers }) => {
   // get the authentication token from local storage if it exists
   const token = JSON.parse(localStorage.getItem('apollo-token'))

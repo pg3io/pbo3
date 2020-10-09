@@ -137,6 +137,12 @@ body {
   left: auto;
 }
 
+#archiveTable {
+  position: absolute;
+  top: 160px;
+  left: auto;
+}
+
 #searchEngine{
   z-index: 9;
   top: 20px;
