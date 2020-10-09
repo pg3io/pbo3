@@ -147,16 +147,11 @@
           </b-form-group>
         </div>
         <div class="inputField1">
-          <b-form-group label-cols="3" label="Cred:" label-for="input-horizontal">
-            <b-form-select v-model="editCred">
-              <b-form-select-option  selected :value="editInfos.cred.id">
-                {{ editInfos.cred.name }}
-              </b-form-select-option>
-              <b-form-select-option v-for="cred in creds" v-bind:key="cred.id" :value="cred.id" v-if="cred.id != editInfos.cred.id">
-                {{ cred.name }}
-              </b-form-select-option>
-            </b-form-select>
-          </b-form-group>
+          <b-form-datepicker
+          v-model="$v.editInfos.date.$model"
+          right
+          locale="en-US"
+        ></b-form-datepicker>
         </div>
       </div>
     </div>
@@ -264,7 +259,10 @@ export default {
       profile: {},
       os: {},
       services: {},
-      raid: {}
+      raid: {},
+      date: {},
+      archiveDate: {},
+      archived: {}
     }
   },
   props: {
@@ -359,17 +357,21 @@ export default {
       profile = this.editProfile != null ? this.editProfile : 0,
       server_user = this.editServerUser != null ? this.editServerUser : 0,
       os = this.editOs != null ? this.editOs : 0,
+      date = this.editInfos.date,
+      archiveDate = new Date().toISOString().slice(0,10),
+      archived = false,
       services = this.listServices.length != 0 ? this.listServices : [];
       this.$apollo.mutate({
         mutation: updateServer,
-        variables: {id, hostname, ip, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services}
+        variables: {id, hostname, ip, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived}
       });
       window.location.reload(true);
     },
   },
   apollo: {
     servers: {
-      query: ALL_SERVERS_QUERY
+      query: ALL_SERVERS_QUERY,
+      variables: {"where": {"archived": false}}
     },
     creds: {
       query: CRED_QUERY

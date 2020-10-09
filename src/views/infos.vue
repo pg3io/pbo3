@@ -37,9 +37,23 @@
                         <th>Offer</th>
                         <td v-if="servers[get_server_id].offer">{{ servers[get_server_id].offer.name }} - {{ servers[get_server_id].offer.hoster.name}}</td>
                     </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col p-5 bg-light">
+                <table class="table table-hover mt-5">
+                    <tbody>
+                    <tr v-if="servers[get_server_id].archived == true">
+                        <th>Archived</th>
+                        <td v-if="servers[get_server_id].archived == true">{{servers[get_server_id].archiveDate}}</td>
+                    </tr>
                     <tr>
-                        <th>Infos</th>
-                        <td v-if="servers[get_server_id]">{{ servers[get_server_id].infos }}</td>
+                        <th>Creation</th>
+                        <td v-if="servers[get_server_id].date">{{servers[get_server_id].date}}</td>
+                    </tr>
+                    <tr>
+                        <th>Client</th>
+                        <td v-if="servers[get_server_id].client" class="text-capitalize">{{ servers[get_server_id].client.name }}</td>
                     </tr>
                     <tr v-if="servers[get_server_id]">
                         <th>Services</th>
@@ -47,7 +61,6 @@
                             <span>No services</span>
                         </td>
                         <td v-else >
-
                             <span v-for="(service, index) in servers[get_server_id].services" :key="service.id" >
                                 <span v-if="index == Object.keys(servers[get_server_id].services).length - 1">{{service.name}}</span>
                                 <span v-else>
@@ -56,16 +69,9 @@
                             </span>
                         </td>
                     </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col p-5 bg-light">
-                <h4 class="text-center">Client</h4>
-                <table class="table table-hover mt-5">
-                    <tbody>
                     <tr>
-                        <th>Name</th>
-                        <td v-if="servers[get_server_id].client" class="text-capitalize">{{ servers[get_server_id].client.name }}</td>
+                        <th>Infos</th>
+                        <td v-if="servers[get_server_id]">{{ servers[get_server_id].infos }}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -82,7 +88,7 @@
 </template>
 
 <script>
-import {ALL_SERVERS_QUERY} from '@/assets/js/query/graphql'
+import {ALL_SERVER_QUERY} from '@/assets/js/query/graphql'
 
 export default {
   name: "Servers",
@@ -133,7 +139,8 @@ export default {
   },
   apollo: {
         servers: {
-            query: ALL_SERVERS_QUERY
+            query: ALL_SERVER_QUERY,
+            variables: {"where": {"archived": false}}
         }
     }
 }

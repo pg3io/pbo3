@@ -35,6 +35,7 @@
     </b-modal>
     <add-server :addInfos='editAll' :services='services'></add-server>
     <edit-server :editInfos='editInfos' :server='server' :services='services' :options='options'></edit-server>
+    <archive-server :editInfos='editInfos'></archive-server>
     <add-hoster :addInfos='editAll'></add-hoster>
     <add-client :addInfos='editAll'></add-client>
     <add-os :addInfos='editAll'></add-os>
@@ -56,8 +57,6 @@
     <div class="container-sm linklist">
       <div>
         <div id="searchEngine">
-          <div v-if="loading" id="loader" class="spinner-fast centerDiv">
-          </div>
           <div style="margin-left: 1.25%; margin-right: -1.25%">
             <b-input-group>
               <b-input-group-prepend v-for="tag in tags" :key="tag">
@@ -132,6 +131,12 @@
                 <th v-else @click="sort('env.name', 2)" class="th-sm tableServer">
                   Env
                 </th>
+                <th v-if="currentSort === 'date'" @click="sort('date', 1)" class="th-sm tableServer">
+                  Creation Date<font-awesome-icon class="float-right" icon="sort" />
+                </th>
+                <th v-else @click="sort('date', 1)" class="th-sm tableServer">
+                  Creation Date
+                </th>
                 <th v-if="currentSort === 'os.os_name'" @click="sort('os.os_name', 2)" class="th-sm tableServer">
                   Os<font-awesome-icon class="float-right" icon="sort" />
                 </th>
@@ -145,21 +150,21 @@
                   Edit
                 </th>
                 <th class="th-sm">
-                  Delete
+                  Archive
                 </th>
               </tr>
             </thead>
-            <tbody v-if="hostname() === true">
+            <tbody>
               <tr v-for="server in servers" :key="server.id">
                 <td v-if="server.id">
                   {{server.id}}
                 </td>
-                <td v-else> 
+                <td v-else>
                 </td>
                 <td v-if="server.hostname" class="text-left">
                   {{server.hostname}}
                 </td>
-                <td v-else>
+                <td v-else> 
                 </td>
                 <td v-if="server.ip">
                   {{server.ip}}
@@ -179,75 +184,15 @@
                 <td v-if="server.type && server.type.name">
                   {{server.type.name}}
                 </td>
-                <td v-else>
+                <td v-else> 
                 </td>
                 <td v-if="server.env && server.env.name">
                   {{server.env.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="!server.os">
-                </td>
-                <td v-else-if="server.os.os_name && server.os.os_name === 'windows'">
-                  <font-awesome-icon :icon="['fab', 'windows']" />
-                </td>
-                <td v-else>
-                  <span v-if="server.os && server.os.os_name" :class="icon(server.os.os_name)">
-                  </span>
-                </td>
-                <td>
-                  <router-link :to="{ name: 'Servers', params: { hostname: server.hostname, id: server.id}}">
-                    <b-button size="sm" variant="outline-dark" pill>
-                      <font-awesome-icon icon="info" />
-                    </b-button>
-                  </router-link>
-                </td>
-                <td>
-                  <b-button v-b-modal.editServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="pencil-alt"/>
-                  </b-button>
-                </td>
-                <td>
-                  <b-button @click="delete_modals(server.id)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="trash-alt"/>
-                  </b-button>
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-else-if="client_filter() === true">
-              <tr v-for="server in servers" :key="server.id">
-                <td v-if="server.id">
-                  {{server.id}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.hostname" class="text-left">
-                  {{server.hostname}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server.ip">
-                  {{server.ip}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.client && server.client.name">
-                  {{server.client.name}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.dc && server.dc.hoster && server.dc.hoster.name">
-                  {{server.dc.hoster.name}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.type && server.type.name">
-                  {{server.type.name}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.env && server.env.name">
-                  {{server.env.name}}
+                <td v-if="server.date">
+                  {{server.date}}
                 </td>
                 <td v-else> 
                 </td>
@@ -273,73 +218,8 @@
                   </b-button>
                 </td>
                 <td>
-                  <b-button @click="delete_modals(server.id)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="trash-alt"/>
-                  </b-button>
-                </td>
-              </tr>
-            </tbody>
-            <tbody v-else>
-              <tr v-for="server in servers" :key="server.id">
-                <td v-if="server.id">
-                  {{server.id}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.hostname" class="text-left">
-                  {{server.hostname}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server.ip">
-                  {{server.ip}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server.client && server.client.name">
-                  {{server.client.name}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server.dc && server.dc.hoster && server.dc.hoster.name">
-                  {{server.dc.hoster.name}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server.type && server.type.name">
-                  {{server.type.name}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server.env && server.env.name">
-                  {{server.env.name}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="!server.os"> 
-                </td>
-                <td v-else-if="server.os.os_name &&server.os.os_name === 'windows'">
-                  <font-awesome-icon :icon="['fab', 'windows']" />
-                </td>
-                <td v-else>
-                  <span v-if="server.os && server.os.os_name" :class="icon(server.os.os_name)">
-                  </span>
-                </td>
-                <td>
-                  <router-link :to="{ name: 'Servers', params: { hostname: server.hostname, id: server.id}}">
-                    <b-button size="sm" variant="outline-dark" pill>
-                      <font-awesome-icon icon="info" />
-                    </b-button>
-                  </router-link>
-                </td>
-                <td>
-                  <b-button v-b-modal.editServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="pencil-alt"/>
-                  </b-button>
-                </td>
-                <td>
-                  <b-button @click="delete_modals(server.id)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="trash-alt"/>
+                  <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
+                    <font-awesome-icon icon="archive"/>
                   </b-button>
                 </td>
               </tr>
@@ -432,6 +312,8 @@
   
   import EditServer from "@/components/server/editServerModal.vue"
   import AddServer from "@/components/server/addServerModal.vue"
+  import ArchiveServer from "@/components/server/archiveServerModal.vue"
+
   
   import AddHoster from "@/components/hosters/addHosterModal.vue"
   import EditHoster from "@/components/hosters/editHosterModal.vue"
@@ -465,6 +347,7 @@
     components: { 
       AddServer,
       EditServer,
+      ArchiveServer,
       AddHoster,
       EditHoster,
       AddClient,
@@ -590,7 +473,10 @@
           profile: null,
           server_user: null,
           os: null,
-          services: null
+          services: null,
+          date: null,
+          archiveDate: null,
+          archived: false
         },
         tag: "",
         tagSave: "",
@@ -771,6 +657,8 @@
         this.editInfos.os = server.os != null ? server.os : 0;
         this.editInfos.services = server.services;
         this.editAll = this.editInfos
+        this.editInfos.date = server.date != null ? server.date : new Date().toISOString().slice(0,10)
+        this.editInfos.archiveDate = new Date().toISOString().slice(0,10)
         this.getOptions(this.server);
         this.selectOptions();
       },
@@ -792,6 +680,7 @@
         this.addInfos.offer = null
         this.addInfos.services = null
         this.listServices = []
+        this.addInfos.date = new Date().toISOString().slice(0,10)
 
       },
       hideModal: function(modal) {
@@ -1059,8 +948,12 @@
             this.editMutations();
             break;
           case "delete":
-            if (this.tags[1])
-              return this.delete_modals(this.capitalizeFirstLetter(this.tags[1]))
+            if (this.tags[1] && this.tags[1] == 'server') {
+              this.getId_of('server')
+              this.$bvModal.show('archiveServerModal')
+            }
+            else if (this.tags[1])
+              this.delete_modals(this.capitalizeFirstLetter(this.tags[1]))
             this.inputSearch = "";
             break;
           case 'show':
@@ -1510,8 +1403,10 @@
           case 'server':
             if ((check = this.filteredServer("hostname", this.tags[rank], 1)).length == 1 || 
             (check = this.filteredServer("ip", this.tags[rank], 1)).length == 1 || 
-            (check = this.filteredServer("id", this.tags[rank], 1)).length == 1)
+            (check = this.filteredServer("id", this.tags[rank], 1)).length == 1) {
               finalId = check[0].id;
+              this.get_all_infos(check[0])
+            }
             break;
           case 'serveruser':
             if ((check = this.filteredServerUser("name", this.tags[rank])).length == 1 
@@ -1559,7 +1454,8 @@
     },
     apollo: {
       servers: {
-        query: ALL_SERVERS_QUERY
+        query: ALL_SERVERS_QUERY,
+        variables: {"where": {"archived": false}}
       },
       creds: {
         query: CRED_QUERY

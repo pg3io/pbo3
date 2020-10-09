@@ -32,6 +32,15 @@ const routes = [
     }
   },
   {
+    path: '/archives',
+    name: 'Archives',
+    component: () => import('@/views/archives.vue'),
+    meta: { 
+      title: 'PBO3 - Archives',
+      requiresAuth: true 
+    }
+  },
+  {
     path: '/clients',
     name: 'Client',
     component: () => import('@/views/clients.vue'),

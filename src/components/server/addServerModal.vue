@@ -121,13 +121,11 @@
           </b-form-group>
         </div>
         <div class="inputField1">
-          <b-form-group label-cols="3" label="Cred" label-for="input-horizontal">
-            <b-form-select v-model="$v.addInfos.cred.$model">
-              <b-form-select-option v-for="cred in creds" v-bind:key="cred.id" :value="cred.id">
-                {{ cred.name }}
-              </b-form-select-option>
-            </b-form-select>
-          </b-form-group>
+          <b-form-datepicker
+          v-model="$v.addInfos.date.$model"
+          right
+          locale="en-US"
+        ></b-form-datepicker>
         </div>
       </div>
     </div>
@@ -235,7 +233,10 @@ export default {
       profile: {},
       os: {},
       services: {},
-      raid: {}
+      raid: {},
+      date: {},
+      archiveDate: {},
+      archived: {}
     }
   },
   props: {
@@ -277,6 +278,7 @@ export default {
       this.addInfos.server_user = null
       this.addInfos.os = null
       this.listServices = []
+      this.addInfos.date = new Date().toISOString().slice(0,10)
       this.fillOptions()
     },
     addToList() {
@@ -298,7 +300,7 @@ export default {
       ip = this.addInfos.ip,
       infos = this.addInfos.infos != null ? this.addInfos.infos : ' ',
       client = this.addInfos.client != null ? this.addInfos.client : 0,
-      cred = this.addInfos.cred != null ? this.addInfos.cred : 0,
+      // cred = this.addInfos.cred != null ? this.addInfos.cred : 0,
       type = this.addInfos.type != null ? this.addInfos.type : 0,
       env = this.addInfos.env != null ? this.addInfos.env : 0,
       dc = this.addInfos.dc != null ? this.addInfos.dc : 0,
@@ -306,11 +308,13 @@ export default {
       raid = this.addInfos.raid,
       offer = this.addInfos.offer != null ? this.addInfos.offer : 0,
       server_user = this.addInfos.server_user != null ? this.addInfos.server_user : 0,
+      cred = 0,
       os = this.addInfos.os != null ? this.addInfos.os : 0,
+      date = this.addInfos.date,
       services = this.addInfos.services != null ? this.listServices : [];
       this.$apollo.mutate({
         mutation: createServer,
-        variables: {hostname, ip, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services}
+        variables: {hostname, ip, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date}
       });
       window.location.reload(true);
     },
@@ -323,13 +327,13 @@ export default {
       if (this.$v.addInfos.$anyError) {
         return;
       }
-
       this.addServer();
     },
   },
   apollo: {
     servers: {
-      query: ALL_SERVERS_QUERY
+      query: ALL_SERVERS_QUERY,
+      variables: {"where": {"archived": false}}
     },
     creds: {
       query: CRED_QUERY

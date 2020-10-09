@@ -17,6 +17,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { faFolderOpen } from '@fortawesome/free-solid-svg-icons'
 import { faHome } from '@fortawesome/free-solid-svg-icons'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faArchive } from '@fortawesome/free-solid-svg-icons'
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons'
 import { faInfo } from '@fortawesome/free-solid-svg-icons'
@@ -39,6 +40,8 @@ library.add(faSort)
 library.add(faWindows)
 library.add(faEye)
 library.add(faEyeSlash)
+library.add(faArchive)
+
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('multiselect', Multiselect)

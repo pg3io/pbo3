@@ -1,10 +1,13 @@
 import gql from 'graphql-tag'
 
-const ALL_SERVERS_QUERY = gql`
-query All {
+const ALL_SERVER_QUERY = gql`
+query allServer {
   servers {
     id,
     hostname,
+    date,
+    archiveDate,
+    archived,
     offer {
       id,
       name,
@@ -75,6 +78,162 @@ query All {
   }
 }
 `
+
+const ALL_SERVERS_QUERY = gql`
+query All ($where: JSON!) {
+  servers(where: $where) {
+    id,
+    hostname,
+    date,
+    archiveDate,
+    archived,
+    offer {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    ip,
+    raid,
+    infos,
+    client {
+      id,
+      name,
+      infos
+    },
+    os {
+      id,
+      os_name,
+      os_version,
+      version_name
+    },
+    cred {
+      id,
+      name,
+      auth,
+      token_hash,
+      url_admin_custom,
+      login,
+      password_hash,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    type {
+      id,
+      name
+    },
+    env {
+      id,
+      name
+    },
+    dc {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    }
+    profile {
+      id,
+      name,
+      infos
+    },
+    server_user {
+      id,
+      name
+    },
+    services {
+      id,
+      name
+    }
+  }
+}
+`
+const ARCHIVED_SERVERS_QUERY = gql`
+query archived ($where: JSON!) {
+  servers(where: $where) {
+    id,
+    hostname,
+    date,
+    archiveDate,
+    archived,
+    offer {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    ip,
+    raid,
+    infos,
+    client {
+      id,
+      name,
+      infos
+    },
+    os {
+      id,
+      os_name,
+      os_version,
+      version_name
+    },
+    cred {
+      id,
+      name,
+      auth,
+      token_hash,
+      url_admin_custom,
+      login,
+      password_hash,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    type {
+      id,
+      name
+    },
+    env {
+      id,
+      name
+    },
+    dc {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    }
+    profile {
+      id,
+      name,
+      infos
+    },
+    server_user {
+      id,
+      name
+    },
+    services {
+      id,
+      name
+    }
+  }
+}`
 
 const SERVER_QUERY = gql`
 query Server($id: ID!) {
@@ -281,6 +440,7 @@ query Services {
 
 export {
   ALL_SERVERS_QUERY,
+  ALL_SERVER_QUERY,
   SERVER_QUERY,
   CRED_QUERY,
   HOSTERS_QUERY,
@@ -293,5 +453,6 @@ export {
   DC_QUERY,
   DC_QUERY_,
   OFFER_QUERY,
-  SERVICES_QUERY
+  SERVICES_QUERY,
+  ARCHIVED_SERVERS_QUERY
 }
