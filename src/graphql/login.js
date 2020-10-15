@@ -12,10 +12,10 @@ export const LOGGED_IN_USER = gql`
 export const LOGIN_USER = gql`
 mutation login ($identifier: String! $password: String! ){
   login(input: {
-    identifier: $email,
+    identifier: $identifier,
     password: $password
     }) {
-    token
+    jwt
   }
 }
 `
