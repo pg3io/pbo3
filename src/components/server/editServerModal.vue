@@ -147,21 +147,34 @@
           </b-form-group>
         </div>
         <div class="inputField1">
-          <b-form-datepicker
-          v-model="$v.editInfos.date.$model"
-          right
-          locale="en-US"
-        ></b-form-datepicker>
+          <b-form-group label-cols="3" label="Admin user" label-for="input-horizontal">
+            <b-form-input id="url_admin-input-edit" name="url_admin-input" v-model="$v.editInfos.user_admin.$model" :state="validateEdit('user_admin')" aria-describedby="input-url_admin-edit-feedback" autocomplete="off">
+            </b-form-input>
+            <b-form-invalid-feedback id="input-url_admin-edit-feedback">
+              <span>Hostname can't be blank!</span>
+            </b-form-invalid-feedback>
+          </b-form-group>
         </div>
       </div>
     </div>
     <div class="inputLine">
-      <div class="inputRaid">
-        <label class="labelRaid" for="">
-          Raid
-        </label>
-        <b-form-checkbox class="raidButton" v-model="$v.editInfos.raid.$model" name="raid-button" switch size="lg">
-        </b-form-checkbox>
+      <div class="inputField">
+        <b-form-group label-cols="3" label="Creation Date" label-for="input-horizontal">
+          <b-form-datepicker
+            v-model="$v.editInfos.date.$model"
+            right
+            locale="en-US"
+          ></b-form-datepicker>
+        </b-form-group>
+        </div>
+      <div class="inputField1">
+        <div class="inputRaid">
+          <label class="labelRaid" for="">
+            Raid
+          </label>
+          <b-form-checkbox class="raidButton" v-model="$v.editInfos.raid.$model" name="raid-button" switch size="lg">
+          </b-form-checkbox>
+        </div>
       </div>
     </div>
     <div>
@@ -220,6 +233,9 @@ export default {
           this.validHostname = true
           return true
         },
+      },
+      user_admin: {
+        required
       },
       ip: {
         required,
@@ -296,7 +312,10 @@ export default {
       listServices: [],
       validHostname: true,
       validIp: true,
-      validFormat: true
+      validFormat: true,
+      hostname: '',
+      ip: '',
+      user_admin: ''
     }
   },
   methods: {
@@ -317,6 +336,7 @@ export default {
       this.editOs = this.editInfos.os.id;
       this.getOptions(this.$parent.server);
       this.hostname = this.editInfos.hostname;
+      this.user_admin = this.editInfos.user_admin;
       this.ip = this.editInfos.ip;
     },
     editToList() {
@@ -346,6 +366,7 @@ export default {
       const id = this.editInfos.id,
       hostname = this.editInfos.hostname,
       ip = this.editInfos.ip,
+      user_admin = this.editInfos.user_admin,
       infos = this.editInfos.infos != null ? this.editInfos.infos : '',
       raid = this.editInfos.raid,
       offer = this.editOffer != null ? this.editOffer : 0,
@@ -363,7 +384,7 @@ export default {
       services = this.listServices.length != 0 ? this.listServices : [];
       this.$apollo.mutate({
         mutation: updateServer,
-        variables: {id, hostname, ip, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived}
+        variables: {id, hostname, ip, user_admin, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived}
       });
       window.location.reload(true);
     },

@@ -121,21 +121,35 @@
           </b-form-group>
         </div>
         <div class="inputField1">
-          <b-form-datepicker
-          v-model="$v.addInfos.date.$model"
-          right
-          locale="en-US"
-        ></b-form-datepicker>
+          <b-form-group label-cols="3" label="Admin user" label-for="input-horizontal">
+            <b-form-input id="user_admin-input" name="user_admin-input" v-model="$v.addInfos.user_admin.$model" :state="validateState('user_admin')" aria-describedby="input-url_admin-live-feedback" autocomplete="off">
+            </b-form-input>
+            <b-form-invalid-feedback id="input-url_admin-live-feedback">
+              <span>Hostname can't be blank</span>
+            </b-form-invalid-feedback>
+          </b-form-group>
         </div>
+        
       </div>
     </div>
     <div class="inputLine">
-      <div class="inputRaid">
-        <label class="labelRaid" for="">
-          Raid
-        </label>
-        <b-form-checkbox class="raidButton" v-model="$v.addInfos.raid.$model" name="raid-button" switch size="lg">
-        </b-form-checkbox>
+      <div class="inputField">
+        <b-form-group label-cols="3" label="Creation Date" label-for="input-horizontal">
+          <b-form-datepicker
+            v-model="$v.addInfos.date.$model"
+            right
+            locale="en-US"
+          ></b-form-datepicker>
+        </b-form-group>
+      </div>
+      <div class="inputField1">
+        <div class="inputRaid">
+          <label class="labelRaid" for="">
+            Raid
+          </label>
+          <b-form-checkbox class="raidButton" v-model="$v.addInfos.raid.$model" name="raid-button" switch size="lg">
+          </b-form-checkbox>
+        </div>
       </div>
     </div>
     <div>
@@ -194,6 +208,9 @@ export default {
           this.validHostname = true
           return true
         },
+      },
+      user_admin: {
+        required
       },
       ip: {
         required,
@@ -276,6 +293,7 @@ export default {
       this.addInfos.dc = null
       this.addInfos.profile = null
       this.addInfos.server_user = null
+      this.addInfos.user_admin = null,
       this.addInfos.os = null
       this.listServices = []
       this.addInfos.date = new Date().toISOString().slice(0,10)
@@ -300,7 +318,7 @@ export default {
       ip = this.addInfos.ip,
       infos = this.addInfos.infos != null ? this.addInfos.infos : ' ',
       client = this.addInfos.client != null ? this.addInfos.client : 0,
-      // cred = this.addInfos.cred != null ? this.addInfos.cred : 0,
+      user_admin = this.addInfos.user_admin,
       type = this.addInfos.type != null ? this.addInfos.type : 0,
       env = this.addInfos.env != null ? this.addInfos.env : 0,
       dc = this.addInfos.dc != null ? this.addInfos.dc : 0,
@@ -314,13 +332,13 @@ export default {
       services = this.addInfos.services != null ? this.listServices : [];
       this.$apollo.mutate({
         mutation: createServer,
-        variables: {hostname, ip, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date}
+        variables: {hostname, ip, user_admin, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date}
       });
       window.location.reload(true);
     },
     validateState(name) {
-    const { $dirty, $error } = this.$v.addInfos[name];
-    return $dirty ? !$error : null;
+      const { $dirty, $error } = this.$v.addInfos[name];
+      return $dirty ? !$error : null;
     },
     onSubmit() {
       this.$v.addInfos.$touch();
