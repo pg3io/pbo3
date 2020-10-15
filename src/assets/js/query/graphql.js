@@ -8,6 +8,7 @@ query allServer {
     date,
     archiveDate,
     archived,
+    user_admin,
     offer {
       id,
       name,
@@ -87,6 +88,7 @@ query All ($where: JSON!) {
     date,
     archiveDate,
     archived,
+    user_admin,
     offer {
       id,
       name,

@@ -1,7 +1,7 @@
 import gql from 'graphql-tag'
 
 export const updateServer = gql`
-mutation updateServer ($id: ID!, $hostname: String!, $ip: String!, $infos: String!, $raid: Boolean!, $offer: ID!, $client: ID!, $cred: ID!, $type: ID!, $env: ID!, $dc: ID!, $profile: ID!, $server_user: ID!, $os: ID!, $services: [ID], $date: Date!, $archiveDate: Date!, $archived: Boolean!){
+mutation updateServer ($id: ID!, $hostname: String!, $ip: String!, $user_admin: String!, $infos: String!, $raid: Boolean!, $offer: ID!, $client: ID!, $cred: ID!, $type: ID!, $env: ID!, $dc: ID!, $profile: ID!, $server_user: ID!, $os: ID!, $services: [ID], $date: Date!, $archiveDate: Date!, $archived: Boolean!){
     updateServer(input: {
         where: {
       id: $id
@@ -9,6 +9,7 @@ mutation updateServer ($id: ID!, $hostname: String!, $ip: String!, $infos: Strin
     data: {
       hostname: $hostname
       ip: $ip
+      user_admin: $user_admin
       infos: $infos
       raid: $raid
       offer: $offer
