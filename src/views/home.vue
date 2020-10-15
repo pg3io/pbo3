@@ -379,6 +379,9 @@
           ip: {
             required,
           },
+          user_admin: {
+            required
+          },
           infos: {},
           offer: {},
           client: {},
@@ -395,6 +398,7 @@
       editInfos: {
         hostname: {required},
         ip: {required},
+        user_admin: {required},
         infos: {},
         offer: {},
         client: {},
@@ -446,6 +450,7 @@
           id: null,
           hostname: null,
           ip: null,
+          user_admin: null,
           infos: null,
           raid: false,
           offer: 0,
@@ -462,6 +467,7 @@
         addInfos: {
           hostname: null,
           ip: null,
+          user_admin: null,
           infos: null,
           raid: false,
           offer: null,
@@ -643,6 +649,7 @@
         this.server = new Object(server);
         this.editInfos.id = this.server.id;
         this.editInfos.hostname = server.hostname;
+        this.editInfos.user_admin = server.user_admin;
         this.editInfos.ip = server.ip;
         this.editInfos.infos = server.infos || "";
         this.editInfos.raid = server.raid || false;
@@ -656,14 +663,15 @@
         this.editInfos.server_user = server.server_user != null ? server.server_user : 0;
         this.editInfos.os = server.os != null ? server.os : 0;
         this.editInfos.services = server.services;
-        this.editAll = this.editInfos
         this.editInfos.date = server.date != null ? server.date : new Date().toISOString().slice(0,10)
         this.editInfos.archiveDate = new Date().toISOString().slice(0,10)
         this.getOptions(this.server);
         this.selectOptions();
+        this.editAll = this.editInfos
       },
       reset_infos() {
         this.addInfos.hostname = null
+        this.addInfos.user_admin = null
         this.addInfos.ip = ''
         this.addInfos.id_host = null
         this.addInfos.raid = false

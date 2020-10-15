@@ -70,6 +70,10 @@
                         </td>
                     </tr>
                     <tr>
+                        <th>Admin</th>
+                        <td v-if="servers[get_server_id].user_admin">{{servers[get_server_id].user_admin}}</td>
+                    </tr>
+                    <tr>
                         <th>Infos</th>
                         <td v-if="servers[get_server_id]">{{ servers[get_server_id].infos }}</td>
                     </tr>
