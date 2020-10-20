@@ -36,6 +36,7 @@ const routes = [
     name: 'Suppliers',
     component: () => import('@/views/suppliers.vue'),
     meta: { 
+      title: 'PBO3 - Suppliers',
       requiresAuth: true 
     }
   },
