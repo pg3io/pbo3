@@ -127,7 +127,15 @@ export default {
 
     }
   },
+  mounted() {
+    this.setTitle();
+  },
   methods: {
+    setTitle() {
+      var path = this.$route.path.split("/")
+      var supplier = path[2]
+      document.title = 'PBO3 - ' + supplier
+    },
     icon:function(name){
         return 'fl-' + name
       },
