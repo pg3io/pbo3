@@ -137,6 +137,11 @@ body {
   left: auto;
 }
 
+#supplierTable {
+  margin-top: 120px;
+  left: auto;
+}
+
 #archiveTable {
   position: absolute;
   top: 160px;

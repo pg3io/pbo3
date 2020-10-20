@@ -24,7 +24,11 @@ query allServer {
     client {
       id,
       name,
-      infos
+      infos,
+      supplier {
+        id,
+        name
+      }
     },
     os {
       id,
@@ -104,7 +108,11 @@ query All ($where: JSON!) {
     client {
       id,
       name,
-      infos
+      infos,
+      supplier {
+        id,
+        name
+      }
     },
     os {
       id,
@@ -182,7 +190,11 @@ query archived ($where: JSON!) {
     client {
       id,
       name,
-      infos
+      infos,
+      supplier {
+        id,
+        name
+      }
     },
     os {
       id,
@@ -257,7 +269,11 @@ query Server($id: ID!) {
     client {
       id,
       name,
-      infos
+      infos,
+      supplier {
+        id,
+        name
+      }
     },
     os {
       id,
@@ -440,6 +456,15 @@ query Services {
 }
 `
 
+const SUPPLIER_QUERY = gql`
+query Supplier {
+  suppliers {
+    id,
+    name
+  }
+}
+`
+
 export {
   ALL_SERVERS_QUERY,
   ALL_SERVER_QUERY,
@@ -456,5 +481,6 @@ export {
   DC_QUERY_,
   OFFER_QUERY,
   SERVICES_QUERY,
-  ARCHIVED_SERVERS_QUERY
+  ARCHIVED_SERVERS_QUERY,
+  SUPPLIER_QUERY
 }

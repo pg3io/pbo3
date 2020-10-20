@@ -24,6 +24,22 @@ const routes = [
     }
   },
   {
+    path: '/suppliers/:name',
+    name: 'SuppliersTable',
+    component: () => import('@/views/suppliersTable.vue'),
+    meta: { 
+      requiresAuth: true 
+    }
+  },
+  {
+    path: '/suppliers',
+    name: 'Suppliers',
+    component: () => import('@/views/suppliers.vue'),
+    meta: { 
+      requiresAuth: true 
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/login.vue'),

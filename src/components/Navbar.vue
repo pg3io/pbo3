@@ -59,6 +59,11 @@
                 Service
               </router-link>
             </b-dropdown-item>
+            <b-dropdown-item @click="go_to('/suppliers')">
+              <router-link class="rlink" tag="a" to="/suppliers">
+                Suppliers
+              </router-link>
+            </b-dropdown-item>
             <b-dropdown-item @click="go_to('/archives')">
               <router-link class="rlink" tag="a" to="/archives">
                 Archives
