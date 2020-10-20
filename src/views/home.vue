@@ -2,34 +2,37 @@
   <div id='mainLinkDiv'>
     <b-modal id="addModal" ref="add" hide-footer title="Add:" :no-close-on-backdrop=true :no-close-on-esc=true>
       <div class="addButton">
-        <b-button class="addButton" v-b-modal.addServerModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="addButton" v-b-modal.addServerModal variant="outline-dark" @click="hideModal('add', 'server')">
           Server
         </b-button>
       </div>
       <div class="addButton">
-        <b-button class="buttonGroupLeft" v-b-modal.addHosterModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addHosterModal variant="outline-dark" @click="hideModal('add', 'hoster')">
           Hoster
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addClientModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addClientModal variant="outline-dark" @click="hideModal('add', 'client')">
           Client
         </b-button>
-        <b-button class="buttonGroupLeft" v-b-modal.addOsModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addOsModal variant="outline-dark" @click="hideModal('add', 'os')">
           Os
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addEnvModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addEnvModal variant="outline-dark" @click="hideModal('add', 'env')">
           Env
         </b-button>
-        <b-button class="buttonGroupLeft" v-b-modal.addTypeModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addTypeModal variant="outline-dark" @click="hideModal('add', 'type')">
           Type
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addProfileModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addProfileModal variant="outline-dark" @click="hideModal('add', 'profile')">
           Profile
         </b-button>
-        <b-button class="buttonGroupLeft" v-b-modal.addServerUserModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupLeft" v-b-modal.addServerUserModal variant="outline-dark" @click="hideModal('add', 'serverUser')">
           Server User
         </b-button>
-        <b-button class="buttonGroupRight" v-b-modal.addDcModal variant="outline-dark" @click="hideModal('add')">
+        <b-button class="buttonGroupRight" v-b-modal.addDcModal variant="outline-dark" @click="hideModal('add', 'dc')">
           Dc
+        </b-button>
+        <b-button class="buttonGroupLeft" v-b-modal.addSupplierModal variant="outline-dark" @click="hideModal('add', 'supplier')">
+          Supplier
         </b-button>
       </div>
     </b-modal>
@@ -40,6 +43,7 @@
     <add-client :addInfos='editAll'></add-client>
     <add-os :addInfos='editAll'></add-os>
     <add-env :addInfos='editAll'></add-env>
+    <add-supplier :addInfos='editAll'></add-supplier>
     <add-type :addInfos='editAll'></add-type>
     <add-profile :addInfos='editAll'></add-profile>
     <add-serverUser :addInfos='editAll'></add-serverUser>
@@ -49,6 +53,7 @@
     <edit-client :editInfos='editAll' :client='client'></edit-client>
     <edit-os :editInfos='editAll'></edit-os>
     <edit-env :editInfos='editAll' :env='env'></edit-env>
+    <edit-supplier :editInfos='editAll' :supplier='supplier'></edit-supplier>
     <edit-type :editInfos='editAll' :type='type'></edit-type>
     <edit-profile :editInfos='editAll' :profile='profile'></edit-profile>
     <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
@@ -270,6 +275,8 @@
   import { SERVICES_QUERY } from '@/assets/js/query/graphql'
   import { TYPE_QUERY } from '@/assets/js/query/graphql'
   import { HOSTERS_QUERY } from '@/assets/js/query/graphql'
+  import { SUPPLIER_QUERY } from '@/assets/js/query/graphql'
+
 
     /* Delete mutations */
   import { deleteClient } from '@/assets/js/deleteMutations/deleteClient'
@@ -283,6 +290,8 @@
   import { deleteServerUser } from '@/assets/js/deleteMutations/deleteServerUser'
   import { deleteType } from '@/assets/js/deleteMutations/deleteType'
   import { deleteService } from '@/assets/js/deleteMutations/deleteService'
+  import { deleteSupplier } from '@/assets/js/deleteMutations/deleteSupplier'
+
 
     /* Update mutations */
   import { updateClient } from '@/assets/js/updateMutations/updateClient'
@@ -295,6 +304,7 @@
   import { updateServer } from '@/assets/js/updateMutations/updateServer'
   import { updateServerUser } from '@/assets/js/updateMutations/updateServerUser'
   import { updateType } from '@/assets/js/updateMutations/updateType'
+  import { updateSupplier } from '@/assets/js/updateMutations/updateSupplier'
 
     /* Create mutations */
   import { createClient } from '@/assets/js/createMutations/createClient'
@@ -307,6 +317,8 @@
   import { createServer } from '@/assets/js/createMutations/createServer'
   import { createServerUser } from '@/assets/js/createMutations/createServerUser'
   import { createType } from '@/assets/js/createMutations/createType'
+  import { createSupplier } from '@/assets/js/createMutations/createSupplier'
+
   
   import { required } from "vuelidate/lib/validators";
   
@@ -339,6 +351,9 @@
   import AddDc from "@/components/dc/addDcModal.vue"
   import EditDc from "@/components/dc/editDcModal.vue"
 
+  import AddSupplier from "@/components/supplier/addSupplierModal.vue"
+  import EditSupplier from "@/components/supplier/editSupplierModal.vue"
+
   import AddService from "@/components/service/addServiceModal.vue"
   import EditService from "@/components/service/editServiceModal.vue"
 
@@ -366,6 +381,8 @@
       EditDc,
       AddService,
       EditService,
+      AddSupplier,
+      EditSupplier
     },
     mounted() {
       this.timeout();
@@ -426,6 +443,8 @@
         types: [],
         envs: [],
         dcs: [],
+        suppliers: [],
+        supplier: null,
         profiles: [],
         serverUsers: [],
         hoster: null,
@@ -499,7 +518,8 @@
           'hostname',
           'client',
           'os',
-          'hoster'
+          'hoster',
+          'supplier'
         ],
         lock: false,
         suggests: {
@@ -519,7 +539,8 @@
             'Server',
             'ServerUser',
             'Dc',
-            'Service'
+            'Service',
+            'Supplier'
           ],
           search: [
             'id',
@@ -542,7 +563,8 @@
             'Profile',
             'Server',
             'ServerUser',
-            'Type'
+            'Type',
+            'Supplier'
           ],
           deleteFunction: [
             deleteClient,
@@ -555,7 +577,8 @@
             deleteServer,
             deleteServerUser,
             deleteType,
-            deleteService
+            deleteService,
+            deleteSupplier
           ],
           updateFunction: [
             updateClient,
@@ -567,7 +590,8 @@
             updateProfile,
             updateServer,
             updateServerUser,
-            updateType
+            updateType,
+            updateSupplier
           ],
           createFunction: [
             createClient,
@@ -579,7 +603,8 @@
             createProfile,
             createServer,
             createServerUser,
-            createType
+            createType,
+            createSupplier
           ]
         },
         hide_suggest: true,
@@ -691,9 +716,13 @@
         this.addInfos.date = new Date().toISOString().slice(0,10)
 
       },
-      hideModal: function(modal) {
+      hideModal: function(modal, type) {
         this.editAll = this.addInfos
         this.$refs[modal].hide();
+        this.tags.push('add');
+        this.tags.push(type);
+        this.addMutations();
+        this.tags = []
       },
       deleteServer() {
         const id = this.id_server
@@ -846,6 +875,10 @@
             this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addServiceModal');
             break;
+          case "supplier":
+            this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
+            this.$bvModal.show('addSupplierModal');
+            break;
           default:
             this.$refs["add"].show();
             break;
@@ -858,7 +891,8 @@
           return this.inputSearch = "";
         if (this.tags[this.tags.length - 1].length < 2) this.tags.pop();
         temp = this.tags[this.tags.length - 1] == temp ? this.inputSearch : this.tags[this.tags.length - 1];
-        switch (this.tags[1]) {
+        if (this.tags[this.tags.length - 1] == this.inputSearch) this.inputSearch = ''
+        switch (this.tags[1].toLowerCase()) {
           case "server":
             if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
               this.get_all_infos(check[0]);
@@ -926,6 +960,13 @@
               this.editAll = {id: check[0].id, name: check[0].name};
               this.service = check[0];
               this.$bvModal.show('editServiceModal');
+            }
+            break;
+          case "supplier":
+            if ((check = this.filteredSupplier('name', this.tags[this.tags.length - 1])).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name};
+              this.supplier = check[0];
+              this.$bvModal.show('editSupplierModal');
             }
             break;
           default:
@@ -1226,6 +1267,19 @@
               result[rank++] = this.services[i];
         return result;
       },
+      filteredSupplier: function(opt, string) {
+        var rank = 0, i = -1, result = [];
+        for (i = 0; string && this.suppliers[i]; i++)
+          if ((opt == "all" || opt == "name") && this.suppliers[i].name && this.suppliers[i].name.toLowerCase() == string.toLowerCase() ||
+          (opt == "all" || opt == "id") && this.suppliers[i].id && this.suppliers[i].id.toLowerCase() == string.toLowerCase())
+            result[rank++] = this.suppliers[i];
+        if (!rank)
+          for (i = 0; string && this.clients[i]; i++)
+            if ((opt == "all" || opt == "name") && this.suppliers[i].name && this.suppliers[i].name.toLowerCase().match(string.toLowerCase()) ||
+            (opt == "all" || opt == "id") && this.suppliers[i].id && this.suppliers[i].id.toLowerCase().match(string))
+              result[rank++] = this.suppliers[i];
+        return result;
+      },
       filteredDc: function(opt, string) {
         var rank = 0, i = -1, result = [];
         for (i = 0; string && this.dcs[i]; i++)
@@ -1497,6 +1551,9 @@
       },
       hosters: {
         query: HOSTERS_QUERY
+      },
+      suppliers: {
+        query: SUPPLIER_QUERY
       }
     }
   }

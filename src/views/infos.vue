@@ -37,6 +37,14 @@
                         <th>Offer</th>
                         <td v-if="servers[get_server_id].offer">{{ servers[get_server_id].offer.name }} - {{ servers[get_server_id].offer.hoster.name}}</td>
                     </tr>
+                    <tr>
+                        <th>Supplier</th>
+                        <td v-if="servers[get_server_id].client.supplier">
+                            <router-link :to="{ name: 'SuppliersTable', params: { name: servers[get_server_id].client.supplier.name, id: servers[get_server_id].client.supplier.id}}">
+                                {{ servers[get_server_id].client.supplier.name }}
+                            </router-link>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
