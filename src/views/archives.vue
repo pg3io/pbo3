@@ -71,60 +71,60 @@
             </thead>
             <tbody>
               <tr v-for="server in filteredServers" :key="server.id">
-                <td v-if="server.id">
+                <td v-if="server">
                   {{server.id}}
                 </td>
                 <td v-else>
                 </td>
-                <td v-if="server.hostname" class="text-left">
+                <td v-if="server" class="text-left">
                   {{server.hostname}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.ip">
+                <td v-if="server">
                   {{server.ip}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.client && server.client.name">
+                <td v-if="server && server.client">
                   {{server.client.name}}
                 </td>
                 <td v-else>
                 </td>
-                <td v-if="server.dc && server.dc.hoster && server.dc.hoster.name">
+                <td v-if="server && server.dc && server.dc.hoster">
                   {{server.dc.hoster.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.type && server.type.name">
+                <td v-if="server && server.type">
                   {{server.type.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.env && server.env.name">
+                <td v-if="server && server.env">
                   {{server.env.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.date">
+                <td v-if="server">
                   {{server.date}}
                 </td>
                 <td v-else> 
-                <td v-if="server.archiveDate">
+                <td v-if="server">
                   {{server.archiveDate}}
                 </td>
                 <td v-else> 
                 </td>
                 <td v-if="!server.os"> 
                 </td>
-                <td v-else-if="server.os.os_name && server.os.os_name === 'windows'">
+                <td v-else-if="server && server.os && server.os.os_name === 'windows'">
                   <font-awesome-icon :icon="['fab', 'windows']" />
                 </td>
                 <td v-else>
-                  <span v-if="server.os && server.os.os_name" :class="icon(server.os.os_name)">
+                  <span v-if="server && server.os && server.os.os_name" :class="icon(server.os.os_name)">
                   </span>
                 </td>
-                <td>
+                <td v-if="server">
                   <router-link :to="{ name: 'Servers', params: { hostname: server.hostname, id: server.id}}">
                     <b-button size="sm" variant="outline-dark" pill>
                       <font-awesome-icon icon="info" />

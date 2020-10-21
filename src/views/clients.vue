@@ -20,18 +20,23 @@
           <tr>
             <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('id', 1)" class="text-center th-sm s-m-1">Id</th>
-            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-1">Name<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-1">Name</th>
+            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-2">Name<font-awesome-icon class="float-right" icon="sort" /></th>
+            <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-2">Name</th>
+            <th v-if="currentSort === 'supplier.name'" @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier<font-awesome-icon class="float-right" icon="sort" /></th>
+            <th v-else @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier</th>
             <th class="s-m-1">Edit</th>
             <th class="s-m-1">Delete</th>
           </tr>
         </thead>
         <tbody v-if="filteredClients">
           <tr v-for="client in filteredClients" :key="client.id">
-            <td>{{client.id}}</td>
-            <td class="text-left">{{client.name}}</td>
-            <td><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="client">{{client.id}}</td>
+            <td v-if="client" class="text-left">{{client.name}}</td>
+            <td v-if="client" class="text-left">
+              <p v-if="client.supplier">{{client.supplier.name}}</p>
+            </td>
+            <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="client"><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>
@@ -67,16 +72,19 @@ export default {
       Client: {
         id: null,
         name: null,
-        infos: null
+        infos: null,
+        supplier: 0
       },
       editInfos: {
         id: null,
         name: null,
-        infos: null
+        infos: null,
+        supplier: 0
       },
       addInfos: {
         name: null,
-        infos: null
+        infos: null,
+        supplier: null
       }
     }
   },
@@ -117,19 +125,38 @@ export default {
         return order === "desc" ? comparison * -1 : comparison;
       };
     },
+    sortBy2(properties, order) {
+      this.currnetSortDir=order;
+      return function(a, b) {
+        const varA =
+          typeof a[properties[0]][properties[1]] === "string"
+            ? a[properties[0]][properties[1]].toUpperCase()
+            : a[properties[0]][properties[1]];
+        const varB =
+          typeof b[properties[0]][properties[1]] === "string"
+            ? b[properties[0]][properties[1]].toUpperCase()
+            : b[properties[0]][properties[1]];
+        let comparison = 0;
+        if (varA > varB) comparison = 1;
+        else if (varA < varB) comparison = -1;
+        return order === "desc" ? comparison * -1 : comparison;
+      };
+    },
     get_client: function(client) {
       this.editInfos.id = client.id
       this.editInfos.name = client.name
       this.editInfos.infos = client.infos
+      this.editInfos.supplier = client.supplier
       this.Client.id = client.id
       this.Client.name = client.name
       this.Client.infos = client.infos
+      this.Client.supplier = client.supplier
     },
   },
   computed: {
     filteredClients: function(){
       return this.clients.filter((client) => {
-        if (client.name.toLowerCase().match(this.search.toLowerCase()))
+        if (client.name.toLowerCase().match(this.search.toLowerCase()) || ((client.supplier) && client.supplier.name.toLowerCase().match(this.search.toLowerCase())))
           return true
       });
     }

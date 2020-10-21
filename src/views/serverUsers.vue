@@ -27,10 +27,10 @@
         </thead>
         <tbody v-if="filteredServerUsers">
           <tr v-for="serverUser in filteredServerUsers" :key="serverUser.id">
-            <td class="">{{serverUser.id}}</td>
-            <td class="text-left">{{serverUser.name}}</td>
-            <td><b-button v-b-modal.editServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="serverUser" class="">{{serverUser.id}}</td>
+            <td v-if="serverUser" class="text-left">{{serverUser.name}}</td>
+            <td v-if="serverUser"><b-button v-b-modal.editServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="serverUser"><b-button v-b-modal.deleteServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>

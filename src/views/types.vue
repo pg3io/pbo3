@@ -27,10 +27,10 @@
         </thead>
         <tbody v-if="filteredTypes">
           <tr v-for="type in filteredTypes" :key="type.id">
-            <td class="">{{type.id}}</td>
-            <td class="text-left">{{type.name}}</td>
-            <td><b-button v-b-modal.editTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="type" class="">{{type.id}}</td>
+            <td v-if="type" class="text-left">{{type.name}}</td>
+            <td v-if="type"><b-button v-b-modal.editTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="type"><b-button v-b-modal.deleteTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>

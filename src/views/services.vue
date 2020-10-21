@@ -27,10 +27,10 @@
         </thead>
         <tbody v-if="filteredServices">
           <tr v-for="service in filteredServices" :key="service.id">
-            <td class="">{{service.id}}</td>
-            <td class="text-left">{{service.name}}</td>
-            <td><b-button v-b-modal.editServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="service" class="">{{service.id}}</td>
+            <td v-if="service" class="text-left">{{service.name}}</td>
+            <td v-if="service"><b-button v-b-modal.editServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="service"><b-button v-b-modal.deleteServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>
