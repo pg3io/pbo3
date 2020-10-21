@@ -161,12 +161,12 @@
             </thead>
             <tbody>
               <tr v-for="server in servers" :key="server.id">
-                <td v-if="server.id">
+                <td v-if="server">
                   {{server.id}}
                 </td>
                 <td v-else>
                 </td>
-                <td v-if="server.hostname" class="text-left">
+                <td v-if="server" class="text-left">
                   {{server.hostname}}
                 </td>
                 <td v-else> 
@@ -176,53 +176,53 @@
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.client && server.client.name">
+                <td v-if="server && server.client">
                   {{server.client.name}}
                 </td>
                 <td v-else>
                 </td>
-                <td v-if="server.dc && server.dc.hoster && server.dc.hoster.name">
+                <td v-if="server && server.dc && server.dc.hoster">
                   {{server.dc.hoster.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.type && server.type.name">
+                <td v-if="server && server.type">
                   {{server.type.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.env && server.env.name">
+                <td v-if="server && server.env">
                   {{server.env.name}}
                 </td>
                 <td v-else> 
                 </td>
-                <td v-if="server.date">
+                <td v-if="server">
                   {{server.date}}
                 </td>
                 <td v-else> 
                 </td>
                 <td v-if="!server.os"> 
                 </td>
-                <td v-else-if="server.os.os_name &&server.os.os_name === 'windows'">
+                <td v-else-if="server.os && server.os.os_name === 'windows'">
                   <font-awesome-icon :icon="['fab', 'windows']" />
                 </td>
                 <td v-else>
-                  <span v-if="server.os && server.os.os_name" :class="icon(server.os.os_name)">
+                  <span v-if="server && server.os" :class="icon(server.os.os_name)">
                   </span>
                 </td>
-                <td>
+                <td v-if="server">
                   <router-link :to="{ name: 'Servers', params: { hostname: server.hostname, id: server.id}}">
                     <b-button size="sm" variant="outline-dark" pill>
                       <font-awesome-icon icon="info" />
                     </b-button>
                   </router-link>
                 </td>
-                <td>
+                <td v-if="server">
                   <b-button v-b-modal.editServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
                     <font-awesome-icon icon="pencil-alt"/>
                   </b-button>
                 </td>
-                <td>
+                <td v-if="server">
                   <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
                     <font-awesome-icon icon="archive"/>
                   </b-button>
@@ -912,7 +912,7 @@
             break;
           case "client":
             if ((check = this.filteredClient('name', temp)).length == 1) {
-              this.editAll = {name: check[0].name, infos: check[0].infos, id: check[0].id};
+              this.editAll = {name: check[0].name, infos: check[0].infos, id: check[0].id, supplier: check[0].supplier};
               this.client = check[0];
               this.$bvModal.show('editClientModal');
             }

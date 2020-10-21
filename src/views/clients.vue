@@ -28,10 +28,10 @@
         </thead>
         <tbody v-if="filteredClients">
           <tr v-for="client in filteredClients" :key="client.id">
-            <td>{{client.id}}</td>
-            <td class="text-left">{{client.name}}</td>
-            <td><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="client">{{client.id}}</td>
+            <td v-if="client" class="text-left">{{client.name}}</td>
+            <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="client"><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>
@@ -67,16 +67,19 @@ export default {
       Client: {
         id: null,
         name: null,
-        infos: null
+        infos: null,
+        supplier: 0
       },
       editInfos: {
         id: null,
         name: null,
-        infos: null
+        infos: null,
+        supplier: 0
       },
       addInfos: {
         name: null,
-        infos: null
+        infos: null,
+        supplier: null
       }
     }
   },
@@ -121,9 +124,11 @@ export default {
       this.editInfos.id = client.id
       this.editInfos.name = client.name
       this.editInfos.infos = client.infos
+      this.editInfos.supplier = client.supplier
       this.Client.id = client.id
       this.Client.name = client.name
       this.Client.infos = client.infos
+      this.Client.supplier = client.supplier
     },
   },
   computed: {

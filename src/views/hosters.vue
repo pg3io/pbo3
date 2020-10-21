@@ -29,11 +29,11 @@
         </thead>
         <tbody v-if="filteredHosters">
           <tr v-for="hoster in filteredHosters" :key="hoster.id">
-            <td>{{hoster.id}}</td>
-            <td class="text-left">{{hoster.name}}</td>
-            <td class="text-left">{{hoster.url_admin}}</td>
-            <td><b-button v-b-modal.editHosterModal @click="get_hoster(hoster)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteHosterModal @click="get_hoster(hoster)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="hoster">{{hoster.id}}</td>
+            <td v-if="hoster" class="text-left">{{hoster.name}}</td>
+            <td v-if="hoster" class="text-left">{{hoster.url_admin}}</td>
+            <td v-if="hoster"><b-button v-b-modal.editHosterModal @click="get_hoster(hoster)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="hoster"><b-button v-b-modal.deleteHosterModal @click="get_hoster(hoster)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>

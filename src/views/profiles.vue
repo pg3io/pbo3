@@ -27,10 +27,10 @@
         </thead>
         <tbody v-if="filteredProfiles">
           <tr v-for="profile in filteredProfiles" :key="profile.id">
-            <td>{{profile.id}}</td>
-            <td class="text-left">{{profile.name}}</td>
-            <td><b-button v-b-modal.editProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="profile">{{profile.id}}</td>
+            <td v-if="profile" class="text-left">{{profile.name}}</td>
+            <td v-if="profile"><b-button v-b-modal.editProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="profile"><b-button v-b-modal.deleteProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>

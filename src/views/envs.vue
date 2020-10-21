@@ -27,10 +27,10 @@
         </thead>
         <tbody v-if="filteredEnvs">
           <tr v-for="env in filteredEnvs" :key="env.id">
-            <td class="">{{env.id}}</td>
-            <td class="text-left">{{env.name}}</td>
-            <td><b-button v-b-modal.editEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="env" class="">{{env.id}}</td>
+            <td v-if="env" class="text-left">{{env.name}}</td>
+            <td v-if="env"><b-button v-b-modal.editEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="env"><b-button v-b-modal.deleteEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>

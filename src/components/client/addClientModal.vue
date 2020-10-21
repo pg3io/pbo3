@@ -14,6 +14,15 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
+            <div class="inputField1">
+              <b-form-group label-cols="3" label="Supplier" label-for="input-horizontal">
+                <b-form-select v-model="$v.addInfos.supplier.$model">
+                  <b-form-select-option v-for="supplier in suppliers" v-bind:key="supplier.id" :value="supplier.id">
+                    {{ supplier.name }}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-form-group>
+            </div>
           </div>
           <div class="inputOffer">
             <b-form-textarea
@@ -39,7 +48,7 @@
 import { createClient } from '@/assets/js/createMutations/createClient'
 import { required } from "vuelidate/lib/validators";
 import { CLIENTS_QUERY } from '@/assets/js/query/graphql'
-
+import { SUPPLIER_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'AddClient',
@@ -59,7 +68,8 @@ export default {
         },
       },
       infos: {
-      }
+      },
+      supplier:{}
     },
   },
   props: {
@@ -68,6 +78,7 @@ export default {
   data() {
     return {
       clients: [],
+      suppliers: [],
       validName: true
     }
   },
@@ -82,10 +93,11 @@ export default {
     },
     addClient() {
       const name = this.addInfos.name,
+      supplier = this.addInfos.supplier != null ? this.addInfos.supplier : 0,
       infos = this.addInfos.infos != null ? this.addInfos.infos : ' ';
       this.$apollo.mutate({
         mutation: createClient,
-        variables: {name, infos}
+        variables: {name, infos, supplier}
       });
       window.location.reload(true);
     },
@@ -104,6 +116,9 @@ export default {
   apollo: {
     clients: {
       query: CLIENTS_QUERY
+    },
+    suppliers: {
+      query: SUPPLIER_QUERY
     }
   }
 }

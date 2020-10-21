@@ -14,6 +14,24 @@
                 </b-form-invalid-feedback>
               </b-form-group>
             </div>
+            <div class="inputField1">
+              <b-form-group label-cols="3" label="Supplier" label-for="input-horizontal">
+                <b-form-select v-model="editSupplier">
+                  <b-form-select-option v-if="editInfos.supplier" selected :value="null">
+                    {{ editInfos.supplier.name }}
+                  </b-form-select-option>
+                  <b-form-select-option v-else selected :value="null">
+
+                  </b-form-select-option>
+                  <b-form-select-option v-for="supplier in suppliers" v-bind:key="supplier.id" :value="supplier.id" v-if="editInfos.supplier && (supplier.name != editInfos.supplier.name)">
+                    {{ supplier.name }}
+                  </b-form-select-option>
+                  <b-form-select-option v-for="supplier in suppliers" v-bind:key="supplier.id" :value="supplier.id" v-if="editInfos.supplier == null">
+                    {{ supplier.name }}
+                  </b-form-select-option>
+                </b-form-select>
+              </b-form-group>
+            </div>
           </div>
           <div class="inputOffer">
             <b-form-textarea
@@ -39,7 +57,7 @@
 import { updateClient } from '@/assets/js/updateMutations/updateClient'
 import { required } from "vuelidate/lib/validators";
 import {CLIENTS_QUERY} from '@/assets/js/query/graphql'
-
+import { SUPPLIER_QUERY } from '@/assets/js/query/graphql'
 
 export default {
   name: 'EditClient',
@@ -68,6 +86,9 @@ export default {
   },
   data() {
     return {
+      clients: [],
+      suppliers: [],
+      editSupplier: null,
       validName: true
     }
   },
@@ -78,10 +99,11 @@ export default {
     editClient() {
       const id = this.editInfos.id,
       name = this.editInfos.name,
+      supplier = this.editSupplier != null ? this.editSupplier : 0,
       infos = this.editInfos.infos != null ? this.editInfos.infos : ' ';
       this.$apollo.mutate({
         mutation: updateClient,
-        variables: {id, name, infos}
+        variables: {id, name, infos, supplier}
       });
       window.location.reload(true);
     },
@@ -100,6 +122,9 @@ export default {
   apollo: {
     clients: {
       query: CLIENTS_QUERY
+    },
+    suppliers: {
+      query: SUPPLIER_QUERY
     }
   }
 }

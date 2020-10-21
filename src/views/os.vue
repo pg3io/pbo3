@@ -32,18 +32,18 @@
         </thead>
         <tbody v-if="os">
           <tr v-for="o in filteredOs" :key="o.id">
-            <td>{{o.id}}</td>
-            <td class="text-capitalize">{{o.os_name}}</td>
-            <td>{{o.os_version}}</td>
-            <td>{{o.version_name}}</td>
-            <td v-if="o.os_name === 'windows'">
+            <td v-if="o">{{o.id}}</td>
+            <td v-if="o" class="text-capitalize">{{o.os_name}}</td>
+            <td v-if="o">{{o.os_version}}</td>
+            <td v-if="o">{{o.version_name}}</td>
+            <td v-if="o && o.os_name === 'windows'">
               <font-awesome-icon :icon="['fab', 'windows']" />
             </td>
             <td v-else>
-              <span :class="icon(o.os_name)"></span>
+              <span v-if="o" :class="icon(o.os_name)"></span>
             </td>
-            <td><b-button v-b-modal.editOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="o"><b-button v-b-modal.editOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="o"><b-button v-b-modal.deleteOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>

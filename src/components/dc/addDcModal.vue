@@ -33,7 +33,7 @@
               </b-form-select-option>
             </b-form-select>
           <b-form-invalid-feedback id="hoster_error">
-            You have to choose an offer!
+            You have to choose an hoster!
           </b-form-invalid-feedback>
           </b-form-group>
         </div>

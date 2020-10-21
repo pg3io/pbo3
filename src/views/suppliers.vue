@@ -27,10 +27,10 @@
         </thead>
         <tbody v-if="filteredSuppliers">
           <tr v-for="supplier in filteredSuppliers" :key="supplier.id">
-            <td class="">{{supplier.id}}</td>
-            <td class="text-left">{{supplier.name}}</td>
-            <td><b-button v-b-modal.editSupplierModal @click="get_Supplier(supplier)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td><b-button v-b-modal.deleteSupplierModal @click="get_Supplier(supplier)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="supplier" class="">{{supplier.id}}</td>
+            <td v-if="supplier" class="text-left">{{supplier.name}}</td>
+            <td v-if="supplier"><b-button v-b-modal.editSupplierModal @click="get_Supplier(supplier)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+            <td v-if="supplier"><b-button v-b-modal.deleteSupplierModal @click="get_Supplier(supplier)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
         </tbody>
       </table>
