@@ -182,6 +182,13 @@
         <b-form-textarea id="infos" v-model="editInfos.infos" placeholder="Infos ..." rows="5" max-rows="8">
         </b-form-textarea>
       </div>
+      <div class="inputOffer">
+        <b-form-textarea id="ansible-edit-input" name="ansible-edit-input" v-model="$v.editInfos.ansible.$model" :state="validateEdit('ansible')" aria-describedby="input-ansible-edit-feedback" placeholder="Ansible vars ..." max-rows="10">
+        </b-form-textarea>
+        <b-form-invalid-feedback id="input-ansible-edit-feedback">
+          Not a valid yaml format!
+        </b-form-invalid-feedback>
+      </div>
     </div>
     <div class="inputConfirm">
       <b-button class="modalLeftButton" variant="outline-dark" @click="hideServerModal('edit-server')">
@@ -233,6 +240,97 @@ export default {
           this.validHostname = true
           return true
         },
+      },
+      ansible: {
+        check_vars(ansible) {
+          if (ansible == '') {
+            return true
+          }
+          var keyValue = /(\w:[ ]{1}\w)/,
+          key = /\w:/,
+          metaChars1 = /[\"\'\\\/!@#$%^&*()+=|~:;,.?<>]/,
+          metaChars2 = /[\"\'\\!@#$%^&*()+=|~:;,.?<>]/,
+          listItem = /-[ ]{1}[a-zA-Z0-9_]/,
+          start = /^[ ]{0}/,
+          indentStart = /^[ ]{2}/,
+          end = /\S$/,
+          result = true,
+          array = ansible.split('\n'),
+          splitted = [];
+          for (let index = 0; index < array.length; index++) {
+            splitted = array[index].split(':')
+            for (let idx = 0; idx < splitted.length; idx++) {
+              if (idx == 0) {
+                if (metaChars1.test(splitted[idx])) {
+                  return false
+                }
+              }
+              else {
+                if (metaChars2.test(splitted[idx])) {
+                  return false
+                }
+              }
+            }
+          }
+          for (let index = 0; index < array.length; index++) {
+            if (index == 0) {
+              if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                result = true;
+              }
+              else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                result = true;
+              }
+              else {
+                return false
+              }
+            }
+            else {
+              if (start.test(array[index - 1]) == true && keyValue.test(array[index - 1]) == true && end.test(array[index - 1]) == true) {
+                if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else {
+                  return false
+                }
+              }
+              else if (start.test(array[index - 1]) == true && key.test(array[index - 1]) == true && end.test(array[index - 1]) == true) {
+                if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (indentStart.test(array[index]) == true && listItem.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else {
+                  return false
+                }
+              }
+              else if (indentStart.test(array[index - 1]) == true && listItem.test(array[index - 1]) == true && end.test(array[index - 1]) == true) {
+                if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (indentStart.test(array[index]) == true && listItem.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else {
+                  return false
+                }
+              }
+              else {
+                return false
+              }
+            }
+          }
+          return result
+        }
       },
       user_admin: {
         required
@@ -368,6 +466,7 @@ export default {
       ip = this.editInfos.ip,
       user_admin = this.editInfos.user_admin,
       infos = this.editInfos.infos != null ? this.editInfos.infos : '',
+      ansible = this.editInfos.ansible != null ? this.editInfos.ansible : '',
       raid = this.editInfos.raid,
       offer = this.editOffer != null ? this.editOffer : 0,
       client = this.editClient != null ? this.editClient : 0,
@@ -384,7 +483,7 @@ export default {
       services = this.listServices.length != 0 ? this.listServices : [];
       this.$apollo.mutate({
         mutation: updateServer,
-        variables: {id, hostname, ip, user_admin, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived}
+        variables: {id, hostname, ip, user_admin, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived, ansible}
       });
       window.location.reload(true);
     },

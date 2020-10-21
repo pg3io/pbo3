@@ -9,6 +9,7 @@ query allServer {
     archiveDate,
     archived,
     user_admin,
+    ansible_vars,
     offer {
       id,
       name,
@@ -93,6 +94,7 @@ query All ($where: JSON!) {
     archiveDate,
     archived,
     user_admin,
+    ansible_vars,
     offer {
       id,
       name,
@@ -175,6 +177,8 @@ query archived ($where: JSON!) {
     date,
     archiveDate,
     archived,
+    user_admin,
+    ansible_vars,
     offer {
       id,
       name,
@@ -254,6 +258,7 @@ query Server($id: ID!) {
   server(id: $id) {
     id,
     hostname,
+    ansible_vars,
     offer {
       id,
       name,

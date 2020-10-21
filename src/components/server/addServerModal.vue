@@ -158,6 +158,15 @@
         </b-form-textarea>
       </div>
     </div>
+    <div>
+      <div class="inputOffer">
+        <b-form-textarea id="ansible-input" name="ansible-input" v-model="$v.addInfos.ansible.$model" :state="validateState('ansible')" aria-describedby="input-ansible-live-feedback" placeholder="Ansible vars ..." max-rows="10">
+        </b-form-textarea>
+        <b-form-invalid-feedback id="input-ansible-live-feedback">
+          Not a valid yaml format!
+        </b-form-invalid-feedback>
+      </div>
+    </div>
     <div class="inputConfirm">
       <b-button class="modalLeftButton" variant="outline-dark" @click="hideServerModal('add-server') && hideModal('add')">
         Cancel
@@ -171,6 +180,7 @@
   </b-modal>
 </template>
 
+<script src="js-yaml.min.js"></script>
 <script>
 import Multiselect from 'vue-multiselect';
 import { required } from "vuelidate/lib/validators";
@@ -208,6 +218,97 @@ export default {
           this.validHostname = true
           return true
         },
+      },
+      ansible: {
+        check_vars(ansible) {
+          if (ansible == '') {
+            return true
+          }
+          var keyValue = /([a-zA-Z0-9_]\:[ ]{1}[a-zA-Z0-9_])/,
+          key = /\w\:/,
+          metaChars1 = /[\"\'\\\/!@#$%^&*()+=|~:;,.?<>]/,
+          metaChars2 = /[\"\'\\!@#$%^&*()+=|~:;,.?<>]/,
+          listItem = /-[ ]{1}[a-zA-Z0-9_]/,
+          start = /^[ ]{0}/,
+          indentStart = /^[ ]{2}/,
+          end = /\S$/,
+          result = true,
+          array = ansible.split('\n'),
+          splitted = [];
+          for (let index = 0; index < array.length; index++) {
+            splitted = array[index].split(':')
+            for (let idx = 0; idx < splitted.length; idx++) {
+              if (idx == 0) {
+                if (metaChars1.test(splitted[idx])) {
+                  return false
+                }
+              }
+              else {
+                if (metaChars2.test(splitted[idx])) {
+                  return false
+                }
+              }
+            }
+          }
+          for (let index = 0; index < array.length; index++) {
+            if (index == 0) {
+              if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                result = true;
+              }
+              else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                result = true;
+              }
+              else {
+                return false
+              }
+            }
+            else {
+              if (start.test(array[index - 1]) == true && keyValue.test(array[index - 1]) == true && end.test(array[index - 1]) == true) {
+                if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else {
+                  return false
+                }
+              }
+              else if (start.test(array[index - 1]) == true && key.test(array[index - 1]) == true && end.test(array[index - 1]) == true) {
+                if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (indentStart.test(array[index]) == true && listItem.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else {
+                  return false
+                }
+              }
+              else if (indentStart.test(array[index - 1]) == true && listItem.test(array[index - 1]) == true && end.test(array[index - 1]) == true) {
+                if (start.test(array[index]) == true && keyValue.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (start.test(array[index]) == true && key.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else if (indentStart.test(array[index]) == true && listItem.test(array[index]) == true && end.test(array[index]) == true) {
+                  result = true;
+                }
+                else {
+                  return false
+                }
+              }
+              else {
+                return false
+              }
+            }
+          }
+          return result
+        }
       },
       user_admin: {
         required
@@ -280,6 +381,9 @@ export default {
     }
   },
   methods: {
+    concatPattern(indent) {
+      return "^[ ]{" + indent + "}"
+    },
     reset_infos() {
       this.addInfos.hostname = null
       this.addInfos.ip = ''
@@ -329,10 +433,11 @@ export default {
       cred = 0,
       os = this.addInfos.os != null ? this.addInfos.os : 0,
       date = this.addInfos.date,
+      ansible = this.addInfos.ansible != null ? this.addInfos.ansible : '',
       services = this.addInfos.services != null ? this.listServices : [];
       this.$apollo.mutate({
         mutation: createServer,
-        variables: {hostname, ip, user_admin, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date}
+        variables: {hostname, ip, user_admin, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date, ansible}
       });
       window.location.reload(true);
     },

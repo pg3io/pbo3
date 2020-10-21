@@ -481,7 +481,8 @@
           profile: 0,
           server_user: 0,
           os: 0,
-          services: 0
+          services: 0,
+          ansible: null
         },
         addInfos: {
           hostname: null,
@@ -501,7 +502,8 @@
           services: null,
           date: null,
           archiveDate: null,
-          archived: false
+          archived: false,
+          ansible: null
         },
         tag: "",
         tagSave: "",
@@ -677,6 +679,7 @@
         this.editInfos.user_admin = server.user_admin;
         this.editInfos.ip = server.ip;
         this.editInfos.infos = server.infos || "";
+        this.editInfos.ansible = server.ansible_vars != null ? server.ansible_vars : '';
         this.editInfos.raid = server.raid || false;
         this.editInfos.offer = server.offer != null ? server.offer : 0;
         this.editInfos.client = server.client != null ? server.client : 0;
@@ -712,6 +715,7 @@
         this.addInfos.os = null
         this.addInfos.offer = null
         this.addInfos.services = null
+        this.addInfos.ansible = null
         this.listServices = []
         this.addInfos.date = new Date().toISOString().slice(0,10)
 
