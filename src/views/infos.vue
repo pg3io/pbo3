@@ -1,45 +1,45 @@
 <template>
   <div v-if="servers[get_server_id]" class="servers">
-      <h1 v-if="servers[get_server_id].hostname" class="text-center">{{ servers[get_server_id].hostname }}</h1>
-      <h2 v-if="servers[get_server_id].ip" class="text-center">{{ servers[get_server_id].ip  }}</h2>
-      <h3 v-if="servers[get_server_id].client" class="text-center">{{ servers[get_server_id].client.name }}</h3>
+      <h1 v-if="servers[get_server_id].hostname != null" class="text-center">{{ servers[get_server_id].hostname }}</h1>
+      <h2 v-if="servers[get_server_id].ip != null" class="text-center">{{ servers[get_server_id].ip  }}</h2>
+      <h3 v-if="servers[get_server_id].client != null" class="text-center">{{ servers[get_server_id].client.name }}</h3>
   <div class="container-sm">
       <div v-if="servers[get_server_id]" class="row mt-5">
             <div class="col bg-light p-5">
                 <h4 class="text-center">Infos</h4>
                 <table class="table table-hover">
                     <tbody>
-                    <tr v-if="servers[get_server_id].os">
+                    <tr>
                         <th>OS </th>
-                        <td v-if="servers[get_server_id].os.os_version === ''" class="text-capitalize"><span :class="icon(servers[get_server_id].os.os_name)"></span> {{ servers[get_server_id].os.os_name }} </td>
-                        <td v-else class="text-capitalize">
+                        <td v-if="servers[get_server_id].os != null && servers[get_server_id].os.os_version === ''" class="text-capitalize"><span :class="icon(servers[get_server_id].os.os_name)"></span> {{ servers[get_server_id].os.os_name }} </td>
+                        <td v-else-if="servers[get_server_id].os != null" class="text-capitalize">
                           <span v-if="servers[get_server_id].os.os_name !== 'windows'" :class="icon(servers[get_server_id].os.os_name)"></span>
                           <font-awesome-icon v-else :icon="['fab', 'windows']" /> {{ servers[get_server_id].os.os_name }} {{ servers[get_server_id].os.os_version }}
                         </td>
                     </tr>
                     <tr>
                         <th>Env</th>
-                        <td v-if="servers[get_server_id].env">{{ servers[get_server_id].env.name }}</td>
+                        <td v-if="servers[get_server_id].env != null">{{ servers[get_server_id].env.name }}</td>
                     </tr>
                     <tr>
                         <th>Hoster</th>
-                        <td v-if="servers[get_server_id].dc">{{ servers[get_server_id].dc.hoster.name }}</td>
+                        <td v-if="servers[get_server_id].dc != null">{{ servers[get_server_id].dc.hoster.name }}</td>
                     </tr>
                     <tr>
                         <th>DC</th>
-                        <td v-if="servers[get_server_id].dc">{{ servers[get_server_id].dc.name }}</td>
+                        <td v-if="servers[get_server_id].dc != null">{{ servers[get_server_id].dc.name }}</td>
                     </tr>
                     <tr>
                         <th>Type</th>
-                        <td v-if="servers[get_server_id].type">{{ servers[get_server_id].type.name }}</td>
+                        <td v-if="servers[get_server_id].type != null">{{ servers[get_server_id].type.name }}</td>
                     </tr>
                     <tr>
                         <th>Offer</th>
-                        <td v-if="servers[get_server_id].offer">{{ servers[get_server_id].offer.name }} - {{ servers[get_server_id].offer.hoster.name}}</td>
+                        <td v-if="servers[get_server_id].offer != null">{{ servers[get_server_id].offer.name }} - {{ servers[get_server_id].offer.hoster.name}}</td>
                     </tr>
                     <tr>
                         <th>Supplier</th>
-                        <td v-if="servers[get_server_id].client.supplier">
+                        <td v-if="servers[get_server_id].client != null && servers[get_server_id].client.supplier">
                             <router-link :to="{ name: 'SuppliersTable', params: { name: servers[get_server_id].client.supplier.name, id: servers[get_server_id].client.supplier.id}}">
                                 {{ servers[get_server_id].client.supplier.name }}
                             </router-link>
@@ -57,16 +57,15 @@
                     </tr>
                     <tr>
                         <th>Creation</th>
-                        <td v-if="servers[get_server_id].date">{{servers[get_server_id].date}}</td>
+                        <td v-if="servers[get_server_id].date != null">{{servers[get_server_id].date}}</td>
                     </tr>
                     <tr>
                         <th>Client</th>
-                        <td v-if="servers[get_server_id].client" class="text-capitalize">{{ servers[get_server_id].client.name }}</td>
+                        <td v-if="servers[get_server_id].client != null" class="text-capitalize">{{ servers[get_server_id].client.name }}</td>
                     </tr>
-                    <tr v-if="servers[get_server_id]">
+                    <tr v-if="servers[get_server_id] != null">
                         <th>Services</th>
                         <td v-if="servers[get_server_id].services.length === 0">
-                            <span>No services</span>
                         </td>
                         <td v-else >
                             <span v-for="(service, index) in servers[get_server_id].services" :key="service.id" >
@@ -79,11 +78,17 @@
                     </tr>
                     <tr>
                         <th>Admin</th>
-                        <td v-if="servers[get_server_id].user_admin">{{servers[get_server_id].user_admin}}</td>
+                        <td v-if="servers[get_server_id].user_admin != null">{{servers[get_server_id].user_admin}}</td>
                     </tr>
                     <tr>
                         <th>Infos</th>
-                        <td v-if="servers[get_server_id]">{{ servers[get_server_id].infos }}</td>
+                        <td class="pre-formatted" v-if="servers[get_server_id] != ''">{{ servers[get_server_id].infos }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ansible vars</th>
+                        <td v-if="servers[get_server_id].ansible_vars != ''">
+                          <p class="pre-formatted" >{{servers[get_server_id].ansible_vars}}</p>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -162,5 +167,8 @@ export default {
     .noServer {
         margin: 100px auto 0 auto;
         width: 400px; 
+    }
+    .pre-formatted {
+      white-space: pre-wrap;
     }
 </style>

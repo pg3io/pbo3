@@ -15,7 +15,9 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       "vue/no-use-v-if-with-v-for": ["error", {
         "allowUsingIterationVar": true
-      }]
+      }],
+      "no-useless-escape": 0
+      
   }
   
 }
