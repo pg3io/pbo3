@@ -34,7 +34,9 @@
             <td v-if="dc">{{dc.id}}</td>
             <td v-if="dc" class="text-left">{{dc.name}}</td>
             <td v-if="dc" class="text-left">{{dc.location}}</td>
-            <td v-if="dc && dc.hoster" class="text-left">{{dc.hoster.name}}</td>
+            <td v-if="dc" class="text-left">
+              <p v-if="dc.hoster">{{dc.hoster.name}}</p>
+            </td>
             <td v-else></td>
             <td v-if="dc"><b-button v-b-modal.editDcModal @click="get_dc(dc)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
             <td v-if="dc"><b-button v-b-modal.deleteDcModal @click="get_dc(dc)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
@@ -153,7 +155,7 @@ export default {
     filteredDcs: function(){
       return this.dcs.filter((dc) => {
         if (dc.name.toLowerCase().match(this.search.toLowerCase()) 
-        || dc.hoster.name.toLowerCase().match(this.search.toLowerCase()) 
+        || (dc.hoster && dc.hoster.name.toLowerCase().match(this.search.toLowerCase())) 
         || dc.location.toLowerCase().match(this.search.toLowerCase()))
           return true
       });
