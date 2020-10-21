@@ -348,7 +348,11 @@ query Clients {
   clients {
       id,
       name,
-      infos
+      infos,
+      supplier {
+        id,
+        name
+      }
   }
 }
 `
