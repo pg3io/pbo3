@@ -1,4 +1,3 @@
-
 <template>
   <div >
     <div class="container-sm">
@@ -15,32 +14,36 @@
           </b-input-group>
         </div>
       </div>
-      <table id="tableClient" v-if="Object.keys(clients).length !== 0" class="table table-striped table-bordered table-hover text-center bg-light">
-        <thead class="thead-dark">
-          <tr>
-            <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('id', 1)" class="text-center th-sm s-m-1">Id</th>
-            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-2">Name<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-2">Name</th>
-            <th v-if="currentSort === 'supplier.name'" @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier</th>
-            <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
-          </tr>
-        </thead>
-        <tbody v-if="filteredClients">
-          <tr v-for="client in filteredClients" :key="client.id">
-            <td v-if="client">{{client.id}}</td>
-            <td v-if="client" class="text-left">{{client.name}}</td>
-            <td v-if="client" class="text-left">
-              <p v-if="client.supplier">{{client.supplier.name}}</p>
-            </td>
-            <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="client"><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
-          </tr>
-        </tbody>
-      </table>
-      <spinner v-else></spinner>
+      <div>
+        <div>
+          <table id="tableClient" v-if="Object.keys(clients).length !== 0" class="table tablemobile table-striped table-bordered table-hover bg-light text-center table-responsive">
+            <thead class="thead-dark">
+              <tr>
+                <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
+                <th v-else @click="sort('id', 1)" class="text-center th-sm s-m-1">Id</th>
+                <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-2">Name<font-awesome-icon class="float-right" icon="sort" /></th>
+                <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-2">Name</th>
+                <th v-if="currentSort === 'supplier.name'" @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier<font-awesome-icon class="float-right" icon="sort" /></th>
+                <th v-else @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier</th>
+                <th class="s-m-1">Edit</th>
+                <th class="s-m-1">Delete</th>
+              </tr>
+            </thead>
+            <tbody v-if="filteredClients">
+              <tr v-for="client in filteredClients" :key="client.id">
+                <td v-if="client">{{client.id}}</td>
+                <td v-if="client" class="text-left">{{client.name}}</td>
+                <td v-if="client" class="text-left">
+                  <p v-if="client.supplier">{{client.supplier.name}}</p>
+                </td>
+                <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
+                <td v-if="client"><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <spinner v-if='Object.keys(clients).length == 0'></spinner>
     </div>
     <add-client v-bind:addInfos="editInfos"></add-client>
     <edit-client v-bind:editInfos="editInfos" :client='Client'></edit-client>
@@ -88,8 +91,24 @@ export default {
       }
     }
   },
+  mounted() {
+    this.getClient();
+  },
   methods: {
-    split: function (string) { 
+    async getClient() {
+      this.clients = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:CLIENTS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['clients'][i]; i++)
+          this.clients.push(tmp['data']['clients'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -161,11 +180,6 @@ export default {
       });
     }
   },
-  apollo: {
-    clients: {
-      query: CLIENTS_QUERY
-    }
-  }
 }
 </script>
 

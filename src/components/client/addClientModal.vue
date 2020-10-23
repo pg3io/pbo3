@@ -61,7 +61,7 @@ export default {
             if(name && name.toLowerCase() == this.clients[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -82,7 +82,37 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getClient();
+    this.getSuppliers();
+  },
   methods: {
+    async getClient() {
+      this.clients = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:CLIENTS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['clients'][i]; i++)
+          this.clients.push(tmp['data']['clients'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
+    },
+    async getSuppliers() {
+      this.suppliers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SUPPLIER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['suppliers'][i]; i++)
+          this.suppliers.push(tmp['data']['suppliers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
+    },
     reset_infos() {
       this.addInfos.name = null,
       this.addInfos.infos = null
@@ -113,14 +143,6 @@ export default {
       this.addClient();
     },
   },
-  apollo: {
-    clients: {
-      query: CLIENTS_QUERY
-    },
-    suppliers: {
-      query: SUPPLIER_QUERY
-    }
-  }
 }
 </script>
 

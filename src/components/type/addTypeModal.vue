@@ -40,7 +40,7 @@ export default {
             if(name && name.toLowerCase() == this.types[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -57,7 +57,23 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getType();
+  },
   methods: {
+    async getType() {
+      this.types = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:TYPE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['types'][i]; i++)
+          this.types.push(tmp['data']['types'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['types'] && tmp['data']['types'].length)
+    },
     reset_infos() {
       this.addInfos.name = null
     },
@@ -85,11 +101,6 @@ export default {
       this.addType();
     },
   },
-  apollo: {
-    types: {
-      query: TYPE_QUERY
-    }
-  }
 }
 </script>
 

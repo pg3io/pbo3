@@ -76,8 +76,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getService();
+  },
   methods: {
-    split: function (string) { 
+    async getService() {
+      this.services = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SERVICES_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['services'][i]; i++)
+          this.services.push(tmp['data']['services'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['services'] && tmp['data']['services'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -126,11 +142,6 @@ export default {
         if (service.name.toLowerCase().match(this.search.toLowerCase()))
           return true
       });
-    }
-  },
-  apollo: {
-    services: {
-      query: SERVICES_QUERY
     }
   }
 }

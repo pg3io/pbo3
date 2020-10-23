@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editTypeModal" size="xl" ref="edit-type" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">      
+      <b-form @submit.stop.prevent="onSubmit">
           <div class="inputLine">
             <div class="inputField">
               <b-form-group label-cols="3" label="Type" label-for="input-horizontal">
@@ -39,7 +39,7 @@ export default {
             if(name && name.toLowerCase() == this.types[index].name.toLowerCase() && name.toLowerCase() != this.type.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -53,10 +53,27 @@ export default {
   },
   data() {
     return {
+      types: {},
       validName: true
     }
   },
+  mounted() {
+    this.getType();
+  },
   methods: {
+    async getType() {
+      this.types = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:TYPE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['types'][i]; i++)
+          this.types.push(tmp['data']['types'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['types'] && tmp['data']['types'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -81,11 +98,6 @@ export default {
       this.editType();
     },
   },
-  apollo: {
-    types: {
-      query: TYPE_QUERY
-    }
-  }
 }
 </script>
 

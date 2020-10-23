@@ -51,7 +51,7 @@ export default {
             if(name && name.toLowerCase() == this.profiles[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -70,7 +70,23 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getProfile();
+  },
   methods: {
+    async getProfile() {
+      this.profiles = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:PROFILE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['profiles'][i]; i++)
+          this.profiles.push(tmp['data']['profiles'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['profiles'] && tmp['data']['profiles'].length)
+    },
     reset_infos() {
       this.addInfos.name = null,
       this.addInfos.infos = null
@@ -100,11 +116,6 @@ export default {
       this.addProfile();
     },
   },
-  apollo: {
-    profiles: {
-      query: PROFILE_QUERY
-    }
-  }
 }
 </script>
 

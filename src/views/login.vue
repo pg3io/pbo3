@@ -44,7 +44,7 @@ export default {
       document.getElementById("password").type = (this.showPassword) ? 'text' : 'password';
     },
     ...mapActions(['login']),
-    loginUser: function () {
+    loginUser() {
       this.login(this.authDetails)
         .then(() => this.$router.push('/'))
     }

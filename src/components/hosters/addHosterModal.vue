@@ -54,7 +54,7 @@ export default {
             if(name && name.toLowerCase() == this.hosters[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -67,7 +67,7 @@ export default {
             if(url_admin == this.hosters[index].url_admin) {
               this.validUrl = false
               return false
-            }       
+            }
           }
           this.validUrl = true
           return true
@@ -85,7 +85,23 @@ export default {
       validUrl: true
     }
   },
+  mounted() {
+    this.getHoster();
+  },
   methods: {
+    async getHoster() {
+      this.hosters = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:HOSTERS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['hosters'][i]; i++)
+          this.hosters.push(tmp['data']['hosters'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+    },
     reset_infos() {
       this.addInfos.name = null,
       this.addInfos.url_admin = null
@@ -113,11 +129,6 @@ export default {
         return;
       }
       this.addHoster();
-    },
-  },
-  apollo: {
-    hosters: {
-      query: HOSTERS_QUERY
     }
   }
 }

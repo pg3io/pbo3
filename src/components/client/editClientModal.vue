@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editClientModal" size="xl" ref="edit-client" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">          
+      <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
             <div class="inputField">
@@ -70,7 +70,7 @@ export default {
             if(name && name.toLowerCase() == this.clients[index].name.toLowerCase() && name.toLowerCase() != this.client.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -92,7 +92,37 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getClient();
+    this.getSuppliers();
+  },
   methods: {
+    async getClient() {
+      this.clients = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:CLIENTS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['clients'][i]; i++)
+          this.clients.push(tmp['data']['clients'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
+    },
+    async getSuppliers() {
+      this.suppliers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SUPPLIER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['suppliers'][i]; i++)
+          this.suppliers.push(tmp['data']['suppliers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -119,14 +149,6 @@ export default {
       this.editClient();
     },
   },
-  apollo: {
-    clients: {
-      query: CLIENTS_QUERY
-    },
-    suppliers: {
-      query: SUPPLIER_QUERY
-    }
-  }
 }
 </script>
 

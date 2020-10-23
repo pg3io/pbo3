@@ -82,8 +82,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getHoster();
+  },
   methods: {
-    split: function (string) { 
+    async getHoster() {
+      this.hosters = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:HOSTERS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['hosters'][i]; i++)
+          this.hosters.push(tmp['data']['hosters'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -129,11 +145,6 @@ export default {
           return true
       });
     },
-  },
-  apollo: {
-    hosters: {
-      query: HOSTERS_QUERY
-    }
   }
 }
 </script>

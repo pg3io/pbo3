@@ -9,9 +9,9 @@ const routes = [
     path: '/',
     name: 'Home',
     component: () => import('@/views/home.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3',
-      requiresAuth: true 
+      requiresAuth: true
     },
     alias: ["/search=:input"]
   },
@@ -19,25 +19,25 @@ const routes = [
     path: '/server/:hostname',
     name: 'Servers',
     component: () => import('@/views/infos.vue'),
-    meta: { 
-      requiresAuth: true 
+    meta: {
+      requiresAuth: true
     }
   },
   {
     path: '/suppliers/:name',
     name: 'SuppliersTable',
     component: () => import('@/views/suppliersTable.vue'),
-    meta: { 
-      requiresAuth: true 
+    meta: {
+      requiresAuth: true
     }
   },
   {
     path: '/suppliers',
     name: 'Suppliers',
     component: () => import('@/views/suppliers.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Suppliers',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
@@ -52,18 +52,18 @@ const routes = [
     path: '/archives',
     name: 'Archives',
     component: () => import('@/views/archives.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Archives',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
     path: '/clients',
     name: 'Client',
     component: () => import('@/views/clients.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Clients',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
@@ -71,35 +71,35 @@ const routes = [
     name: 'Service',
     component: () => import('@/views/services.vue'),
     meta: {
-      title: 'PBO3 - Services', 
-      requiresAuth: true 
+      title: 'PBO3 - Services',
+      requiresAuth: true
     }
   },
   {
     path: '/dcs',
     name: 'Dc',
     component: () => import('@/views/dcs.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Dcs',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
     path: '/envs',
     name: 'Env',
     component: () => import('@/views/envs.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Envs',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
     path: '/hosters',
     name: 'Hoster',
     component: () => import('@/views/hosters.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Hosters',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
@@ -108,7 +108,7 @@ const routes = [
     component: () => import('@/views/os.vue'),
     meta: {
       title: 'PBO3 - Os',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
@@ -117,7 +117,7 @@ const routes = [
     component: () => import('@/views/profiles.vue'),
     meta: {
       title: 'PBO3 - Profiles',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {
@@ -132,9 +132,9 @@ const routes = [
     path: '/types',
     name: 'Type',
     component: () => import('@/views/types.vue'),
-    meta: { 
+    meta: {
       title: 'PBO3 - Types',
-      requiresAuth: true 
+      requiresAuth: true
     }
   },
   {

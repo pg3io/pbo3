@@ -2,7 +2,7 @@
   <div id="app">
     <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico"/>
     <header class="header">
-        <div v-if="authStatus" id="nav">
+        <div v-if="isAuthenticated" id="nav">
           <Navbar/>
         </div>
         <div v-else>
@@ -28,13 +28,13 @@ export default {
     }
   },
   methods: {
-    logOut: function () {
+    logOut() {
       this.$store.dispatch('logOut')
         .then(() => this.$router.push('/login'))
     }
   },
   computed: {
-    ...mapGetters(['authStatus', 'user'])
+    ...mapGetters(['user', 'isAuthenticated'])
   }
 }
 </script>

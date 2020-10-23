@@ -70,7 +70,7 @@ export default {
         variables: {id, os_name, os_version, version_name}
       });
       window.location.reload(true);
-      
+
     },
     validateState(name) {
     const { $dirty, $error } = this.$v.editInfos[name];

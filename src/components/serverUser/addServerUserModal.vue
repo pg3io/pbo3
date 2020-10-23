@@ -40,7 +40,7 @@ export default {
             if(name && name.toLowerCase() == this.serverUsers[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -57,7 +57,23 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getServerUser();
+  },
   methods: {
+    async getServerUser() {
+      this.serverUsers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SERVER_USER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['serverUsers'][i]; i++)
+          this.serverUsers.push(tmp['data']['serverUsers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['serverUsers'] && tmp['data']['serverUsers'].length)
+    },
     reset_infos() {
       this.addInfos.name = null
     },
@@ -85,11 +101,6 @@ export default {
       this.addServerUser();
     },
   },
-  apollo: {
-    serverUsers: {
-      query: SERVER_USER_QUERY
-    }
-  }
 }
 </script>
 

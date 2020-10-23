@@ -32,7 +32,7 @@
                 {{ editInfos.hoster.name }}
               </b-form-select-option>
               <b-form-select-option v-else selected :value="null">
-                
+
               </b-form-select-option>
               <b-form-select-option v-for="hoster in hosters" v-bind:key="hoster.id" :value="hoster.id" v-if="editInfos.hoster && (hoster.name != editInfos.hoster.name)">
                 {{ hoster.name }}
@@ -75,7 +75,7 @@ export default {
             if(name && name.toLowerCase() == this.dcs[index].name.toLowerCase() && name.toLowerCase() != this.dc.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -89,7 +89,37 @@ export default {
     editInfos: Object,
     dc: Object
   },
+  mounted() {
+    this.getDc();
+    this.getHoster();
+  },
   methods: {
+    async getDc() {
+      this.dcs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:DC_QUERY_,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['dcs'][i]; i++)
+          this.dcs.push(tmp['data']['dcs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['dcs'] && tmp['data']['dcs'].length)
+    },
+    async getHoster() {
+      this.hosters = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:HOSTERS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['hosters'][i]; i++)
+          this.hosters.push(tmp['data']['hosters'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -103,7 +133,7 @@ export default {
         variables: {id, name, hoster, location}
       });
       window.location.reload(true);
-      
+
     },
     validateState(name) {
     const { $dirty, $error } = this.$v.editInfos[name];
@@ -117,14 +147,6 @@ export default {
       this.editDc();
     },
   },
-  apollo: {
-    hosters: {
-      query: HOSTERS_QUERY
-    },
-    dcs: {
-      query: DC_QUERY_
-    }
-  }
 }
 </script>
 

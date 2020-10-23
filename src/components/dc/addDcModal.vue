@@ -65,7 +65,7 @@ export default {
             if(name && name.toLowerCase() == this.dcs[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -88,7 +88,37 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getDc();
+    this.getHoster();
+  },
   methods: {
+    async getDc() {
+      this.dcs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:DC_QUERY_,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['dcs'][i]; i++)
+          this.dcs.push(tmp['data']['dcs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['dcs'] && tmp['data']['dcs'].length)
+    },
+    async getHoster() {
+      this.hosters = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:HOSTERS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['hosters'][i]; i++)
+          this.hosters.push(tmp['data']['hosters'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+    },
     reset_infos() {
       this.addInfos.name = null,
       this.addInfos.location = null
@@ -118,14 +148,6 @@ export default {
       }
       this.addDc();
     },
-  },
-  apollo: {
-    hosters: {
-      query: HOSTERS_QUERY
-    },
-    dcs: {
-      query: DC_QUERY_
-    }
   }
 }
 </script>

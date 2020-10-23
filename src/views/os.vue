@@ -89,11 +89,27 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getOs();
+  },
   methods: {
+    async getOs() {
+      this.os = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:OS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['os'][i]; i++)
+          this.os.push(tmp['data']['os'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['os']&& tmp['data']['os'].length);
+    },
     icon:function(name){
       return 'fl-' + name
     },
-    split: function (string) { 
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -133,7 +149,7 @@ export default {
       this.editInfos.id = os.id
       this.editInfos.os_name = os.os_name
       this.editInfos.os_version = os.os_version
-      this.editInfos.version_name = os.version_name 
+      this.editInfos.version_name = os.version_name
     },
   },
   computed: {
@@ -144,11 +160,6 @@ export default {
       });
     }
   },
-  apollo: {
-    os: {
-      query: OS_QUERY
-    }
-  }
 }
 </script>
 

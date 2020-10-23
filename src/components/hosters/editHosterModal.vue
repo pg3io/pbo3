@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">          
+      <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
             <div class="inputField">
@@ -54,7 +54,7 @@ export default {
             if(name && name.toLowerCase() == this.hosters[index].name.toLowerCase() && name.toLowerCase() != this.hoster.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -67,7 +67,7 @@ export default {
             if(url_admin == this.hosters[index].url_admin && url_admin != this.hoster.url_admin) {
               this.validUrl = false
               return false
-            }       
+            }
           }
           this.validUrl = true
           return true
@@ -82,10 +82,27 @@ export default {
   data() {
     return {
       validName: true,
-      validUrl: true
+      validUrl: true,
+      hosters: {}
     }
   },
+  mounted() {
+    this.getHoster();
+  },
   methods: {
+    async getHoster() {
+      this.hosters = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:HOSTERS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['hosters'][i]; i++)
+          this.hosters.push(tmp['data']['hosters'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -98,7 +115,7 @@ export default {
         variables: {id, name, url_admin}
       });
       window.location.reload(true);
-      
+
     },
     validateState(name) {
       const { $dirty, $error } = this.$v.editInfos[name];
@@ -110,11 +127,6 @@ export default {
         return;
       }
       this.editHoster();
-    },
-  },
-  apollo: {
-    hosters: {
-      query: HOSTERS_QUERY
     }
   }
 }

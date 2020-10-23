@@ -56,8 +56,8 @@ import AddDc from '@/components/dc/addDcModal.vue'
 import EditDc from '@/components/dc/editDcModal.vue'
 import DeleteDc from '@/components/dc/deleteDcModal.vue'
 import Spinner from "@/components/spinner.vue"
-import { DC_QUERY } from '@/assets/js/query/graphql'
-  
+import { DC_QUERY_ } from '@/assets/js/query/graphql'
+
 export default {
   name: 'Dc',
   components: {
@@ -91,8 +91,24 @@ export default {
       }
     }
   },
+  mounted() {
+    this.getDc();
+  },
   methods: {
-    split: function (string) { 
+    async getDc() {
+      this.dcs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:DC_QUERY_,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['dcs'][i]; i++)
+          this.dcs.push(tmp['data']['dcs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['dcs'] && tmp['data']['dcs'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -150,22 +166,17 @@ export default {
       this.editInfos.hoster = this.Dc.hoster = dc.hoster
     },
   },
-  
+
   computed: {
     filteredDcs: function(){
       return this.dcs.filter((dc) => {
-        if (dc.name.toLowerCase().match(this.search.toLowerCase()) 
-        || (dc.hoster && dc.hoster.name.toLowerCase().match(this.search.toLowerCase())) 
+        if (dc.name.toLowerCase().match(this.search.toLowerCase())
+        || (dc.hoster && dc.hoster.name.toLowerCase().match(this.search.toLowerCase()))
         || dc.location.toLowerCase().match(this.search.toLowerCase()))
           return true
       });
     },
   },
-  apollo: {
-    dcs: {
-      query: DC_QUERY
-    }
-  }
 }
 </script>
 

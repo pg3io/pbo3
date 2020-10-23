@@ -76,8 +76,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getEnv();
+  },
   methods: {
-    split: function (string) { 
+    async getEnv() {
+      this.envs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:ENV_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['envs'][i]; i++)
+          this.envs.push(tmp['data']['envs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -126,11 +142,6 @@ export default {
         if (env.name.toLowerCase().match(this.search.toLowerCase()))
           return true
       });
-    }
-  },
-  apollo: {
-    envs: {
-      query: ENV_QUERY
     }
   }
 }

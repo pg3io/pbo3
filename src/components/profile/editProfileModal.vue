@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editProfileModal" size="xl" ref="edit-profile" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">          
+      <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
             <div class="inputField">
@@ -51,7 +51,7 @@ export default {
             if(name && name.toLowerCase() == this.profiles[index].name.toLowerCase() && name.toLowerCase() != this.profile.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -67,10 +67,27 @@ export default {
   },
   data(){
     return {
-      validName: true
+      validName: true,
+      profiles: {}
     }
   },
+  mounted() {
+    this.getProfile();
+  },
   methods: {
+    async getProfile() {
+      this.profiles = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:PROFILE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['profiles'][i]; i++)
+          this.profiles.push(tmp['data']['profiles'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['profiles'] && tmp['data']['profiles'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -96,11 +113,6 @@ export default {
       this.editProfile();
     },
   },
-  apollo: {
-    profiles: {
-      query: PROFILE_QUERY
-    }
-  }
 }
 </script>
 

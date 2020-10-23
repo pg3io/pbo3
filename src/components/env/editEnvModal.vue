@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editEnvModal" size="xl" ref="edit-env" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">      
+      <b-form @submit.stop.prevent="onSubmit">
         <div class="inputLine">
           <div class="inputField">
             <b-form-group label-cols="3" label="Name" label-for="input-horizontal">
@@ -39,7 +39,7 @@ export default {
             if(name && name.toLowerCase() == this.envs[index].name.toLowerCase() && name.toLowerCase() != this.env.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -54,9 +54,26 @@ export default {
   data() {
     return {
       validName: true,
+      envs: {}
     }
   },
+  mounted() {
+    this.getEnv();
+  },
   methods: {
+    async getEnv() {
+      this.envs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:ENV_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['envs'][i]; i++)
+          this.envs.push(tmp['data']['envs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -81,11 +98,6 @@ export default {
       this.editEnv();
     },
   },
-  apollo: {
-    envs: {
-      query: ENV_QUERY
-    }
-  }
 }
 </script>
 

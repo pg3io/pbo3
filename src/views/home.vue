@@ -100,137 +100,141 @@
           </div>
         </div>
         <div id="serverTable" class="container-sm">
-          <table v-if="Object.keys(servers).length !== 0" class="table tablemobile table-striped table-bordered table-hover text-center bg-light">
-            <thead class="thead-dark">
-              <tr>
-                <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-left th-sm tableServer">
-                  Id<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('id', 1)" class="text-left th-sm tableServer">Id</th>
-                <th v-if="currentSort === 'hostname'" @click="sort('hostname', 1)" class="text-left th-sm tableServer">
-                  Hostname<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('hostname', 1)" class="text-left th-sm tableServer">
-                  Hostname
-                </th>
-                <th class="th-sm">
-                  IP
-                </th>
-                <th v-if="currentSort === 'client.name'" @click="sort('client.name', 2)" class="th-sm tableServer">
-                  Client<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('client.name', 2)" class="th-sm tableServer">Client</th>
-                <th v-if="currentSort === 'dc.hoster.name'" @click="sort('dc.hoster.name', 3)" class="th-sm tableServer">
-                  Hoster<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('dc.hoster.name', 3)" class="th-sm tableServer">Hoster</th>
-                <th v-if="currentSort === 'type.name'" @click="sort('type.name', 2)" class="th-sm tableServer">
-                  Type<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('type.name', 2)" class="th-sm tableServer">
-                  Type
-                </th>
-                <th v-if="currentSort === 'env.name'" @click="sort('env.name', 2)" class="th-sm tableServer">
-                  Env<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('env.name', 2)" class="th-sm tableServer">
-                  Env
-                </th>
-                <th v-if="currentSort === 'date'" @click="sort('date', 1)" class="th-sm tableServer">
-                  Creation Date<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('date', 1)" class="th-sm tableServer">
-                  Creation Date
-                </th>
-                <th v-if="currentSort === 'os.os_name'" @click="sort('os.os_name', 2)" class="th-sm tableServer">
-                  Os<font-awesome-icon class="float-right" icon="sort" />
-                </th>
-                <th v-else @click="sort('os.os_name', 2)" class="th-sm tableServer">
-                  Os
-                </th>
-                <th class="th-sm">
-                  Info
-                </th>
-                <th class="th-sm">
-                  Edit
-                </th>
-                <th class="th-sm">
-                  Archive
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="server in servers" :key="server.id">
-                <td v-if="server">
-                  {{server.id}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server" class="text-left">
-                  {{server.hostname}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server.ip">
-                  {{server.ip}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server && server.client">
-                  {{server.client.name}}
-                </td>
-                <td v-else>
-                </td>
-                <td v-if="server && server.dc && server.dc.hoster">
-                  {{server.dc.hoster.name}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server && server.type">
-                  {{server.type.name}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server && server.env">
-                  {{server.env.name}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="server">
-                  {{server.date}}
-                </td>
-                <td v-else> 
-                </td>
-                <td v-if="!server.os"> 
-                </td>
-                <td v-else-if="server.os && server.os.os_name === 'windows'">
-                  <font-awesome-icon :icon="['fab', 'windows']" />
-                </td>
-                <td v-else>
-                  <span v-if="server && server.os" :class="icon(server.os.os_name)">
-                  </span>
-                </td>
-                <td v-if="server">
-                  <router-link :to="{ name: 'Servers', params: { hostname: server.hostname, id: server.id}}">
-                    <b-button size="sm" variant="outline-dark" pill>
-                      <font-awesome-icon icon="info" />
-                    </b-button>
-                  </router-link>
-                </td>
-                <td v-if="server">
-                  <b-button v-b-modal.editServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="pencil-alt"/>
-                  </b-button>
-                </td>
-                <td v-if="server">
-                  <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
-                    <font-awesome-icon icon="archive"/>
-                  </b-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-else>
+          <div>
+            <div>
+              <table v-if="Object.keys(servers).length !== 0" class="table tablemobile table-striped table-bordered table-hover bg-light text-center table-sm">
+                <thead class="thead-dark">
+                  <tr>
+                    <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-left th-sm tableServer">
+                      Id<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('id', 1)" class="text-left th-sm tableServer">Id</th>
+                    <th v-if="currentSort === 'hostname'" @click="sort('hostname', 1)" class="text-left th-sm tableServer">
+                      Hostname<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('hostname', 1)" class="text-left th-sm tableServer">
+                      Hostname
+                    </th>
+                    <th class="th-sm">
+                      IP
+                    </th>
+                    <th v-if="currentSort === 'client.name'" @click="sort('client.name', 2)" class="th-sm tableServer">
+                      Client<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('client.name', 2)" class="th-sm tableServer">Client</th>
+                    <th v-if="currentSort === 'dc.hoster.name'" @click="sort('dc.hoster.name', 3)" class="th-sm tableServer">
+                      Hoster<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('dc.hoster.name', 3)" class="th-sm tableServer">Hoster</th>
+                    <th v-if="currentSort === 'type.name'" @click="sort('type.name', 2)" class="th-sm tableServer">
+                      Type<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('type.name', 2)" class="th-sm tableServer">
+                      Type
+                    </th>
+                    <th v-if="currentSort === 'env.name'" @click="sort('env.name', 2)" class="th-sm tableServer">
+                      Env<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('env.name', 2)" class="th-sm tableServer">
+                      Env
+                    </th>
+                    <th v-if="currentSort === 'date'" @click="sort('date', 1)" class="th-sm tableServer">
+                      Creation Date<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('date', 1)" class="th-sm tableServer">
+                      Creation Date
+                    </th>
+                    <th v-if="currentSort === 'os.os_name'" @click="sort('os.os_name', 2)" class="th-sm tableServer">
+                      Os<font-awesome-icon class="float-right" icon="sort" />
+                    </th>
+                    <th v-else @click="sort('os.os_name', 2)" class="th-sm tableServer">
+                      Os
+                    </th>
+                    <th class="th-sm">
+                      Info
+                    </th>
+                    <th class="th-sm">
+                      Edit
+                    </th>
+                    <th class="th-sm">
+                      Archive
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="server in servers" :key="server.id">
+                    <td v-if="server">
+                      {{server.id}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server" class="text-left">
+                      {{server.hostname}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server.ip">
+                      {{server.ip}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server && server.client">
+                      {{server.client.name}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server && server.dc && server.dc.hoster">
+                      {{server.dc.hoster.name}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server && server.type">
+                      {{server.type.name}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server && server.env">
+                      {{server.env.name}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="server">
+                      {{server.date}}
+                    </td>
+                    <td v-else>
+                    </td>
+                    <td v-if="!server.os">
+                    </td>
+                    <td v-else-if="server.os && server.os.os_name === 'windows'">
+                      <font-awesome-icon :icon="['fab', 'windows']" />
+                    </td>
+                    <td v-else>
+                      <span v-if="server && server.os" :class="icon(server.os.os_name)">
+                      </span>
+                    </td>
+                    <td v-if="server">
+                      <router-link :to="{ name: 'Servers', params: { hostname: server.hostname, id: server.id}}">
+                        <b-button size="sm" variant="outline-dark" pill>
+                          <font-awesome-icon icon="info" />
+                        </b-button>
+                      </router-link>
+                    </td>
+                    <td v-if="server">
+                      <b-button v-b-modal.editServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
+                        <font-awesome-icon icon="pencil-alt"/>
+                      </b-button>
+                    </td>
+                    <td v-if="server">
+                      <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
+                        <font-awesome-icon icon="archive"/>
+                      </b-button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div v-if='!Object.keys(servers).length'>
               <div id="loader" class="spinner-fast centerDiv">
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
@@ -319,35 +323,35 @@
   import { createType } from '@/assets/js/createMutations/createType'
   import { createSupplier } from '@/assets/js/createMutations/createSupplier'
 
-  
+
   import { required } from "vuelidate/lib/validators";
-  
+
   import EditServer from "@/components/server/editServerModal.vue"
   import AddServer from "@/components/server/addServerModal.vue"
   import ArchiveServer from "@/components/server/archiveServerModal.vue"
 
-  
+
   import AddHoster from "@/components/hosters/addHosterModal.vue"
   import EditHoster from "@/components/hosters/editHosterModal.vue"
-  
+
   import AddClient from "@/components/client/addClientModal.vue"
   import EditClient from "@/components/client/editClientModal.vue"
-  
+
   import AddOs from "@/components/os/addOsModal.vue"
   import EditOs from "@/components/os/editOsModal.vue"
-  
+
   import AddEnv from "@/components/env/addEnvModal.vue"
   import EditEnv from "@/components/env/editEnvModal.vue"
-  
+
   import AddType from "@/components/type/addTypeModal.vue"
   import EditType from "@/components/type/editTypeModal.vue"
-  
+
   import AddProfile from "@/components/profile/addProfileModal.vue"
   import EditProfile from "@/components/profile/editProfileModal.vue"
-  
+
   import AddServerUser from "@/components/serverUser/addServerUserModal.vue"
   import EditServerUser from "@/components/serverUser/editServerUserModal.vue"
-  
+
   import AddDc from "@/components/dc/addDcModal.vue"
   import EditDc from "@/components/dc/editDcModal.vue"
 
@@ -359,7 +363,7 @@
 
   export default {
     name: 'Home',
-    components: { 
+    components: {
       AddServer,
       EditServer,
       ArchiveServer,
@@ -384,14 +388,10 @@
       AddSupplier,
       EditSupplier
     },
-    mounted() {
-      this.timeout();
-      this.getSearchByUrl();
-    },
     validations: {
       addInfos: {
-          hostname: {
-            required,
+        hostname: {
+          required,
           },
           ip: {
             required,
@@ -443,6 +443,7 @@
         types: [],
         envs: [],
         dcs: [],
+        offers: [],
         suppliers: [],
         supplier: null,
         profiles: [],
@@ -624,7 +625,193 @@
         this.servers = this.saveServers;
       }
     },
+      mounted() {
+        this.getServer();
+        this.getCred();
+        this.getClient()
+        this.getOs();
+        this.getType();
+        this.getEnv();
+        this.getProfile();
+        this.getServerUser();
+        this.getDc();
+        this.getOffer();
+        this.getService();
+        this.getHoster();
+        this.getSuppliers();
+        this.timeout();
+        this.getSearchByUrl();
+      },
     methods: {
+      async getServer() {
+        this.servers = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:ALL_SERVERS_QUERY,
+            variables: {start: start, where: {"archived": false}}
+          })
+          for (let i = 0; tmp['data']['servers'][i]; i++)
+            this.servers.push(tmp['data']['servers'][i])
+          start += 100
+        } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
+      },
+      async getCred() {
+        this.creds = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:CRED_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['creds'][i]; i++)
+            this.creds.push(tmp['data']['creds'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['creds'] && tmp['data']['creds'].length);
+      },
+      async getClient() {
+        this.clients = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:CLIENTS_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['clients'][i]; i++)
+            this.clients.push(tmp['data']['clients'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
+      },
+      async getOs() {
+        this.os = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:OS_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['os'][i]; i++)
+            this.os.push(tmp['data']['os'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['os']&& tmp['data']['os'].length);
+      },
+      async getType() {
+        this.types = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:TYPE_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['types'][i]; i++)
+            this.types.push(tmp['data']['types'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['types'] && tmp['data']['types'].length)
+      },
+      async getEnv() {
+        this.envs = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:ENV_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['envs'][i]; i++)
+            this.envs.push(tmp['data']['envs'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
+      },
+      async getProfile() {
+        this.profiles = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:PROFILE_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['profiles'][i]; i++)
+            this.profiles.push(tmp['data']['profiles'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['profiles'] && tmp['data']['profiles'].length)
+      },
+      async getServerUser() {
+        this.serverUsers = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:SERVER_USER_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['serverUsers'][i]; i++)
+            this.serverUsers.push(tmp['data']['serverUsers'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['serverUsers'] && tmp['data']['serverUsers'].length)
+      },
+      async getDc() {
+        this.dcs = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:DC_QUERY_,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['dcs'][i]; i++)
+            this.dcs.push(tmp['data']['dcs'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['dcs'] && tmp['data']['dcs'].length)
+      },
+      async getOffer() {
+        this.offers = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:OFFER_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['offers'][i]; i++)
+            this.offers.push(tmp['data']['offers'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['offers'] && tmp['data']['offers'].length)
+      },
+      async getService() {
+        this.services = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:SERVICES_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['services'][i]; i++)
+            this.services.push(tmp['data']['services'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['services'] && tmp['data']['services'].length)
+      },
+      async getHoster() {
+        this.hosters = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:HOSTERS_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['hosters'][i]; i++)
+            this.hosters.push(tmp['data']['hosters'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+      },
+      async getSuppliers() {
+        this.suppliers = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:SUPPLIER_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['suppliers'][i]; i++)
+            this.suppliers.push(tmp['data']['suppliers'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
+      },
       getSearchByUrl() {
         var actPath = this.$route.path, savePath = actPath;
         if (!this.servers.length || !actPath || !this.first || actPath == '/' || !actPath.startsWith('/search='))
@@ -638,7 +825,7 @@
         this.$router.push(savePath);
       },
       timeout() {
-          setTimeout(this.stopLoading, 1500);
+          setTimeout(this.stopLoading, 2200);
       },
       stopLoading() {
         var loader = document.getElementById("loader");
@@ -651,13 +838,13 @@
       getOptions(server) {
         this.editServices = []
         for (let index = 0; index < server.services.length; index++)
-          this.editServices[index] = { name: server.services[index].name, value: server.services[index].id } 
+          this.editServices[index] = { name: server.services[index].name, value: server.services[index].id }
       },
       selectOptions() {
         this.options = []
         for (let index = 0, idx = 0; index < this.services.length; index++, idx++) {
           this.options[index] = { name: this.services[index].name, value: this.services[index].id, selected: this.editServices[idx] === this.services[index].id ? true : false }
-          
+
         }
       },
       hostname: function() {
@@ -847,9 +1034,6 @@
             this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : '',
               infos: (this.tags[3] && this.tags[3].length) ? this.tags[3] : ''}
             this.$bvModal.show('addClientModal');
-            this.clients = {
-              query: CLIENTS_QUERY
-            }
             break;
           case "os":
             this.editAll = {os_name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''}
@@ -1260,7 +1444,7 @@
         var rank = 0, i = -1, result = [];
         for (i = 0; string && this.services[i]; i++)
           if ((opt == "all" || opt == "name") && this.services[i].name && this.services[i].name.toLowerCase() == string.toLowerCase() ||
-          (opt == "all" || opt == "location") && this.services[i].location && this.services[i].location.toLowerCase() == string.toLowerCase() || 
+          (opt == "all" || opt == "location") && this.services[i].location && this.services[i].location.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "id") && this.services[i].id && this.services[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.services[i];
         if (!rank)
@@ -1288,7 +1472,7 @@
         var rank = 0, i = -1, result = [];
         for (i = 0; string && this.dcs[i]; i++)
           if ((opt == "all" || opt == "name") && this.dcs[i].name && this.dcs[i].name.toLowerCase() == string.toLowerCase() ||
-          (opt == "all" || opt == "location") && this.dcs[i].location && this.dcs[i].location.toLowerCase() == string.toLowerCase() || 
+          (opt == "all" || opt == "location") && this.dcs[i].location && this.dcs[i].location.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "id") && this.dcs[i].id && this.dcs[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.dcs[i];
         if (!rank)
@@ -1303,7 +1487,7 @@
         var rank = 0, i = -1, result = [];
         for (i = 0; string && this.clients[i]; i++)
           if ((opt == "all" || opt == "name") && this.clients[i].name && this.clients[i].name.toLowerCase() == string.toLowerCase() ||
-          (opt == "all" || opt == "info") && this.clients[i].info && this.clients[i].info.toLowerCase() == string.toLowerCase() || 
+          (opt == "all" || opt == "info") && this.clients[i].info && this.clients[i].info.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "id") && this.clients[i].id && this.clients[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.clients[i];
         if (!rank)
@@ -1318,21 +1502,21 @@
         var rank = 0, i = 0, result = [];
         for (i = 0; string && this.creds[i]; i++)
           if ((opt == "all" || opt == "name") && this.creds[i].name && this.creds[i].name.toLowerCase() == string.toLowerCase() ||
-          (opt == "all" || opt == "auth") && this.creds[i].auth && this.creds[i].auth.toLowerCase() == string.toLowerCase() || 
-          (opt == "all" || opt == "token_hash") && this.creds[i].token_hash && this.creds[i].token_hash.toLowerCase() == string.toLowerCase() || 
-          (opt == "all" || opt == "url_admin_custom") && this.creds[i].url_admin_custom && this.creds[i].url_admin_custom.toLowerCase() == string.toLowerCase() || 
-          (opt == "all" || opt == "login") && this.creds[i].login && this.creds[i].login.toLowerCase() == string.toLowerCase() || 
-          (opt == "all" || opt == "password_hash") && this.creds[i].password_hash && this.creds[i].password_hash.toLowerCase() == string.toLowerCase() || 
+          (opt == "all" || opt == "auth") && this.creds[i].auth && this.creds[i].auth.toLowerCase() == string.toLowerCase() ||
+          (opt == "all" || opt == "token_hash") && this.creds[i].token_hash && this.creds[i].token_hash.toLowerCase() == string.toLowerCase() ||
+          (opt == "all" || opt == "url_admin_custom") && this.creds[i].url_admin_custom && this.creds[i].url_admin_custom.toLowerCase() == string.toLowerCase() ||
+          (opt == "all" || opt == "login") && this.creds[i].login && this.creds[i].login.toLowerCase() == string.toLowerCase() ||
+          (opt == "all" || opt == "password_hash") && this.creds[i].password_hash && this.creds[i].password_hash.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "id") && this.creds[i].id && this.creds[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.creds[i];
         if (!rank)
           for (i = 0; string && this.creds[i]; i++)
             if ((opt == "all" || opt == "name") && this.creds[i].name && this.creds[i].name.toLowerCase().match(string.toLowerCase()) ||
-            (opt == "all" || opt == "auth") && this.creds[i].auth && this.creds[i].auth.toLowerCase().match(string.toLowerCase()) || 
-            (opt == "all" || opt == "token_hash") && this.creds[i].token_hash && this.creds[i].token_hash.toLowerCase().match(string.toLowerCase()) || 
-            (opt == "all" || opt == "url_admin_custom") && this.creds[i].url_admin_custom && this.creds[i].url_admin_custom.toLowerCase().match(string.toLowerCase()) || 
-            (opt == "all" || opt == "login") && this.creds[i].login && this.creds[i].login.toLowerCase().match(string.toLowerCase()) || 
-            (opt == "all" || opt == "password_hash") && this.creds[i].password_hash && this.creds[i].password_hash.toLowerCase().match(string.toLowerCase()) || 
+            (opt == "all" || opt == "auth") && this.creds[i].auth && this.creds[i].auth.toLowerCase().match(string.toLowerCase()) ||
+            (opt == "all" || opt == "token_hash") && this.creds[i].token_hash && this.creds[i].token_hash.toLowerCase().match(string.toLowerCase()) ||
+            (opt == "all" || opt == "url_admin_custom") && this.creds[i].url_admin_custom && this.creds[i].url_admin_custom.toLowerCase().match(string.toLowerCase()) ||
+            (opt == "all" || opt == "login") && this.creds[i].login && this.creds[i].login.toLowerCase().match(string.toLowerCase()) ||
+            (opt == "all" || opt == "password_hash") && this.creds[i].password_hash && this.creds[i].password_hash.toLowerCase().match(string.toLowerCase()) ||
             (opt == "all" || opt == "id") && this.creds[i].id && this.creds[i].id.toLowerCase().match(string.toLowerCase()))
               result[rank++] = this.creds[i];
         return result;
@@ -1340,7 +1524,7 @@
       filteredEnv: function(opt, string) {
         var rank = 0, result = [];
         for (let i = 0; string && this.envs[i]; i++)
-          if ((opt == "all" || opt == "name") && this.envs[i].name && this.envs[i].name.toLowerCase() == string.toLowerCase() 
+          if ((opt == "all" || opt == "name") && this.envs[i].name && this.envs[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.envs[i].id && this.envs[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.envs[i];
         if (!rank)
@@ -1353,13 +1537,13 @@
       filteredHoster: function(opt, string) {
         var result = [], rank = 0;
         for (let i = 0; string && this.hosters[i]; i++)
-          if ((opt == "all" || opt == "name") && this.hosters[i].name && this.hosters[i].name.toLowerCase() == string.toLowerCase() 
+          if ((opt == "all" || opt == "name") && this.hosters[i].name && this.hosters[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "url_admin") && this.hosters[i].url_admin && this.hosters[i].url_admin.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.hosters[i].id && this.hosters[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.hosters[i];
         if (!rank)
           for (let i = 0; string && this.hosters[i]; i++)
-            if ((opt == "all" || opt == "name") && this.hosters[i].name && this.hosters[i].name.toLowerCase().match(string.toLowerCase()) 
+            if ((opt == "all" || opt == "name") && this.hosters[i].name && this.hosters[i].name.toLowerCase().match(string.toLowerCase())
             || (opt == "all" || opt == "url_admin") && this.hosters[i].url_admin && this.hosters[i].url_admin.toLowerCase().match(string.toLowerCase())
             || (opt == "all" || opt == "id") && this.hosters[i].id && this.hosters[i].id.toLowerCase().match(string.toLowerCase()))
               result[rank++] = this.hosters[i];
@@ -1368,16 +1552,16 @@
       filteredOs: function(opt, string) {
         var result = [], rank = 0;
         for (let i = 0; string && this.os[i]; i++)
-          if ((opt == "all" || opt == "os_name") && this.os[i].os_name && this.os[i].os_name.toLowerCase() == string.toLowerCase() 
-          || (opt == "all" || opt == "os_version") && this.os[i].os_version && this.os[i].os_version.toLowerCase() == string.toLowerCase() 
-          || (opt == "all" || opt == "version_name") && this.os[i].version_name && this.os[i].version_name.toLowerCase() == string.toLowerCase() 
+          if ((opt == "all" || opt == "os_name") && this.os[i].os_name && this.os[i].os_name.toLowerCase() == string.toLowerCase()
+          || (opt == "all" || opt == "os_version") && this.os[i].os_version && this.os[i].os_version.toLowerCase() == string.toLowerCase()
+          || (opt == "all" || opt == "version_name") && this.os[i].version_name && this.os[i].version_name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.os[i].id && this.os[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.os[i];
         if (!rank)
           for (let i = 0; string && this.os[i]; i++)
-            if ((opt == "all" || opt == "os_name") && this.os[i].os_name && this.os[i].os_name.toLowerCase().match(string.toLowerCase()) 
-            || (opt == "all" || opt == "os_version") && this.os[i].os_version && this.os[i].os_version.toLowerCase().match(string.toLowerCase()) 
-            || (opt == "all" || opt == "version_name") && this.os[i].version_name && this.os[i].version_name.toLowerCase().match(string.toLowerCase()) 
+            if ((opt == "all" || opt == "os_name") && this.os[i].os_name && this.os[i].os_name.toLowerCase().match(string.toLowerCase())
+            || (opt == "all" || opt == "os_version") && this.os[i].os_version && this.os[i].os_version.toLowerCase().match(string.toLowerCase())
+            || (opt == "all" || opt == "version_name") && this.os[i].version_name && this.os[i].version_name.toLowerCase().match(string.toLowerCase())
             || (opt == "all" || opt == "id") && this.os[i].id && this.os[i].id.toLowerCase().match(string.toLowerCase()))
               result[rank++] = this.os[i];
         return result;
@@ -1385,14 +1569,14 @@
       filteredProfile: function(opt, string) {
         var result = [], rank = 0;
         for (let i = 0; string && this.profiles[i]; i++)
-          if ((opt == "all" || opt == "name") && this.profiles[i].name && this.profiles[i].name.toLowerCase() == string.toLowerCase() 
-          || (opt == "all" || opt == "infos") && this.profiles[i].infos && this.profiles[i].infos.toLowerCase() == string.toLowerCase() 
+          if ((opt == "all" || opt == "name") && this.profiles[i].name && this.profiles[i].name.toLowerCase() == string.toLowerCase()
+          || (opt == "all" || opt == "infos") && this.profiles[i].infos && this.profiles[i].infos.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.profiles[i].id && this.profiles[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.profiles[i];
         if (!rank)
           for (let i = 0; string && this.profiles[i]; i++)
-            if ((opt == "all" || opt == "name") && this.profiles[i].name && this.profiles[i].name.toLowerCase().match(string.toLowerCase()) 
-            || (opt == "all" || opt == "infos") && this.profiles[i].infos && this.profiles[i].infos.toLowerCase().match(string.toLowerCase()) 
+            if ((opt == "all" || opt == "name") && this.profiles[i].name && this.profiles[i].name.toLowerCase().match(string.toLowerCase())
+            || (opt == "all" || opt == "infos") && this.profiles[i].infos && this.profiles[i].infos.toLowerCase().match(string.toLowerCase())
             || (opt == "all" || opt == "id") && this.profiles[i].id && this.profiles[i].id.toLowerCase().match(string.toLowerCase()))
               result[rank++] = this.profiles[i];
         return result;
@@ -1400,12 +1584,12 @@
       filteredServerUser: function(opt, string) {
         var result = [], rank = 0;
         for (let i = 0; string && this.serverUsers[i]; i++)
-          if ((opt == "all" || opt == "name") && this.serverUsers[i].name && this.serverUsers[i].name.toLowerCase() == string.toLowerCase() 
+          if ((opt == "all" || opt == "name") && this.serverUsers[i].name && this.serverUsers[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.serverUsers[i].id && this.serverUsers[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.serverUsers[i];
         if (!rank)
           for (let i = 0; string && this.serverUsers[i]; i++)
-            if ((opt == "all" || opt == "name") && this.serverUsers[i].name && this.serverUsers[i].name.toLowerCase().match(string.toLowerCase()) 
+            if ((opt == "all" || opt == "name") && this.serverUsers[i].name && this.serverUsers[i].name.toLowerCase().match(string.toLowerCase())
             || (opt == "all" || opt == "id") && this.serverUsers[i].id && this.serverUsers[i].id.toLowerCase().match(string.toLowerCase()))
               result[rank++] = this.serverUsers[i];
         return result;
@@ -1413,12 +1597,12 @@
       filteredType: function(opt, string) {
         var result = [], rank = 0;
         for (let i = 0; string && this.types[i]; i++)
-          if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase() == string.toLowerCase() 
+          if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.types[i];
         if (!rank)
           for (let i = 0; string && this.types[i]; i++)
-            if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase().match(string.toLowerCase()) 
+            if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase().match(string.toLowerCase())
             || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase().match(string.toLowerCase()))
               result[rank++] = this.types[i];
         return result;
@@ -1427,7 +1611,7 @@
         var finalId = -1, rank = 2, check = [];
         switch (ofWhat) {
           case 'client':
-            if ((check = this.filteredClient("name", this.tags[rank])).length == 1 
+            if ((check = this.filteredClient("name", this.tags[rank])).length == 1
             || (check = this.filteredClient("info", this.tags[rank]).length) == 1
             || (check = this.filteredClient("id", this.tags[rank]).length) == 1)
               finalId = check[0].id;
@@ -1443,44 +1627,44 @@
               finalId = check[0].id;
             break;
           case 'env':
-            if ((check = this.filteredEnv("name", this.tags[rank])).length == 1 
+            if ((check = this.filteredEnv("name", this.tags[rank])).length == 1
             || (check = this.filteredEnv("id", this.tags[rank])).length == 1)
               finalId = check[0].id;
             break;
           case 'hoster':
-            if ((check = this.filteredHoster("name", this.tags[rank])).length == 1 
-            || (check = this.filteredHoster("url_admin", this.tags[rank])).length == 1 
+            if ((check = this.filteredHoster("name", this.tags[rank])).length == 1
+            || (check = this.filteredHoster("url_admin", this.tags[rank])).length == 1
             || (check = this.filteredHoster("id", this.tags[rank])).length == 1)
               finalId = check[0].id;
             break;
           case 'os':
-            if ((check = this.filteredOs("os_name", this.tags[rank])).length == 1 
-            || (check = this.filteredOs("os_version", this.tags[rank])).length == 1 
-            || (check = this.filteredOs("version_name", this.tags[rank])).length == 1 
+            if ((check = this.filteredOs("os_name", this.tags[rank])).length == 1
+            || (check = this.filteredOs("os_version", this.tags[rank])).length == 1
+            || (check = this.filteredOs("version_name", this.tags[rank])).length == 1
             || (check = this.filteredOs("id", this.tags[rank])).length == 1)
               finalId = check[0].id;
             break;
           case 'profile':
-            if ((check = this.filteredProfile("name", this.tags[rank])).length == 1 
-            || (check = this.filteredProfile("infos", this.tags[rank])).length == 1 
+            if ((check = this.filteredProfile("name", this.tags[rank])).length == 1
+            || (check = this.filteredProfile("infos", this.tags[rank])).length == 1
             || (check = this.filteredProfile("id", this.tags[rank])).length == 1)
               finalId = check[0].id;
             break;
           case 'server':
-            if ((check = this.filteredServer("hostname", this.tags[rank], 1)).length == 1 || 
-            (check = this.filteredServer("ip", this.tags[rank], 1)).length == 1 || 
+            if ((check = this.filteredServer("hostname", this.tags[rank], 1)).length == 1 ||
+            (check = this.filteredServer("ip", this.tags[rank], 1)).length == 1 ||
             (check = this.filteredServer("id", this.tags[rank], 1)).length == 1) {
               finalId = check[0].id;
               this.get_all_infos(check[0])
             }
             break;
           case 'serveruser':
-            if ((check = this.filteredServerUser("name", this.tags[rank])).length == 1 
+            if ((check = this.filteredServerUser("name", this.tags[rank])).length == 1
             || (check = this.filteredServerUser("id", this.tags[rank])).length == 1)
               finalId = check[0].id;
             break;
           case 'type':
-            if ((check = this.filteredType("name", this.tags[rank])).length == 1 
+            if ((check = this.filteredType("name", this.tags[rank])).length == 1
             || (check = this.filteredType("id", this.tags[rank])).length == 1)
               finalId = check[0].id;
             break;
@@ -1518,48 +1702,6 @@
         }
       },
     },
-    apollo: {
-      servers: {
-        query: ALL_SERVERS_QUERY,
-        variables: {"where": {"archived": false}}
-      },
-      creds: {
-        query: CRED_QUERY
-      },
-      clients: {
-        query: CLIENTS_QUERY
-      },
-      os: {
-        query: OS_QUERY
-      },
-      types: {
-        query: TYPE_QUERY
-      },
-      envs: {
-        query: ENV_QUERY
-      },
-      profiles: {
-        query: PROFILE_QUERY
-      },
-      serverUsers: {
-        query: SERVER_USER_QUERY
-      },
-      dcs: {
-        query: DC_QUERY_
-      },
-      offers: {
-        query: OFFER_QUERY
-      },
-      services: {
-        query: SERVICES_QUERY
-      },
-      hosters: {
-        query: HOSTERS_QUERY
-      },
-      suppliers: {
-        query: SUPPLIER_QUERY
-      }
-    }
   }
 </script>
 <style scoped>

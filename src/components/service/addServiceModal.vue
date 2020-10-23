@@ -42,7 +42,7 @@ export default {
             if(name && name.toLowerCase() == this.services[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -59,7 +59,23 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getService();
+  },
   methods: {
+    async getService() {
+      this.services = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SERVICES_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['services'][i]; i++)
+          this.services.push(tmp['data']['services'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['services'] && tmp['data']['services'].length)
+    },
     reset_infos() {
       this.addInfos.name = null;
     },
@@ -85,11 +101,6 @@ export default {
         return;
       }
       this.addService();
-    },
-  },
-  apollo: {
-    services: {
-      query: SERVICES_QUERY
     }
   }
 }

@@ -35,8 +35,10 @@
               <b-form-select-option selected :value="editInfos.client.id">
                 {{ editInfos.client.name }}
               </b-form-select-option>
-              <b-form-select-option v-for="client in clients" v-bind:key="client.id" :value="client.id" v-if="client.id != editInfos.client.id">
+              <b-form-select-option v-for="client in clients" v-bind:key="client.id" :value="client.id">
+                <p v-if="client.id != editInfos.client.id">
                 {{ client.name }}
+                </p>
               </b-form-select-option>
             </b-form-select>
           </b-form-group>
@@ -73,12 +75,12 @@
               <b-form-select-option selected :value="editInfos.os.id" v-if="editInfos.os">
                 <p v-if="editInfos.os.os_version && editInfos.os.version_name">{{ editInfos.os.os_name }}, {{editInfos.os.os_version}} ({{editInfos.os.version_name}})</p>
                 <p v-else-if="editInfos.os.os_version && editInfos.os.version_name == null">{{ editInfos.os.os_name }}, {{editInfos.os.os_version}}</p>
-                <p v-else>{{ editInfos.os.os_name }}</p> 
+                <p v-else>{{ editInfos.os.os_name }}</p>
               </b-form-select-option>
               <b-form-select-option v-for="o in os" v-bind:key="o.id" :value="o.id" v-if="o.id != editInfos.os.id">
                 <p v-if="o.os_version && o.version_name">{{ o.os_name }}, {{o.os_version}} ({{o.version_name}})</p>
                 <p v-else-if="o.os_version && o.version_name == null">{{ o.os_name }}, {{o.os_version}}</p>
-                <p v-else>{{ o.os_name }}</p> 
+                <p v-else>{{ o.os_name }}</p>
               </b-form-select-option>
             </b-form-select>
           </b-form-group>
@@ -89,10 +91,20 @@
           <b-form-group label-cols="3" label="Dc:" label-for="input-horizontal">
             <b-form-select v-model="editDc">
               <b-form-select-option selected :value="editInfos.dc.id" v-if="editInfos.dc.hoster">
-                {{ editInfos.dc.name }} - {{ editInfos.dc.hoster.name}}
+                <p v-if='editInfos.dc.hoster'>
+                  {{ editInfos.dc.name }} - {{ editInfos.dc.hoster.name}}
+                </p>
+                <p v-else>
+                  {{ editInfos.dc.name }}
+                </p>
               </b-form-select-option>
               <b-form-select-option v-for="dc in dcs" v-bind:key="dc.id" :value="dc.id" v-if="dc.id != editInfos.dc.id">
-                {{ dc.name }} - {{ dc.hoster.name }}
+                <p v-if='dc.hoster'>
+                  {{ dc.name }} - {{ dc.hoster.name}}
+                </p>
+                <p v-else>
+                  {{ dc.name }}
+                </p>
               </b-form-select-option>
             </b-form-select>
           </b-form-group>
@@ -235,7 +247,7 @@ export default {
             if(hostname == this.servers[index].hostname && hostname != this.server.hostname) {
               this.validHostname = false
               return false
-            }       
+            }
           }
           this.validHostname = true
           return true
@@ -356,7 +368,7 @@ export default {
             if(ip == this.servers[index].ip && ip != this.server.ip) {
               this.validIp = false
               return false
-            }       
+            }
           }
           this.validIp = true
           return true
@@ -416,11 +428,167 @@ export default {
       user_admin: ''
     }
   },
+  mounted() {
+    this.getServer();
+    this.getCred();
+    this.getClient()
+    this.getOs();
+    this.getType();
+    this.getEnv();
+    this.getProfile();
+    this.getServerUser();
+    this.getDc();
+    this.getOffer();
+    this.getHoster();
+  },
   methods: {
+    async getServer() {
+      this.servers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:ALL_SERVERS_QUERY,
+          variables: {start: start, where: {"archived": false}}
+        })
+        for (let i = 0; tmp['data']['servers'][i]; i++)
+          this.servers.push(tmp['data']['servers'][i])
+        start += 100
+      } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
+    },
+    async getCred() {
+      this.creds = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:CRED_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['creds'][i]; i++)
+          this.creds.push(tmp['data']['creds'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['creds'] && tmp['data']['creds'].length);
+    },
+    async getClient() {
+      this.clients = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:CLIENTS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['clients'][i]; i++)
+          this.clients.push(tmp['data']['clients'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
+    },
+    async getOs() {
+      this.os = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:OS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['os'][i]; i++)
+          this.os.push(tmp['data']['os'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['os']&& tmp['data']['os'].length);
+    },
+    async getType() {
+      this.types = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:TYPE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['types'][i]; i++)
+          this.types.push(tmp['data']['types'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['types'] && tmp['data']['types'].length)
+    },
+    async getEnv() {
+      this.envs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:ENV_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['envs'][i]; i++)
+          this.envs.push(tmp['data']['envs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
+    },
+    async getProfile() {
+      this.profiles = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:PROFILE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['profiles'][i]; i++)
+          this.profiles.push(tmp['data']['profiles'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['profiles'] && tmp['data']['profiles'].length)
+    },
+    async getServerUser() {
+      this.serverUsers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SERVER_USER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['serverUsers'][i]; i++)
+          this.serverUsers.push(tmp['data']['serverUsers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['serverUsers'] && tmp['data']['serverUsers'].length)
+    },
+    async getDc() {
+      this.dcs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:DC_QUERY_,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['dcs'][i]; i++)
+          this.dcs.push(tmp['data']['dcs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['dcs'] && tmp['data']['dcs'].length)
+    },
+    async getOffer() {
+      this.offers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:OFFER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['offers'][i]; i++)
+          this.offers.push(tmp['data']['offers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['offers'] && tmp['data']['offers'].length)
+    },
+    async getHoster() {
+      this.hosters = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:HOSTERS_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['hosters'][i]; i++)
+          this.hosters.push(tmp['data']['hosters'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
+    },
     getOptions(server) {
       this.editServices = []
       for (let index = 0; index < server.services.length; index++)
-        this.editServices[index] = { name: server.services[index].name, value: server.services[index].id } 
+        this.editServices[index] = { name: server.services[index].name, value: server.services[index].id }
     },
     fill() {
       this.editOffer = this.editInfos.offer.id;
@@ -488,42 +656,6 @@ export default {
       window.location.reload(true);
     },
   },
-  apollo: {
-    servers: {
-      query: ALL_SERVERS_QUERY,
-      variables: {"where": {"archived": false}}
-    },
-    creds: {
-      query: CRED_QUERY
-    },
-    clients: {
-      query: CLIENTS_QUERY
-    },
-    os: {
-      query: OS_QUERY
-    },
-    types: {
-      query: TYPE_QUERY
-    },
-    envs: {
-      query: ENV_QUERY
-    },
-    profiles: {
-      query: PROFILE_QUERY
-    },
-    serverUsers: {
-      query: SERVER_USER_QUERY
-    },
-    dcs: {
-      query: DC_QUERY_
-    },
-    offers: {
-      query: OFFER_QUERY
-    },
-    hosters: {
-      query: HOSTERS_QUERY
-    }
-  }
 }
 </script>
 

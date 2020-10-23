@@ -76,8 +76,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getServerUser();
+  },
   methods: {
-    split: function (string) { 
+    async getServerUser() {
+      this.serverUsers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SERVER_USER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['serverUsers'][i]; i++)
+          this.serverUsers.push(tmp['data']['serverUsers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['serverUsers'] && tmp['data']['serverUsers'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -126,11 +142,6 @@ export default {
         if (serverUser.name.toLowerCase().match(this.search.toLowerCase()))
           return true
       });
-    }
-  },
-  apollo: {
-    serverUsers: {
-      query: SERVER_USER_QUERY
     }
   }
 }

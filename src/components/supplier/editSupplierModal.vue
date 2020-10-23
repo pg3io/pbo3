@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editSupplierModal" size="xl" ref="edit-supplier" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">      
+      <b-form @submit.stop.prevent="onSubmit">
         <div class="inputLine">
           <div class="inputField">
             <b-form-group label-cols="3" label="Name" label-for="input-horizontal">
@@ -39,7 +39,7 @@ export default {
             if(name && name.toLowerCase() == this.suppliers[index].name.toLowerCase() && name.toLowerCase() != this.supplier.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -56,7 +56,23 @@ export default {
       validName: true,
     }
   },
+  mounted() {
+    this.getSuppliers();
+  },
   methods: {
+    async getSuppliers() {
+      this.suppliers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SUPPLIER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['suppliers'][i]; i++)
+          this.suppliers.push(tmp['data']['suppliers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -81,11 +97,6 @@ export default {
       this.editSupplier();
     },
   },
-  apollo: {
-    suppliers: {
-      query: SUPPLIER_QUERY
-    }
-  }
 }
 </script>
 

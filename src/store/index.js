@@ -38,14 +38,13 @@ export default new Vuex.Store({
   actions: {
     async login ({ commit, dispatch }, authDetails) {
       try {
-        const { data } = await apolloClient.mutate({
+        var {data} = await apolloClient.mutate({
           mutation: gql`
             mutation($identifier: String!, $password: String!) {
               login(input: { identifier: $identifier, password: $password }) {
-                jwt
+                  jwt
               }
-            }
-          `,
+          }`,
           variables: authDetails
         })
         const token = JSON.stringify("Bearer " + data.login.jwt)

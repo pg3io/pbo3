@@ -40,7 +40,7 @@ export default {
             if(name && name.toLowerCase() == this.envs[index].name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -57,7 +57,23 @@ export default {
       validName: true
     }
   },
+  mounted() {
+    this.getEnv();
+  },
   methods: {
+    async getEnv() {
+      this.envs = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:ENV_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['envs'][i]; i++)
+          this.envs.push(tmp['data']['envs'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
+    },
     reset_infos() {
       this.addInfos.name = null
     },
@@ -85,11 +101,6 @@ export default {
       this.addEnv();
     },
   },
-  apollo: {
-    envs: {
-      query: ENV_QUERY
-    }
-  }
 }
 </script>
 

@@ -79,8 +79,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getProfile();
+  },
   methods: {
-    split: function (string) { 
+    async getProfile() {
+      this.profiles = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:PROFILE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['profiles'][i]; i++)
+          this.profiles.push(tmp['data']['profiles'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['profiles'] && tmp['data']['profiles'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -133,11 +149,6 @@ export default {
       });
     }
   },
-  apollo: {
-    profiles: {
-      query: PROFILE_QUERY
-    }
-  }
 }
 </script>
 

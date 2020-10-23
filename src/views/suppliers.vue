@@ -76,8 +76,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getSuppliers();
+  },
   methods: {
-    split: function (string) { 
+    async getSuppliers() {
+      this.suppliers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SUPPLIER_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['suppliers'][i]; i++)
+          this.suppliers.push(tmp['data']['suppliers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -128,11 +144,6 @@ export default {
       });
     }
   },
-  apollo: {
-    suppliers: {
-      query: SUPPLIER_QUERY
-    }
-  }
 }
 </script>
 

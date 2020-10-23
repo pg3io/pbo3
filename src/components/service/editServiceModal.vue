@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-modal id="editServiceModal" size="xl" ref="edit-service" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-      <b-form @submit.stop.prevent="onSubmit">          
+      <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
             <div class="inputField">
@@ -41,7 +41,7 @@ export default {
             if (name && name.toLowerCase() == this.services[index].name.toLowerCase() && name.toLowerCase() != this.service.name.toLowerCase()) {
               this.validName = false
               return false
-            }       
+            }
           }
           this.validName = true
           return true
@@ -55,10 +55,27 @@ export default {
   },
   data() {
     return {
-      validName: true
+      validName: true,
+      services: {}
     }
   },
+  mounted() {
+    this.getService();
+  },
   methods: {
+    async getService() {
+      this.services = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:SERVICES_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['services'][i]; i++)
+          this.services.push(tmp['data']['services'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['services'] && tmp['data']['services'].length)
+    },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();
     },
@@ -82,11 +99,6 @@ export default {
       }
       this.editService();
     },
-  },
-  apollo: {
-    services: {
-      query: SERVICES_QUERY
-    }
   }
 }
 </script>

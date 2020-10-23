@@ -76,8 +76,24 @@ export default {
       },
     }
   },
+  mounted() {
+    this.getType();
+  },
   methods: {
-    split: function (string) { 
+    async getType() {
+      this.types = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation:TYPE_QUERY,
+          variables: {start: start}
+        })
+        for (let i = 0; tmp['data']['types'][i]; i++)
+          this.types.push(tmp['data']['types'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['types'] && tmp['data']['types'].length)
+    },
+    split: function (string) {
       return string.split(".");
     },
     sort(col, args) {
@@ -126,11 +142,6 @@ export default {
         if (type.name.toLowerCase().match(this.search.toLowerCase()))
           return true
       });
-    }
-  },
-  apollo: {
-    types: {
-      query: TYPE_QUERY
     }
   }
 }

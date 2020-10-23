@@ -1,120 +1,134 @@
 <template>
-  <div v-if="servers[get_server_id]" class="servers">
-      <h1 v-if="servers[get_server_id].hostname != null" class="text-center">{{ servers[get_server_id].hostname }}</h1>
-      <h2 v-if="servers[get_server_id].ip != null" class="text-center">{{ servers[get_server_id].ip  }}</h2>
-      <h3 v-if="servers[get_server_id].client != null" class="text-center">{{ servers[get_server_id].client.name }}</h3>
-  <div class="container-sm">
-      <div v-if="servers[get_server_id]" class="row mt-5">
-            <div class="col bg-light p-5">
-                <h4 class="text-center">Infos</h4>
-                <table class="table table-hover">
-                    <tbody>
-                    <tr>
-                        <th>OS </th>
-                        <td v-if="servers[get_server_id].os != null && servers[get_server_id].os.os_version === ''" class="text-capitalize"><span :class="icon(servers[get_server_id].os.os_name)"></span> {{ servers[get_server_id].os.os_name }} </td>
-                        <td v-else-if="servers[get_server_id].os != null" class="text-capitalize">
-                          <span v-if="servers[get_server_id].os.os_name !== 'windows'" :class="icon(servers[get_server_id].os.os_name)"></span>
-                          <font-awesome-icon v-else :icon="['fab', 'windows']" /> {{ servers[get_server_id].os.os_name }} {{ servers[get_server_id].os.os_version }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Env</th>
-                        <td v-if="servers[get_server_id].env != null">{{ servers[get_server_id].env.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Hoster</th>
-                        <td v-if="servers[get_server_id].dc != null">{{ servers[get_server_id].dc.hoster.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>DC</th>
-                        <td v-if="servers[get_server_id].dc != null">{{ servers[get_server_id].dc.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Type</th>
-                        <td v-if="servers[get_server_id].type != null">{{ servers[get_server_id].type.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Offer</th>
-                        <td v-if="servers[get_server_id].offer != null">{{ servers[get_server_id].offer.name }} - {{ servers[get_server_id].offer.hoster.name}}</td>
-                    </tr>
-                    <tr>
-                        <th>Supplier</th>
-                        <td v-if="servers[get_server_id].client != null && servers[get_server_id].client.supplier">
-                            <router-link :to="{ name: 'SuppliersTable', params: { name: servers[get_server_id].client.supplier.name, id: servers[get_server_id].client.supplier.id}}">
-                                {{ servers[get_server_id].client.supplier.name }}
-                            </router-link>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="col p-5 bg-light">
-                <table class="table table-hover mt-5">
-                    <tbody>
-                    <tr v-if="servers[get_server_id].archived == true">
-                        <th>Archived</th>
-                        <td v-if="servers[get_server_id].archived == true">{{servers[get_server_id].archiveDate}}</td>
-                    </tr>
-                    <tr>
-                        <th>Creation</th>
-                        <td v-if="servers[get_server_id].date != null">{{servers[get_server_id].date}}</td>
-                    </tr>
-                    <tr>
-                        <th>Client</th>
-                        <td v-if="servers[get_server_id].client != null" class="text-capitalize">{{ servers[get_server_id].client.name }}</td>
-                    </tr>
-                    <tr v-if="servers[get_server_id] != null">
-                        <th>Services</th>
-                        <td v-if="servers[get_server_id].services.length === 0">
-                        </td>
-                        <td v-else >
-                            <span v-for="(service, index) in servers[get_server_id].services" :key="service.id" >
-                                <span v-if="index == Object.keys(servers[get_server_id].services).length - 1">{{service.name}}</span>
-                                <span v-else>
-                                    {{service.name, }}, 
-                                </span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Admin</th>
-                        <td v-if="servers[get_server_id].user_admin != null">{{servers[get_server_id].user_admin}}</td>
-                    </tr>
-                    <tr>
-                        <th>Infos</th>
-                        <td class="pre-formatted" v-if="servers[get_server_id] != ''">{{ servers[get_server_id].infos }}</td>
-                    </tr>
-                    <tr>
-                        <th>Ansible vars</th>
-                        <td v-if="servers[get_server_id].ansible_vars != ''">
-                          <p class="pre-formatted" >{{servers[get_server_id].ansible_vars}}</p>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <hr class="mt-5 mb-5">
-            </div>
+<div>
+  <div v-if='servers && Object.keys(servers).length'>
+    <div v-if="servers" class="servers">
+        <h1 v-if="servers.hostname != null" class="text-center">{{ servers.hostname }}</h1>
+        <h2 v-if="servers.ip != null" class="text-center">{{ servers.ip  }}</h2>
+        <h3 v-if="servers.client != null" class="text-center">{{ servers.client.name }}</h3>
+    <div class="container-sm">
+        <div v-if="servers" class="row mt-5">
+              <div class="col bg-light p-5">
+                  <h4 class="text-center">Infos</h4>
+                  <table class="table table-hover">
+                      <tbody>
+                      <tr>
+                          <th>OS </th>
+                          <td v-if="servers.os != null && servers.os.os_version === ''" class="text-capitalize"><span :class="icon(servers.os.os_name)"></span> {{ servers.os.os_name }} </td>
+                          <td v-else-if="servers.os != null" class="text-capitalize">
+                            <span v-if="servers.os.os_name !== 'windows'" :class="icon(servers.os.os_name)"></span>
+                            <font-awesome-icon v-else :icon="['fab', 'windows']" /> {{ servers.os.os_name }} {{ servers.os.os_version }}
+                          </td>
+                      </tr>
+                      <tr>
+                          <th>Env</th>
+                          <td v-if="servers.env != null">{{ servers.env.name }}</td>
+                      </tr>
+                      <tr>
+                          <th>Hoster</th>
+                          <td v-if="servers.dc != null && servers.dc.hoster">{{ servers.dc.hoster.name }}</td>
+                      </tr>
+                      <tr>
+                          <th>DC</th>
+                          <td v-if="servers.dc != null">{{ servers.dc.name }}</td>
+                      </tr>
+                      <tr>
+                          <th>Type</th>
+                          <td v-if="servers.type != null">{{ servers.type.name }}</td>
+                      </tr>
+                      <tr>
+                          <th>Offer</th>
+                          <td v-if="servers.offer != null">{{ servers.offer.name }} - {{ servers.offer.hoster.name}}</td>
+                      </tr>
+                      <tr>
+                          <th>Supplier</th>
+                          <td v-if="servers.client != null && servers.client.supplier">
+                              <router-link :to="{ name: 'SuppliersTable', params: { name: servers.client.supplier.name, id: servers.client.supplier.id}}">
+                                  {{ servers.client.supplier.name }}
+                              </router-link>
+                          </td>
+                      </tr>
+                      </tbody>
+                  </table>
+              </div>
+              <div class="col p-5 bg-light">
+                  <table class="table table-hover mt-5">
+                      <tbody>
+                      <tr v-if="servers.archived == true">
+                          <th>Archived</th>
+                          <td v-if="servers.archived == true">{{servers.archiveDate}}</td>
+                      </tr>
+                      <tr>
+                          <th>Creation</th>
+                          <td v-if="servers.date != null">{{servers.date}}</td>
+                      </tr>
+                      <tr>
+                          <th>Client</th>
+                          <td v-if="servers.client != null" class="text-capitalize">{{ servers.client.name }}</td>
+                      </tr>
+                      <tr v-if="servers != null">
+                          <th>Services</th>
+                          <td v-if="servers.services.length === 0">
+                          </td>
+                          <td v-else >
+                              <span v-for="(service, index) in servers.services" :key="service.id" >
+                                  <span v-if="index == Object.keys(servers.services).length - 1">{{service.name}}</span>
+                                  <span v-else>
+                                      {{service.name, }},
+                                  </span>
+                              </span>
+                          </td>
+                      </tr>
+                      <tr>
+                          <th>Admin</th>
+                          <td v-if="servers.user_admin != null">{{servers.user_admin}}</td>
+                      </tr>
+                      <tr>
+                          <th>Infos</th>
+                          <td class="pre-formatted" v-if="servers != ''">{{ servers.infos }}</td>
+                      </tr>
+                      <tr>
+                          <th>Ansible vars</th>
+                          <td v-if="servers.ansible_vars != ''">
+                            <p class="pre-formatted" >{{servers.ansible_vars}}</p>
+                          </td>
+                      </tr>
+                      </tbody>
+                  </table>
+                  <hr class="mt-5 mb-5">
+              </div>
+        </div>
       </div>
     </div>
   </div>
-  <div v-else>
+  <div v-if="!servers && !servers.length">
       <div id="loader" class="spinner-fast centerDiv">
       </div>
       <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
   </div>
+</div>
 </template>
 
 <script>
-import {ALL_SERVER_QUERY} from '@/assets/js/query/graphql'
+import {ALL_SERVERS_QUERY} from '@/assets/js/query/graphql'
 
 export default {
   name: "Servers",
   data () {
       return {
         servers: [],
+        id: 0
       }
     },
   methods: {
+    async getServer() {
+      this.servers = []
+      var tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:ALL_SERVERS_QUERY,
+        variables: {start: 0, where: {"hostname": this.$route.path.split("/")[2]}}
+      })
+        this.servers = tmp['data']['servers'][0]
+    },
     setTitle() {
       var path = this.split(this.$route.path)
       var server_name = path[2]
@@ -130,7 +144,7 @@ export default {
         loader.style.display = "none";
         message.style.display = "block";
       }
-    }, 
+    },
     split: function (string) {
       return string.split("/");
     },
@@ -139,34 +153,17 @@ export default {
     },
   },
     mounted() {
+        this.getServer();
         this.timeout()
         this.setTitle()
     },
-  computed: {
-      get_server_id: function()  {
-        var path = this.split(this.$route.path)
-        var server_name = path[2]
-        for (let index = 0; index < this.servers.length; index++) {
-            if (this.servers[index].hostname === server_name) {
-                return index
-            }
-        }
-        return null
-      }
-  },
-  apollo: {
-        servers: {
-            query: ALL_SERVER_QUERY,
-            variables: {"where": {"archived": false}}
-        }
-    }
 }
 </script>
 
 <style scoped>
     .noServer {
         margin: 100px auto 0 auto;
-        width: 400px; 
+        width: 400px;
     }
     .pre-formatted {
       white-space: pre-wrap;
