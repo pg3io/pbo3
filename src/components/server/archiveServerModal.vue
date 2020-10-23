@@ -51,7 +51,6 @@ export default {
       }
       const id = this.editInfos.id,
       hostname = this.editInfos.hostname,
-      user_admin = this.editInfos.user_admin,
       ip = this.editInfos.ip,
       infos = this.editInfos.infos != null ? this.editInfos.infos : '',
       ansible = this.editInfos.ansible != null ? this.editInfos.ansible : '',
@@ -71,7 +70,7 @@ export default {
       services = this.listServices.length != 0 ? this.listServices : [];
       this.$apollo.mutate({
         mutation: updateServer,
-        variables: {id, hostname, ip, user_admin, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived, ansible}
+        variables: {id, hostname, ip, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived, ansible}
       });
       window.location.reload(true);
     }

@@ -396,9 +396,6 @@
           ip: {
             required,
           },
-          user_admin: {
-            required
-          },
           infos: {},
           offer: {},
           client: {},
@@ -415,7 +412,6 @@
       editInfos: {
         hostname: {required},
         ip: {required},
-        user_admin: {required},
         infos: {},
         offer: {},
         client: {},
@@ -470,7 +466,6 @@
           id: null,
           hostname: null,
           ip: null,
-          user_admin: null,
           infos: null,
           raid: false,
           offer: 0,
@@ -488,7 +483,6 @@
         addInfos: {
           hostname: null,
           ip: null,
-          user_admin: null,
           infos: null,
           raid: false,
           offer: null,
@@ -863,7 +857,6 @@
         this.server = new Object(server);
         this.editInfos.id = this.server.id;
         this.editInfos.hostname = server.hostname;
-        this.editInfos.user_admin = server.user_admin;
         this.editInfos.ip = server.ip;
         this.editInfos.infos = server.infos || "";
         this.editInfos.ansible = server.ansible_vars != null ? server.ansible_vars : '';
@@ -886,7 +879,6 @@
       },
       reset_infos() {
         this.addInfos.hostname = null
-        this.addInfos.user_admin = null
         this.addInfos.ip = ''
         this.addInfos.id_host = null
         this.addInfos.raid = false
@@ -1002,16 +994,29 @@
       filteredServer: function(opt, string, mutate = false) {
         var rank = 0, i = -1, result = [];
         while (string && this.saveServers[++i])
-          if (((opt == "all" || opt == "hostname") && this.saveServers[i].hostname && this.saveServers[i].hostname.toLowerCase().match(string.toLowerCase())) ||
-          ((opt == "all" || opt =="ip") && this.saveServers[i].ip && this.saveServers[i].ip.toLowerCase().match(string.toLowerCase())) ||
-          ((opt == "all" || opt == "client") && this.saveServers[i].client && this.saveServers[i].client.name && this.saveServers[i].client.name.toLowerCase().match(string.toLowerCase())) ||
-          ((opt == "all" || opt == "os") && this.saveServers[i].os && this.saveServers[i].os.os_name && this.saveServers[i].os.os_name.toLowerCase().match(string.toLowerCase())) ||
-          ((opt == "all" || opt == "dc") && this.saveServers[i].dc && this.saveServers[i].dc.hoster && this.saveServers[i].dc.hoster.name && this.saveServers[i].dc.hoster.name.toLowerCase().match(string.toLowerCase())) ||
-          ((opt == "all" || opt == "type") && this.saveServers[i].type && this.saveServers[i].type.name && this.saveServers[i].type.name.toLowerCase().match(string.toLowerCase())) ||
-          ((opt == "all" || opt == "env") && this.saveServers[i].env && this.saveServers[i].env.name && this.saveServers[i].env.name.toLowerCase().match(string.toLowerCase())) ||
+          if (((opt == "all" || opt == "hostname") && this.saveServers[i].hostname && this.saveServers[i].hostname.toLowerCase() == string.toLowerCase()) ||
+          ((opt == "all" || opt =="ip") && this.saveServers[i].ip && this.saveServers[i].ip.toLowerCase() == string.toLowerCase()) ||
+          ((opt == "all" || opt == "client") && this.saveServers[i].client && this.saveServers[i].client.name && this.saveServers[i].client.name.toLowerCase() == string.toLowerCase()) ||
+          ((opt == "all" || opt == "os") && this.saveServers[i].os && this.saveServers[i].os.os_name && this.saveServers[i].os.os_name.toLowerCase() == string.toLowerCase()) ||
+          ((opt == "all" || opt == "dc") && this.saveServers[i].dc && this.saveServers[i].dc.hoster && this.saveServers[i].dc.hoster.name && this.saveServers[i].dc.hoster.name.toLowerCase() == string.toLowerCase()) ||
+          ((opt == "all" || opt == "type") && this.saveServers[i].type && this.saveServers[i].type.name && this.saveServers[i].type.name.toLowerCase() == string.toLowerCase()) ||
+          ((opt == "all" || opt == "env") && this.saveServers[i].env && this.saveServers[i].env.name && this.saveServers[i].env.name.toLowerCase() == string.toLowerCase()) ||
           ((opt == "all" || opt == "id") && this.saveServers[i].id && this.saveServers[i].id == string) ||
-          (opt == "_id" && this.saveServers[i].id && this.saveServers[i].id.match(string)))
+          (opt == "_id" && this.saveServers[i].id && this.saveServers[i].id == string))
             result[rank++] = this.saveServers[i];
+        if (!rank) {
+          while (string && this.saveServers[++i])
+            if (((opt == "all" || opt == "hostname") && this.saveServers[i].hostname && this.saveServers[i].hostname.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt =="ip") && this.saveServers[i].ip && this.saveServers[i].ip.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt == "client") && this.saveServers[i].client && this.saveServers[i].client.name && this.saveServers[i].client.name.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt == "os") && this.saveServers[i].os && this.saveServers[i].os.os_name && this.saveServers[i].os.os_name.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt == "dc") && this.saveServers[i].dc && this.saveServers[i].dc.hoster && this.saveServers[i].dc.hoster.name && this.saveServers[i].dc.hoster.name.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt == "type") && this.saveServers[i].type && this.saveServers[i].type.name && this.saveServers[i].type.name.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt == "env") && this.saveServers[i].env && this.saveServers[i].env.name && this.saveServers[i].env.name.toLowerCase().match(string.toLowerCase())) ||
+            ((opt == "all" || opt == "id") && this.saveServers[i].id && this.saveServers[i].id == string) ||
+            (opt == "_id" && this.saveServers[i].id && this.saveServers[i].id.match(string)))
+              result[rank++] = this.saveServers[i];
+        }
         if (!mutate) this.inputSearch = this.tags.pop();
         if (!string)
           return this.saveServers;
@@ -1082,7 +1087,9 @@
         if (this.tags[this.tags.length - 1] == this.inputSearch) this.inputSearch = ''
         switch (this.tags[1].toLowerCase()) {
           case "server":
+            alert('ouais ouais ouais')
             if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
+              alert("oui")
               this.get_all_infos(check[0]);
               this.$bvModal.show('editServerModal');
             }

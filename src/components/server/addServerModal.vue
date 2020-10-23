@@ -96,11 +96,14 @@
       <div class="inputLine">
         <div class="inputField">
           <b-form-group label-cols="3" label="Server User" label-for="input-horizontal">
-            <b-form-select id="server_user-input" name="server_user-input" v-model="$v.addInfos.server_user.$model">
+            <b-form-select id="server_user-input" name="server_user-input" v-model="$v.addInfos.server_user.$model" :state="validateState('server_user')" aria-describedby="input-server_user-live-feedback">
               <b-form-select-option v-for="server_user in serverUsers" v-bind:key="server_user.id" :value="server_user.id">
                 {{ server_user.name }}
               </b-form-select-option>
             </b-form-select>
+            <b-form-invalid-feedback id="input-server_user-live-feedback">
+              Server_user can't be blank
+            </b-form-invalid-feedback>
           </b-form-group>
         </div>
         <div class="inputField1">
@@ -129,16 +132,6 @@
             </b-form-select>
           </b-form-group>
         </div>
-        <div class="inputField1">
-          <b-form-group label-cols="3" label="Admin user" label-for="input-horizontal">
-            <b-form-input id="user_admin-input" name="user_admin-input" v-model="$v.addInfos.user_admin.$model" :state="validateState('user_admin')" aria-describedby="input-url_admin-live-feedback" autocomplete="off">
-            </b-form-input>
-            <b-form-invalid-feedback id="input-url_admin-live-feedback">
-              <span>Admin user can't be blank</span>
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </div>
-
       </div>
     </div>
     <div class="inputLine">
@@ -230,7 +223,7 @@ export default {
       },
       ansible: {
         check_vars(ansible) {
-          if (ansible == '') {
+          if (!ansible || ansible == '') {
             return true
           }
           var keyValue = /([a-zA-Z0-9_]\:[ ]{1}[a-zA-Z0-9_])/,
@@ -319,9 +312,6 @@ export default {
           return result
         }
       },
-      user_admin: {
-        required
-      },
       ip: {
         required,
         validIp(ip) {
@@ -356,7 +346,7 @@ export default {
       type: {},
       env: {},
       dc: {},
-      server_user: {},
+      server_user: {required},
       profile: {},
       os: {},
       services: {},
@@ -570,7 +560,6 @@ export default {
       this.addInfos.dc = null
       this.addInfos.profile = null
       this.addInfos.server_user = null
-      this.addInfos.user_admin = null,
       this.addInfos.os = null
       this.listServices = []
       this.addInfos.date = new Date().toISOString().slice(0,10)
@@ -595,7 +584,6 @@ export default {
       ip = this.addInfos.ip,
       infos = this.addInfos.infos != null ? this.addInfos.infos : ' ',
       client = this.addInfos.client != null ? this.addInfos.client : 0,
-      user_admin = this.addInfos.user_admin,
       type = this.addInfos.type != null ? this.addInfos.type : 0,
       env = this.addInfos.env != null ? this.addInfos.env : 0,
       dc = this.addInfos.dc != null ? this.addInfos.dc : 0,
@@ -610,7 +598,7 @@ export default {
       services = this.addInfos.services != null ? this.listServices : [];
       this.$apollo.mutate({
         mutation: createServer,
-        variables: {hostname, ip, user_admin, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date, ansible}
+        variables: {hostname, ip, infos, client, os, cred, type, env, dc, profile, raid, offer, server_user, services, date, ansible}
       });
       window.location.reload(true);
     },

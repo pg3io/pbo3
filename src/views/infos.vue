@@ -80,7 +80,7 @@
                       </tr>
                       <tr>
                           <th>Admin</th>
-                          <td v-if="servers.user_admin != null">{{servers.user_admin}}</td>
+                          <td v-if="servers.server_user && servers.server_user.name">{{servers.server_user.name}}</td>
                       </tr>
                       <tr>
                           <th>Infos</th>

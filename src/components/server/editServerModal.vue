@@ -120,7 +120,7 @@
       <div class="inputLine">
         <div class="inputField">
           <b-form-group label-cols="3" label="Server User:" label-for="input-horizontal">
-            <b-form-select v-model="editServerUser">
+            <b-form-select v-model="editServerUser" :state="validateEdit('server_user')" aria-describedby="input-server_user-edit-feedback">
               <b-form-select-option  selected :value="editInfos.server_user.id">
                 {{ editInfos.server_user.name }}
               </b-form-select-option>
@@ -128,6 +128,9 @@
                 {{ server_user.name }}
               </b-form-select-option>
             </b-form-select>
+            <b-form-invalid-feedback id="input-server_user-edit-feedback">
+              server_user can't be blank
+            </b-form-invalid-feedback>
           </b-form-group>
         </div>
         <div class="inputField1">
@@ -156,15 +159,6 @@
                 {{ offer.name }}
               </b-form-select-option>
             </b-form-select>
-          </b-form-group>
-        </div>
-        <div class="inputField1">
-          <b-form-group label-cols="3" label="Admin user" label-for="input-horizontal">
-            <b-form-input id="url_admin-input-edit" name="url_admin-input" v-model="$v.editInfos.user_admin.$model" :state="validateEdit('user_admin')" aria-describedby="input-url_admin-edit-feedback" autocomplete="off">
-            </b-form-input>
-            <b-form-invalid-feedback id="input-url_admin-edit-feedback">
-              <span>Hostname can't be blank!</span>
-            </b-form-invalid-feedback>
           </b-form-group>
         </div>
       </div>
@@ -344,9 +338,6 @@ export default {
           return result
         }
       },
-      user_admin: {
-        required
-      },
       ip: {
         required,
         validIp(ip) {
@@ -381,7 +372,14 @@ export default {
       type: {},
       env: {},
       dc: {},
-      server_user: {},
+      server_user: {
+        required,
+        checkServerUser() {
+          if (!this.editServerUser)
+            return false
+          return true
+        }
+      },
       profile: {},
       os: {},
       services: {},
@@ -425,7 +423,6 @@ export default {
       validFormat: true,
       hostname: '',
       ip: '',
-      user_admin: ''
     }
   },
   mounted() {
@@ -602,7 +599,6 @@ export default {
       this.editOs = this.editInfos.os.id;
       this.getOptions(this.$parent.server);
       this.hostname = this.editInfos.hostname;
-      this.user_admin = this.editInfos.user_admin;
       this.ip = this.editInfos.ip;
     },
     editToList() {
@@ -632,7 +628,6 @@ export default {
       const id = this.editInfos.id,
       hostname = this.editInfos.hostname,
       ip = this.editInfos.ip,
-      user_admin = this.editInfos.user_admin,
       infos = this.editInfos.infos != null ? this.editInfos.infos : '',
       ansible = this.editInfos.ansible != null ? this.editInfos.ansible : '',
       raid = this.editInfos.raid,
@@ -651,7 +646,7 @@ export default {
       services = this.listServices.length != 0 ? this.listServices : [];
       this.$apollo.mutate({
         mutation: updateServer,
-        variables: {id, hostname, ip, user_admin, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived, ansible}
+        variables: {id, hostname, ip, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived, ansible}
       });
       window.location.reload(true);
     },
