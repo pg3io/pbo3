@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     deleteDc() {
-      const id = this.$parent.editInfos.id
+      const id = this.editInfos.id
       this.$apollo.mutate({
         mutation: deleteDc,
         variables: {id}

@@ -1,28 +1,30 @@
 <template>
-  <div class="text-center">
-    <div class="container-sm">
-      <form class="form-signin" action="POST" @submit.prevent="loginUser">
-        <img class="mb-4" src="@/assets/images/logo.png" alt="" width="150" height="120">
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="identifier" class="sr-only">User</label>
-        <input type="text" id="identifier" class="form-control" placeholder="User" v-model="authDetails.identifier" required autocomplete="off">
-        <b-input-group>
-          <b-form-input type="password" id="password" class="form-control passwd" placeholder="Password" v-model="authDetails.password" required autocomplete="off">
-          </b-form-input>
-          <label for="inputPassword" class="sr-only">Password</label>
-          <b-input-group-append class="eyeButton">
-            <b-button v-if="showPassword" variant="link" size="sm" @click="show_hidePassword">
-              <font-awesome-icon class="icon" icon="eye" />
-            </b-button>
-            <b-button v-else variant="link" size="sm" @click="show_hidePassword">
-              <font-awesome-icon class="icon" icon="eye-slash" />
-            </b-button>
-          </b-input-group-append>
-        </b-input-group>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-      </form>
+  <body>
+    <div class="text-center">
+      <div class="container-sm">
+        <form class="form-signin" action="POST" @submit.prevent="loginUser">
+          <img class="mb-4" src="@/assets/images/logo.png" alt="" width="150" height="120">
+          <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+          <label for="identifier" class="sr-only">User</label>
+          <input type="text" id="identifier" class="form-control" placeholder="User" v-model="authDetails.identifier" required autocomplete="off">
+          <b-input-group>
+            <b-form-input type="password" id="password" class="form-control passwd" placeholder="Password" v-model="authDetails.password" required autocomplete="off">
+            </b-form-input>
+            <label for="inputPassword" class="sr-only">Password</label>
+            <b-input-group-append class="eyeButton">
+              <b-button v-if="showPassword" variant="link" size="sm" @click="show_hidePassword">
+                <font-awesome-icon class="icon" icon="eye" />
+              </b-button>
+              <b-button v-else variant="link" size="sm" @click="show_hidePassword">
+                <font-awesome-icon class="icon" icon="eye-slash" />
+              </b-button>
+            </b-input-group-append>
+          </b-input-group>
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        </form>
+      </div>
     </div>
-  </div>
+  </body>
 </template>
 
 <script>

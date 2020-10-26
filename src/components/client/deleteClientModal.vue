@@ -5,8 +5,8 @@
     <div class="inputConfirm">
       <b-button variant="outline-dark" @click="hideServerModal('delete-client')">Cancel</b-button>
       <b-button :disabled='disabled' variant="outline-danger" @click="deleteClient()">Delete</b-button>
-    </div>  
-  </b-modal> 
+    </div>
+  </b-modal>
 </template>
 
 <script>
@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     deleteClient() {
-      const id = this.$parent.editInfos.id
+      const id = this.editInfos.id
       this.$apollo.mutate({
         mutation: deleteClient,
         variables: {id}

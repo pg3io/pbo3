@@ -84,6 +84,9 @@ export default {
           var word = /([a-z0-9_])/,
           metaChars = /[\"\'\\!@#$%^&*()+=|~:;,.?<>]/,
           space = /\s/,
+          end = /\S$/,
+          indentStart = /^[ ]{2}/,
+          listItem = /-[ ]{1}[a-zA-Z0-9_]/,
           result = true,
           array = value.split('\n');
           this.valueExists = false
@@ -91,19 +94,37 @@ export default {
           if (!value || value.length == 0) {
             return false
           }
-          for (let i = 0; i < array.length; i++) {
-            if (word.test(array[i]) == true && space.test(array[i]) == false && metaChars.test(array[i]) == false) {
-              for (let index = 0; index < i; index++) {
-                if(array[i].toLowerCase() == array[index].toLowerCase()) {
-                  this.valueExists = true
-                  return false
+          if (array.length < 2) {
+            for (let i = 0; i < array.length; i++) {
+              if (word.test(array[i]) == true && space.test(array[i]) == false && metaChars.test(array[i]) == false) {
+                for (let index = 0; index < i; index++) {
+                  if(array[i].toLowerCase() == array[index].toLowerCase()) {
+                    this.valueExists = true
+                    return false
+                  }
                 }
+                result = true
               }
-              result = true
+              else {
+                this.validValue = true
+                result = false
+              }
             }
-            else {
-              this.validValue = true
-              result = false
+          } else {
+            for (let i = 0; i < array.length; i++) {
+              if (listItem.test(array[i]) == true && indentStart.test(array[i]) == true && metaChars.test(array[i]) == false && end.test(array[i]) == true && word.test(array[i]) == true) {
+                for (let index = 0; index < i; index++) {
+                  if(array[i].toLowerCase() == array[index].toLowerCase()) {
+                    this.valueExists = true
+                    return false
+                  }
+                }
+                result = true
+              }
+              else {
+                this.validValue = true
+                result = false
+              }
             }
           }
           return result

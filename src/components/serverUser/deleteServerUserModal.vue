@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     deleteServerUser() {
-      const id = this.$parent.editInfos.id
+      const id = this.editInfos.id
       this.$apollo.mutate({
         mutation: deleteServerUser,
         variables: {id}
