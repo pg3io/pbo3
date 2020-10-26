@@ -34,6 +34,9 @@
         <b-button class="buttonGroupLeft" v-b-modal.addSupplierModal variant="outline-dark" @click="hideModal('add', 'supplier')">
           Supplier
         </b-button>
+        <b-button class="buttonGroupRight" v-b-modal.addVarModal variant="outline-dark" @click="hideModal('add', 'var')">
+          Global Vars
+        </b-button>
       </div>
     </b-modal>
     <add-server :addInfos='editAll' :services='services'></add-server>
@@ -41,6 +44,7 @@
     <archive-server :editInfos='editInfos'></archive-server>
     <add-hoster :addInfos='editAll'></add-hoster>
     <add-client :addInfos='editAll'></add-client>
+    <add-var :addInfos='editAll'></add-var>
     <add-os :addInfos='editAll'></add-os>
     <add-env :addInfos='editAll'></add-env>
     <add-supplier :addInfos='editAll'></add-supplier>
@@ -59,6 +63,7 @@
     <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll' :dc='dc'></edit-dc>
+    <edit-var :editInfos='editAll'></edit-var>
     <div class="container-sm linklist">
       <div>
         <div id="searchEngine">
@@ -361,6 +366,9 @@
   import AddService from "@/components/service/addServiceModal.vue"
   import EditService from "@/components/service/editServiceModal.vue"
 
+  import AddVar from "@/components/globalVars/addVarModal.vue"
+  import EditVar from "@/components/globalVars/editVarModal.vue"
+
   export default {
     name: 'Home',
     components: {
@@ -386,7 +394,9 @@
       AddService,
       EditService,
       AddSupplier,
-      EditSupplier
+      EditSupplier,
+      AddVar,
+      EditVar
     },
     validations: {
       addInfos: {
@@ -1071,6 +1081,10 @@
           case "supplier":
             this.editAll = {name: (this.tags[2] && this.tags[2].length) ? this.tags[2] : ''};
             this.$bvModal.show('addSupplierModal');
+            break;
+          case "var":
+            this.editAll = {key: (this.tags[2] && this.tags[2].length) ? this.tags[2] : '', value: ''};
+            this.$bvModal.show('addVarModal');
             break;
           default:
             this.$refs["add"].show();

@@ -41,6 +41,15 @@ const routes = [
     }
   },
   {
+    path: '/globalVars',
+    name: 'GlobalVars',
+    component: () => import('@/views/globalVars.vue'),
+    meta: {
+      title: 'PBO3 - Global Vars',
+      requiresAuth: true
+    }
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/login.vue'),
