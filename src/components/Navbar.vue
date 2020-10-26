@@ -69,6 +69,11 @@
                 Archives
               </router-link>
             </b-dropdown-item>
+            <b-dropdown-item @click="go_to('/globalVars')">
+              <router-link class="rlink" tag="a" to="/globalVars">
+                Global Vars
+              </router-link>
+            </b-dropdown-item>
           </b-nav-item-dropdown>
         </b-navbar-nav>
       </b-collapse>

@@ -471,6 +471,16 @@ query Suppliers($start: Int!) {
 }
 `
 
+const GLOBALVAR_QUERY = gql`
+query GlobalVars($start: Int!) {
+  globalVars(limit: 50, start: $start) {
+    id,
+    key,
+    value
+  }
+}
+`
+
 export {
   ALL_SERVERS_QUERY,
   ALL_SERVER_QUERY,
@@ -488,5 +498,6 @@ export {
   OFFER_QUERY,
   SERVICES_QUERY,
   ARCHIVED_SERVERS_QUERY,
-  SUPPLIER_QUERY
+  SUPPLIER_QUERY,
+  GLOBALVAR_QUERY
 }
