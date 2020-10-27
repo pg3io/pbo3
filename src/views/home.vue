@@ -287,7 +287,7 @@
         <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
       </div>
     </b-modal>
-    <b-button v-show="scrolled" @click='goTop' pill variant='outline-dark' class='bottom-right'>Go Top</b-button>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
 
@@ -1751,7 +1751,7 @@
 }
 .bottom-right {
   position: fixed;
-  right: 5px;
-  bottom: 5px;
+  right: 2%;
+  bottom: 2%;
 }
 </style>

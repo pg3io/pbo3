@@ -25,6 +25,7 @@ import { faSort } from '@fortawesome/free-solid-svg-icons'
 import { faEye } from '@fortawesome/free-solid-svg-icons'
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons'
 import { faWindows } from '@fortawesome/free-brands-svg-icons'
+import { faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import './assets/css/main.css'
 import './assets/css/spinner.css'
 import './assets/css/font-logos.css'
@@ -41,6 +42,7 @@ library.add(faWindows)
 library.add(faEye)
 library.add(faEyeSlash)
 library.add(faArchive)
+library.add(faChevronUp)
 
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
