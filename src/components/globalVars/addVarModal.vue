@@ -84,6 +84,9 @@ export default {
           var word = /([a-z0-9_])/,
           metaChars = /[\"\'\\!@#$%^&*()+=|~:;,.?<>]/,
           space = /\s/,
+          end = /\S$/,
+          indentStart = /^[ ]{2}/,
+          listItem = /-[ ]{1}[a-zA-Z0-9_]/,
           result = true,
           array = value.split('\n');
           this.valueExists = false
@@ -91,19 +94,36 @@ export default {
           if (!value || value.length == 0) {
             return false
           }
-          for (let i = 0; i < array.length; i++) {
-            if (word.test(array[i]) == true && space.test(array[i]) == false && metaChars.test(array[i]) == false) {
-              for (let index = 0; index < i; index++) {
-                if(array[i].toLowerCase() == array[index].toLowerCase()) {
-                  this.valueExists = true
-                  return false
-                }
+          if (array.length < 2) {
+            for (let i = 0; i < array.length; i++) {
+              if (word.test(array[i]) == true && space.test(array[i]) == false && metaChars.test(array[i]) == false) {
+                result = true
+                continue
               }
-              result = true
+              if (listItem.test(array[i]) == true && indentStart.test(array[i]) == true && metaChars.test(array[i]) == false && end.test(array[i]) == true && word.test(array[i]) == true) {
+                result = true
+                continue
+              }
+              else {
+                this.validValue = true
+                result = false
+              }
             }
-            else {
-              this.validValue = true
-              result = false
+          } else {
+            for (let i = 0; i < array.length; i++) {
+              if (listItem.test(array[i]) == true && indentStart.test(array[i]) == true && metaChars.test(array[i]) == false && end.test(array[i]) == true && word.test(array[i]) == true) {
+                for (let index = 0; index < i; index++) {
+                  if(array[i].toLowerCase() == array[index].toLowerCase()) {
+                    this.valueExists = true
+                    return false
+                  }
+                }
+                result = true
+              }
+              else {
+                this.validValue = true
+                result = false
+              }
             }
           }
           return result
@@ -149,8 +169,14 @@ export default {
       } while(tmp && tmp['data'] && tmp['data']['globalVars'] && tmp['data']['globalVars'].length)
     },
     addVar() {
-      const key = this.addInfos.key,
-      value = this.addInfos.value;
+      var value = '';
+      if (this.addInfos.value.split("\n").length == 1) {
+        value = this.addInfos.value.split(' ')[this.addInfos.value.split(' ').length]
+      }
+      else {
+        value = this.addInfos.value
+      }
+      const key = this.addInfos.key;
       this.$apollo.mutate({
         mutation: createVar,
         variables: {key, value}

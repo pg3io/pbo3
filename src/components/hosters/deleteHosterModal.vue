@@ -5,7 +5,7 @@
     <div class="inputConfirm">
       <b-button variant="outline-dark" @click="hideServerModal('delete-hoster')">Cancel</b-button>
       <b-button :disabled='disabled' variant="outline-danger" @click="deleteHoster()">Delete</b-button>
-    </div>  
+    </div>
   </b-modal>
 </template>
 
@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     deleteHoster() {
-      const id = this.$parent.editInfos.id
+      const id = this.editInfos.id
       this.$apollo.mutate({
         mutation: deleteHoster,
         variables: {id}

@@ -1,5 +1,89 @@
 import gql from 'graphql-tag'
 
+const SERVERS_QUERY = gql`
+query allServer($start: Int!, $where: JSON!) {
+  servers(limit: 40, start: $start, where: $where) {
+    id,
+    hostname,
+    date,
+    archiveDate,
+    archived,
+    ansible_vars,
+    offer {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    ip,
+    raid,
+    infos,
+    client {
+      id,
+      name,
+      infos,
+      supplier {
+        id,
+        name
+      }
+    },
+    os {
+      id,
+      os_name,
+      os_version,
+      version_name
+    },
+    cred {
+      id,
+      name,
+      auth,
+      token_hash,
+      url_admin_custom,
+      login,
+      password_hash,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    type {
+      id,
+      name
+    },
+    env {
+      id,
+      name
+    },
+    dc {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    }
+    profile {
+      id,
+      name,
+      infos
+    },
+    server_user {
+      id,
+      name
+    },
+    services {
+      id,
+      name
+    }
+  }
+}
+`
+
 const ALL_SERVER_QUERY = gql`
 query allServer($start: Int!) {
   servers(limit: 100, start: $start) {
@@ -484,6 +568,7 @@ query GlobalVars($start: Int!) {
 export {
   ALL_SERVERS_QUERY,
   ALL_SERVER_QUERY,
+  SERVERS_QUERY,
   SERVER_QUERY,
   CRED_QUERY,
   HOSTERS_QUERY,

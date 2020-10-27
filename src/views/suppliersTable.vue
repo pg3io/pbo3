@@ -129,8 +129,22 @@ export default {
   },
   mounted() {
     this.setTitle();
+    this.getServers();
   },
   methods: {
+    async getServers() {
+      this.servers = []
+      var start = 0, tmp = null
+      do {
+        tmp = await this.$apollo.mutate({
+          mutation: ALL_SERVERS_QUERY,
+          variables: {start: start, where: {"client": {"supplier": {"name": this.$route.params.name}}}}
+        })
+        for (let i = 0; tmp['data']['servers'][i]; i++)
+          this.servers.push(tmp['data']['servers'][i])
+        start += 50
+      } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length)
+    },
     setTitle() {
       var path = this.$route.path.split("/")
       var supplier = path[2]
@@ -211,22 +225,6 @@ export default {
           return order === "desc" ? comparison * -1 : comparison;
         };
       },
-  },
-  apollo: {
-    servers: {
-      query: ALL_SERVERS_QUERY,
-      variables() {
-        return {
-          where: {
-            "client": {
-              "supplier": {
-                "name": this.$route.params.name
-              }
-            }
-          }
-        }
-      }
-    }
   }
 }
 </script>

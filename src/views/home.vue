@@ -63,8 +63,19 @@
     <edit-serverUser :editInfos='editAll' :serverUser='serverUser'></edit-serverUser>
     <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll' :dc='dc'></edit-dc>
-    <edit-var :editInfos='editAll'></edit-var>
-    <div class="container-sm linklist">
+    <edit-var :editInfos='editAll' :var='this.var'></edit-var>
+    <delete-client :editInfos='editAll'></delete-client>
+    <delete-dc :editInfos='editAll'></delete-dc>
+    <delete-env :editInfos='editAll'></delete-env>
+    <delete-var :editInfos='editAll'></delete-var>
+    <delete-hoster :editInfos='editAll'></delete-hoster>
+    <delete-os :editInfos='editAll'></delete-os>
+    <delete-profile :editInfos='editAll'></delete-profile>
+    <delete-serverUser :editInfos='editAll'></delete-serverUser>
+    <delete-service :editInfos='editAll'></delete-service>
+    <delete-supplier :editInfos='editAll'></delete-supplier>
+    <delete-type :editInfos='editAll'></delete-type>
+    <div class="container-sm" style="margin-top: 30px;">
       <div>
         <div id="searchEngine">
           <div style="margin-left: 1.25%; margin-right: -1.25%">
@@ -235,8 +246,17 @@
                       </b-button>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                      <font-awesome-icon icon="plus"/>
+                    </td>
+                    <td v-else colspan='12'>
+                      Nothing else to show
+                    </td>
+                  </tr>
                 </tbody>
               </table>
+              <br><br><br><br>
             </div>
           </div>
           <div v-if='!Object.keys(servers).length'>
@@ -256,7 +276,7 @@
           Are you sur you want to delete this ?
         </p>
         <p>
-          <input id='checkInput' type='checkbox' v-on:click="boolDelete = !boolDelete">
+          <input id='checkInput' type='checkbox' @click="boolDelete = !boolDelete">
           <label for="checkInput">
             Verify
           </label>
@@ -267,107 +287,65 @@
         <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
       </div>
     </b-modal>
+<<<<<<< HEAD
+    <b-button v-show="scrolled" @click='goTop' pill variant='outline-dark' class='bottom-right'>Go Top</b-button>
+=======
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
   </div>
 </template>
 
 <script>
     /* Querys */
-  import { CLIENTS_QUERY } from '@/assets/js/query/graphql'
-  import { CRED_QUERY } from '@/assets/js/query/graphql'
-  import { DC_QUERY_ } from '@/assets/js/query/graphql'
-  import { ENV_QUERY } from '@/assets/js/query/graphql'
-  import { OS_QUERY } from '@/assets/js/query/graphql'
-  import { PROFILE_QUERY } from '@/assets/js/query/graphql'
-  import { ALL_SERVERS_QUERY } from '@/assets/js/query/graphql'
-  import { SERVER_USER_QUERY } from '@/assets/js/query/graphql'
-  import { OFFER_QUERY } from '@/assets/js/query/graphql'
-  import { SERVICES_QUERY } from '@/assets/js/query/graphql'
-  import { TYPE_QUERY } from '@/assets/js/query/graphql'
-  import { HOSTERS_QUERY } from '@/assets/js/query/graphql'
-  import { SUPPLIER_QUERY } from '@/assets/js/query/graphql'
+  import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
+  SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
+  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, SERVERS_QUERY}
+  from '@/assets/js/query/graphql'
 
+    /* Deletes */
+  import deleteClient from '@/components/client/deleteClientModal.vue'
+  import deleteDc from '@/components/dc/deleteDcModal.vue'
+  import deleteEnv from '@/components/env/deleteEnvModal.vue'
+  import deleteVar from '@/components/globalVars/deleteVarModal.vue'
+  import deleteHoster from '@/components/hosters/deleteHosterModal.vue'
+  import deleteOs from '@/components/os/deleteOsModal.vue'
+  import deleteProfile from '@/components/profile/deleteProfileModal.vue'
+  import deleteServerUser from '@/components/serverUser/deleteServerUserModal.vue'
+  import deleteService from '@/components/service/deleteServiceModal.vue'
+  import deleteSupplier from '@/components/supplier/deleteSupplierModal.vue'
+  import deleteType from '@/components/type/deleteTypeModal.vue'
 
-    /* Delete mutations */
-  import { deleteClient } from '@/assets/js/deleteMutations/deleteClient'
-  import { deleteCred } from '@/assets/js/deleteMutations/deleteCred'
-  import { deleteDc } from '@/assets/js/deleteMutations/deleteDc'
-  import { deleteEnv } from '@/assets/js/deleteMutations/deleteEnv'
-  import { deleteHoster } from '@/assets/js/deleteMutations/deleteHoster'
-  import { deleteOs } from '@/assets/js/deleteMutations/deleteOs'
-  import { deleteProfile } from '@/assets/js/deleteMutations/deleteProfile'
-  import { deleteServer } from '@/assets/js/deleteMutations/deleteServer'
-  import { deleteServerUser } from '@/assets/js/deleteMutations/deleteServerUser'
-  import { deleteType } from '@/assets/js/deleteMutations/deleteType'
-  import { deleteService } from '@/assets/js/deleteMutations/deleteService'
-  import { deleteSupplier } from '@/assets/js/deleteMutations/deleteSupplier'
-
-
-    /* Update mutations */
-  import { updateClient } from '@/assets/js/updateMutations/updateClient'
-  import { updateCred } from '@/assets/js/updateMutations/updateCred'
-  import { updateDc } from '@/assets/js/updateMutations/updateDc'
-  import { updateEnv } from '@/assets/js/updateMutations/updateEnv'
-  import { updateHoster } from '@/assets/js/updateMutations/updateHoster'
-  import { updateOs } from '@/assets/js/updateMutations/updateOs'
-  import { updateProfile } from '@/assets/js/updateMutations/updateProfile'
-  import { updateServer } from '@/assets/js/updateMutations/updateServer'
-  import { updateServerUser } from '@/assets/js/updateMutations/updateServerUser'
-  import { updateType } from '@/assets/js/updateMutations/updateType'
-  import { updateSupplier } from '@/assets/js/updateMutations/updateSupplier'
-
-    /* Create mutations */
-  import { createClient } from '@/assets/js/createMutations/createClient'
-  import { createCred } from '@/assets/js/createMutations/createCred'
-  import { createDc } from '@/assets/js/createMutations/createDc'
-  import { createEnv } from '@/assets/js/createMutations/createEnv'
-  import { createHoster } from '@/assets/js/createMutations/createHoster'
-  import { createOs } from '@/assets/js/createMutations/createOs'
-  import { createProfile } from '@/assets/js/createMutations/createProfile'
-  import { createServer } from '@/assets/js/createMutations/createServer'
-  import { createServerUser } from '@/assets/js/createMutations/createServerUser'
-  import { createType } from '@/assets/js/createMutations/createType'
-  import { createSupplier } from '@/assets/js/createMutations/createSupplier'
-
-
-  import { required } from "vuelidate/lib/validators";
-
+    /* Edits */
   import EditServer from "@/components/server/editServerModal.vue"
+  import EditHoster from "@/components/hosters/editHosterModal.vue"
+  import EditClient from "@/components/client/editClientModal.vue"
+  import EditOs from "@/components/os/editOsModal.vue"
+  import EditEnv from "@/components/env/editEnvModal.vue"
+  import EditType from "@/components/type/editTypeModal.vue"
+  import EditProfile from "@/components/profile/editProfileModal.vue"
+  import EditServerUser from "@/components/serverUser/editServerUserModal.vue"
+  import EditDc from "@/components/dc/editDcModal.vue"
+  import EditSupplier from "@/components/supplier/editSupplierModal.vue"
+  import EditService from "@/components/service/editServiceModal.vue"
+  import EditVar from "@/components/globalVars/editVarModal.vue"
+
+    /* Adds */
   import AddServer from "@/components/server/addServerModal.vue"
   import ArchiveServer from "@/components/server/archiveServerModal.vue"
-
-
   import AddHoster from "@/components/hosters/addHosterModal.vue"
-  import EditHoster from "@/components/hosters/editHosterModal.vue"
-
   import AddClient from "@/components/client/addClientModal.vue"
-  import EditClient from "@/components/client/editClientModal.vue"
-
   import AddOs from "@/components/os/addOsModal.vue"
-  import EditOs from "@/components/os/editOsModal.vue"
-
   import AddEnv from "@/components/env/addEnvModal.vue"
-  import EditEnv from "@/components/env/editEnvModal.vue"
-
   import AddType from "@/components/type/addTypeModal.vue"
-  import EditType from "@/components/type/editTypeModal.vue"
-
   import AddProfile from "@/components/profile/addProfileModal.vue"
-  import EditProfile from "@/components/profile/editProfileModal.vue"
-
   import AddServerUser from "@/components/serverUser/addServerUserModal.vue"
-  import EditServerUser from "@/components/serverUser/editServerUserModal.vue"
-
   import AddDc from "@/components/dc/addDcModal.vue"
-  import EditDc from "@/components/dc/editDcModal.vue"
-
   import AddSupplier from "@/components/supplier/addSupplierModal.vue"
-  import EditSupplier from "@/components/supplier/editSupplierModal.vue"
-
   import AddService from "@/components/service/addServiceModal.vue"
-  import EditService from "@/components/service/editServiceModal.vue"
-
   import AddVar from "@/components/globalVars/addVarModal.vue"
-  import EditVar from "@/components/globalVars/editVarModal.vue"
+
+    /* others */
+  import { required } from "vuelidate/lib/validators";
 
   export default {
     name: 'Home',
@@ -396,7 +374,18 @@
       AddSupplier,
       EditSupplier,
       AddVar,
-      EditVar
+      EditVar,
+      deleteClient,
+      deleteDc,
+      deleteEnv,
+      deleteVar,
+      deleteHoster,
+      deleteOs,
+      deleteProfile,
+      deleteServerUser,
+      deleteService,
+      deleteSupplier,
+      deleteType
     },
     validations: {
       addInfos: {
@@ -452,6 +441,8 @@
         offers: [],
         suppliers: [],
         supplier: null,
+        vars: [],
+        var: null,
         profiles: [],
         serverUsers: [],
         hoster: null,
@@ -547,7 +538,8 @@
             'ServerUser',
             'Dc',
             'Service',
-            'Supplier'
+            'Supplier',
+            'Var'
           ],
           search: [
             'id',
@@ -555,69 +547,15 @@
             'hostname',
             'client',
             'os',
-            'hoster'
+            'hoster',
           ]
         },
         hoverSuggest: "",
-        mutationCall: {
-          name: [
-            'Client',
-            'Cred',
-            'Dc',
-            'Env',
-            'Hoster',
-            'Os',
-            'Profile',
-            'Server',
-            'ServerUser',
-            'Type',
-            'Supplier'
-          ],
-          deleteFunction: [
-            deleteClient,
-            deleteCred,
-            deleteDc,
-            deleteEnv,
-            deleteHoster,
-            deleteOs,
-            deleteProfile,
-            deleteServer,
-            deleteServerUser,
-            deleteType,
-            deleteService,
-            deleteSupplier
-          ],
-          updateFunction: [
-            updateClient,
-            updateCred,
-            updateDc,
-            updateEnv,
-            updateHoster,
-            updateOs,
-            updateProfile,
-            updateServer,
-            updateServerUser,
-            updateType,
-            updateSupplier
-          ],
-          createFunction: [
-            createClient,
-            createCred,
-            createDc,
-            createEnv,
-            createHoster,
-            createOs,
-            createProfile,
-            createServer,
-            createServerUser,
-            createType,
-            createSupplier
-          ]
-        },
         hide_suggest: true,
         editAll: {},
         boolDelete: true,
-        idDelete: 0
+        full: false,
+        scrolled: false
       }
     },
     watch: {
@@ -629,36 +567,66 @@
         this.servers = this.saveServers;
       }
     },
-      mounted() {
-        this.getServer();
-        this.getCred();
-        this.getClient()
-        this.getOs();
-        this.getType();
-        this.getEnv();
-        this.getProfile();
-        this.getServerUser();
-        this.getDc();
-        this.getOffer();
-        this.getService();
-        this.getHoster();
-        this.getSuppliers();
-        this.timeout();
-        this.getSearchByUrl();
-      },
+    mounted() {
+      this.getServer(0);
+      this.getCred();
+      this.getClient()
+      this.getOs();
+      this.getType();
+      this.getEnv();
+      this.getProfile();
+      this.getServerUser();
+      this.getDc();
+      this.getOffer();
+      this.getService();
+      this.getHoster();
+      this.getSuppliers();
+      this.getVars();
+      this.timeout();
+      this.getSearchByUrl();
+    },
+    created () {
+      window.addEventListener('scroll', this.scroll);
+    },
+    beforeDestroy () {
+      window.removeEventListener('scroll', this.scroll);
+    },
     methods: {
-      async getServer() {
-        this.servers = []
-        var start = 0, tmp = null
-        do {
-          tmp = await this.$apollo.mutate({
-            mutation:ALL_SERVERS_QUERY,
-            variables: {start: start, where: {"archived": false}}
-          })
-          for (let i = 0; tmp['data']['servers'][i]; i++)
-            this.servers.push(tmp['data']['servers'][i])
-          start += 100
-        } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
+      goTop() {
+        var change = document.scrollingElement.scrollTop / 10
+<<<<<<< HEAD
+        if (change <= 15) change = 15
+=======
+        if (change < 15) change = 20
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
+        if (document.scrollingElement.scrollTop > 0) {
+          document.scrollingElement.scrollTop -= change
+          setTimeout(this.goTop, 10)
+        } else {
+          document.scrollingElement.scrollTop = 0
+<<<<<<< HEAD
+=======
+          this.scrolled = false
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
+        }
+      },
+      scroll() {
+        this.scrolled = !!(document.scrollingElement.scrollTop)
+        if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+          if (this.full == false)
+            this.getServer(this.servers.length)
+        }
+      },
+      async getServer(start) {
+        var length = this.servers.length
+        var tmp = await this.$apollo.mutate({
+          mutation:SERVERS_QUERY,
+          variables: {start: start, where: {"archived": false}}
+        })
+        for (let i = 0; tmp['data']['servers'][i]; i++)
+          this.servers.push(tmp['data']['servers'][i])
+        if (length == this.servers.length)
+          this.full = true
       },
       async getCred() {
         this.creds = []
@@ -816,6 +784,19 @@
           start += 50
         } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
       },
+      async getVars() {
+        this.vars = []
+        var start = 0, tmp = null
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:GLOBALVAR_QUERY,
+            variables: {start: start}
+          })
+          for (let i = 0; tmp['data']['globalVars'][i]; i++)
+            this.vars.push(tmp['data']['globalVars'][i])
+          start += 50
+        } while(tmp && tmp['data'] && tmp['data']['globalVars'] && tmp['data']['globalVars'].length)
+      },
       getSearchByUrl() {
         var actPath = this.$route.path, savePath = actPath;
         if (!this.servers.length || !actPath || !this.first || actPath == '/' || !actPath.startsWith('/search='))
@@ -916,15 +897,6 @@
         this.tags.push(type);
         this.addMutations();
         this.tags = []
-      },
-      deleteServer() {
-        const id = this.id_server
-        this.$apollo.mutate({
-          mutation: deleteServer,
-          variables: {id}
-        })
-        this.id_server = 0;
-        window.location.reload();
       },
       icon:function(name){
         return 'fl-' + name
@@ -1101,9 +1073,7 @@
         if (this.tags[this.tags.length - 1] == this.inputSearch) this.inputSearch = ''
         switch (this.tags[1].toLowerCase()) {
           case "server":
-            alert('ouais ouais ouais')
             if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
-              alert("oui")
               this.get_all_infos(check[0]);
               this.$bvModal.show('editServerModal');
             }
@@ -1172,10 +1142,17 @@
             }
             break;
           case "supplier":
-            if ((check = this.filteredSupplier('name', this.tags[this.tags.length - 1])).length == 1) {
+            if ((check = this.filteredSupplier('name', temp)).length == 1) {
               this.editAll = {id: check[0].id, name: check[0].name};
               this.supplier = check[0];
               this.$bvModal.show('editSupplierModal');
+            }
+            break;
+          case "var":
+            if ((check = this.filteredVar('key', temp)).length == 1) {
+              this.editAll = {id: check[0].id, key: check[0].key, value: check[0].value};
+              this.var = check[0];
+              this.$bvModal.show('editVarModal');
             }
             break;
           default:
@@ -1189,6 +1166,8 @@
       },
       gotoPath(path) {
         var lock = 0, newPath = '';
+        if (path == 'var')
+          return this.$router.push('globalVars')
         if (path[path.length - 1] != 's') newPath = '/' + path + 's';
         else newPath = '/' + path;
         for (let i = 0; this.suggests.funcOptions[i]; i++)
@@ -1196,6 +1175,100 @@
             lock++;
         if (lock)
           this.$router.push(newPath);
+      },
+      deleteMutation() {
+        var check = null, temp = this.tags[2]
+        switch (this.tags[1].toLowerCase()) {
+          case "server":
+            if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
+              this.get_all_infos(check[0]);
+              this.$bvModal.show('archiveServerModal');
+            }
+            break;
+          case "hoster":
+            if ((check = this.filteredHoster('name', temp)).length == 1) {
+              this.editAll = {name: check[0].name, url_admin: check[0].url_admin, id: check[0].id};
+              this.hoster = check[0];
+              this.$bvModal.show('deleteHosterModal');
+            }
+            break;
+          case "client":
+            if ((check = this.filteredClient('name', temp)).length == 1) {
+              this.editAll = {name: check[0].name, infos: check[0].infos, id: check[0].id, supplier: check[0].supplier};
+              this.client = check[0];
+              this.$bvModal.show('deleteClientModal');
+            }
+            break;
+          case "os":
+            if ((check = this.filteredOs('os_name', temp)).length == 1) {
+              this.editAll = {os_name: check[0].os_name, os_version: check[0].os_version, version_name: check[0].version_name};
+              this.$bvModal.show('deleteOsModal');
+            }
+            break;
+          case "env":
+            if ((check = this.filteredEnv('name', temp)).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name};
+              this.env = check[0]
+              this.$bvModal.show('deleteEnvModal');
+            }
+            break;
+          case "type":
+            if ((check = this.filteredType('name', temp)).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name};
+              this.type = check[0];
+              this.$bvModal.show('deleteTypeModal');
+            }
+            break;
+          case "profile":
+            if ((check = this.filteredProfile('name', temp)).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name, infos: check[0].infos};
+              this.profile = check[0];
+              this.$bvModal.show('deleteProfileModal');
+            }
+            break;
+          case "serveruser":
+            if ((check = this.filteredServerUser('name', temp)).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name};
+              this.serverUser = check[0];
+              this.$bvModal.show('deleteServerUserModal');
+            }
+            break;
+          case "dc":
+            if ((check = this.filteredDc('name', temp)).length == 1) {
+              this.editAll = {hoster: check[0].hoster,
+              name: check[0].name, location: check[0].location};
+              this.dc = check[0];
+              this.$bvModal.show('deleteDcModal');
+            }
+            break;
+          case "service":
+            if ((check = this.filteredService('name', temp)).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name};
+              this.service = check[0];
+              this.$bvModal.show('deleteServiceModal');
+            }
+            break;
+          case "supplier":
+            if ((check = this.filteredSupplier('name', temp)).length == 1) {
+              this.editAll = {id: check[0].id, name: check[0].name};
+              this.supplier = check[0];
+              this.$bvModal.show('deleteSupplierModal');
+            }
+            break;
+          case "var":
+            if ((check = this.filteredVar('key', temp)).length == 1) {
+              this.editAll = {id: check[0].id, key: check[0].key, value: check[0].value};
+              this.var = check[0];
+              this.$bvModal.show('deleteVarModal');
+            }
+            break;
+          default:
+            if ((check = this.filteredServer("hostname", this.tags[1], 1)).length == 1) {
+              this.get_all_infos(check[0]);
+              this.$bvModal.show('archiveServerModal');
+            }
+            break;
+        }
       },
       mutationGraphql: function(opt) {
         switch (opt) {
@@ -1206,13 +1279,7 @@
             this.editMutations();
             break;
           case "delete":
-            if (this.tags[1] && this.tags[1] == 'server') {
-              this.getId_of('server')
-              this.$bvModal.show('archiveServerModal')
-            }
-            else if (this.tags[1])
-              this.delete_modals(this.capitalizeFirstLetter(this.tags[1]))
-            this.inputSearch = "";
+            this.deleteMutation()
             break;
           case 'show':
             this.gotoPath(this.tags[1].toLowerCase());
@@ -1373,6 +1440,14 @@
           if ((temp = this.services[i].name).startsWith(this.inputSearch.toLowerCase()) ||
           (temp = this.services[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
+        for (let i = 0, temp = {}; search == 'supplier' && this.suppliers[i]; i++)
+          if ((temp = this.suppliers[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          (temp = this.suppliers[i].id).startsWith(this.inputSearch.toLowerCase()))
+            this.showSuggest.push(temp);
+        for (let i = 0, temp = {}; search == 'var' && this.vars[i]; i++)
+          if ((temp = this.vars[i].key).startsWith(this.inputSearch.toLowerCase()) ||
+          (temp = this.vars[i].id).startsWith(this.inputSearch.toLowerCase()))
+            this.showSuggest.push(temp);
         this.showSuggest = [...new Set(this.showSuggest)];
       },
       get_funcOptions(opt) {
@@ -1443,6 +1518,8 @@
           else if (event.key == 'Enter') this.getOption();
           else this.new_tag(event.key);
         }
+        if (event.key != 'Enter')
+          this.suggest_gesture();
         if (event.key != 'Escape' && event.key != ' ' && event.key != ',' && event.key != ':' && event.key != 'ArrowLeft' && event.key != 'ArrowRight' && event.key != 'ArrowUp' && event.key != 'ArrowDown') {
           if (event.key != 'Backspace') this.lock = true;
           this.suggest_gesture();
@@ -1469,7 +1546,7 @@
           (opt == "all" || opt == "id") && this.services[i].id && this.services[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.services[i];
         if (!rank)
-          for (i = 0; string && this.clients[i]; i++)
+          for (i = 0; string && this.services[i]; i++)
             if ((opt == "all" || opt == "name") && this.services[i].name && this.services[i].name.toLowerCase().match(string.toLowerCase()) ||
             (opt == "all" || opt == "location") && this.services[i].location && this.services[i].location.toLowerCase().match(string.toLowerCase()) ||
             (opt == "all" || opt == "id") && this.services[i].id && this.services[i].id.toLowerCase().match(string))
@@ -1483,10 +1560,23 @@
           (opt == "all" || opt == "id") && this.suppliers[i].id && this.suppliers[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.suppliers[i];
         if (!rank)
-          for (i = 0; string && this.clients[i]; i++)
+          for (i = 0; string && this.suppliers[i]; i++)
             if ((opt == "all" || opt == "name") && this.suppliers[i].name && this.suppliers[i].name.toLowerCase().match(string.toLowerCase()) ||
             (opt == "all" || opt == "id") && this.suppliers[i].id && this.suppliers[i].id.toLowerCase().match(string))
               result[rank++] = this.suppliers[i];
+        return result;
+      },
+      filteredVar: function(opt, string) {
+        var rank = 0, i = -1, result = [];
+        for (i = 0; string && this.vars[i]; i++)
+          if ((opt == "all" || opt == "key") && this.vars[i].key && this.vars[i].key.toLowerCase() == string.toLowerCase() ||
+          (opt == "all" || opt == "id") && this.vars[i].id && this.vars[i].id.toLowerCase() == string.toLowerCase())
+            result[rank++] = this.vars[i];
+        if (!rank)
+          for (i = 0; string && this.vars[i]; i++)
+            if ((opt == "all" || opt == "key") && this.vars[i].key && this.vars[i].key.toLowerCase().match(string.toLowerCase()) ||
+            (opt == "all" || opt == "id") && this.vars[i].id && this.vars[i].id.toLowerCase().match(string))
+              result[rank++] = this.vars[i];
         return result;
       },
       filteredDc: function(opt, string) {
@@ -1497,7 +1587,7 @@
           (opt == "all" || opt == "id") && this.dcs[i].id && this.dcs[i].id.toLowerCase() == string.toLowerCase())
             result[rank++] = this.dcs[i];
         if (!rank)
-          for (i = 0; string && this.clients[i]; i++)
+          for (i = 0; string && this.dcs[i]; i++)
             if ((opt == "all" || opt == "name") && this.dcs[i].name && this.dcs[i].name.toLowerCase().match(string.toLowerCase()) ||
             (opt == "all" || opt == "location") && this.dcs[i].location && this.dcs[i].location.toLowerCase().match(string.toLowerCase()) ||
             (opt == "all" || opt == "id") && this.dcs[i].id && this.dcs[i].id.toLowerCase().match(string))
@@ -1628,109 +1718,12 @@
               result[rank++] = this.types[i];
         return result;
       },
-      getId_of: function(ofWhat) {
-        var finalId = -1, rank = 2, check = [];
-        switch (ofWhat) {
-          case 'client':
-            if ((check = this.filteredClient("name", this.tags[rank])).length == 1
-            || (check = this.filteredClient("info", this.tags[rank]).length) == 1
-            || (check = this.filteredClient("id", this.tags[rank]).length) == 1)
-              finalId = check[0].id;
-            break;
-          case 'cred':
-            if ((check = this.filteredCred("name", this.tags[rank])).length == 1
-            || (check = this.filteredCred("auth", this.tags[rank])).length == 1
-            || (check = this.filteredCred("token_hash", this.tags[rank])).length == 1
-            || (check = this.filteredCred("url_admin_custom", this.tags[rank])).length == 1
-            || (check = this.filteredCred("login", this.tags[rank])).length == 1
-            || (check = this.filteredCred("password_hash", this.tags[rank])).length == 1
-            || (check = this.filteredCred("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          case 'env':
-            if ((check = this.filteredEnv("name", this.tags[rank])).length == 1
-            || (check = this.filteredEnv("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          case 'hoster':
-            if ((check = this.filteredHoster("name", this.tags[rank])).length == 1
-            || (check = this.filteredHoster("url_admin", this.tags[rank])).length == 1
-            || (check = this.filteredHoster("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          case 'os':
-            if ((check = this.filteredOs("os_name", this.tags[rank])).length == 1
-            || (check = this.filteredOs("os_version", this.tags[rank])).length == 1
-            || (check = this.filteredOs("version_name", this.tags[rank])).length == 1
-            || (check = this.filteredOs("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          case 'profile':
-            if ((check = this.filteredProfile("name", this.tags[rank])).length == 1
-            || (check = this.filteredProfile("infos", this.tags[rank])).length == 1
-            || (check = this.filteredProfile("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          case 'server':
-            if ((check = this.filteredServer("hostname", this.tags[rank], 1)).length == 1 ||
-            (check = this.filteredServer("ip", this.tags[rank], 1)).length == 1 ||
-            (check = this.filteredServer("id", this.tags[rank], 1)).length == 1) {
-              finalId = check[0].id;
-              this.get_all_infos(check[0])
-            }
-            break;
-          case 'serveruser':
-            if ((check = this.filteredServerUser("name", this.tags[rank])).length == 1
-            || (check = this.filteredServerUser("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          case 'type':
-            if ((check = this.filteredType("name", this.tags[rank])).length == 1
-            || (check = this.filteredType("id", this.tags[rank])).length == 1)
-              finalId = check[0].id;
-            break;
-          default:
-            finalId = (!isNaN(ofWhat) ? ofWhat : -1);
-            break;
-        }
-        return finalId;
-      },
-      capitalizeFirstLetter: function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-      },
-      delete_modals: function(_delete) {
-        this.boolDelete = true;
-        this.idDelete = _delete
-        this.$bvModal.show('delete_Modal')
-      },
-      hide_and_delete(cancel) {
-        this.$bvModal.hide('delete_Modal');
-        if (cancel)
-          return
-        const id = this.getId_of(this.idDelete.toLowerCase());
-        var rank = -1;
-        if (id == this.idDelete)
-          this.idDelete = 'Server';
-        while (this.mutationCall.name[++rank] && this.mutationCall.name[rank] != this.idDelete);
-        if (id <= 0)
-          return;
-        if (!this.boolDelete) {
-          this.$apollo.mutate({
-            mutation: this.mutationCall.deleteFunction[rank],
-            variables: {id}
-          })
-          window.location.reload();
-        }
-      },
     },
   }
 </script>
 <style scoped>
 .tableServer {
     cursor: pointer;
-}
-.linklist {
-  margin-top: 30px;
 }
 .searchSelect {
   margin-top: 5px;
@@ -1766,5 +1759,17 @@
   margin-right: 10%;
   color: black;
   cursor: pointer;
+}
+.bottom-right {
+  position: fixed;
+<<<<<<< HEAD
+  right: 5px;
+  bottom: 5px;
+  /* margin-bottom: 5px;
+  margin-right: 5px; */
+=======
+  right: 2%;
+  bottom: 2%;
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
 }
 </style>

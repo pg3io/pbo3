@@ -85,7 +85,7 @@ export default {
       var start = 0, tmp = null
       do {
         tmp = await this.$apollo.mutate({
-          mutation:SUPPLIER_QUERY,
+          mutation: SUPPLIER_QUERY,
           variables: {start: start}
         })
         for (let i = 0; tmp['data']['suppliers'][i]; i++)

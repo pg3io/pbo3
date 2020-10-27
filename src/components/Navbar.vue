@@ -97,7 +97,7 @@ export default {
     },
     logOut: function () {
       this.$store.dispatch('logOut')
-        .then(() => this.$router.push('/login'))
+        .then(() => (this.$route.path != '/login') ? this.$router.push('/login') : null)
     }
   },
 };
