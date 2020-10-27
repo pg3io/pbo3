@@ -246,8 +246,17 @@
                       </b-button>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                      <font-awesome-icon icon="plus"/>
+                    </td>
+                    <td v-else colspan='12'>
+                      Nothing else to show
+                    </td>
+                  </tr>
                 </tbody>
               </table>
+              <br><br><br><br>
             </div>
           </div>
           <div v-if='!Object.keys(servers).length'>
@@ -581,12 +590,13 @@
     methods: {
       goTop() {
         var change = document.scrollingElement.scrollTop / 10
-        if (change <= 15) change = 15
+        if (change < 15) change = 20
         if (document.scrollingElement.scrollTop > 0) {
           document.scrollingElement.scrollTop -= change
           setTimeout(this.goTop, 10)
         } else {
           document.scrollingElement.scrollTop = 0
+          this.scrolled = false
         }
       },
       scroll() {
@@ -1743,7 +1753,5 @@
   position: fixed;
   right: 5px;
   bottom: 5px;
-  /* margin-bottom: 5px;
-  margin-right: 5px; */
 }
 </style>
