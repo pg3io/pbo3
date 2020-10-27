@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container-sm" v-if="vars && vars.length">
+    <div class="container-sm">
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
@@ -14,7 +14,7 @@
           </b-input-group>
         </div>
       </div>
-      <table id="tableVars" class="table table-striped table-bordered table-hover text-center bg-light">
+      <table v-if="vars && vars.length" id="tableVars" class="table table-striped table-bordered table-hover text-center bg-light">
         <thead class="thead-dark">
           <tr>
             <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
@@ -37,9 +37,9 @@
         </tbody>
       </table>
     </div>
-    <spinner v-else></spinner>
+    <spinner v-if="!vars || !vars.length"></spinner>
     <add-var :addInfos="addInfos"></add-var>
-    <edit-var :editInfos="editInfos"></edit-var>
+    <edit-var :editInfos="editInfos" :var='this.var'></edit-var>
     <delete-var :editInfos="editInfos"></delete-var>
   </div>
 </template>
@@ -62,6 +62,7 @@ export default {
   data() {
     return {
       vars: [],
+      var: null,
       currentSort: 'id',
       currentSortDir: 'asc',
       search: '',
@@ -84,6 +85,7 @@ export default {
       this.editInfos.id = v.id
       this.editInfos.key = v.key
       this.editInfos.value = v.value
+      this.var = v
     },
     async getVars() {
       this.vars = []
