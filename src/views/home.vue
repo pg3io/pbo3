@@ -75,7 +75,7 @@
     <delete-service :editInfos='editAll'></delete-service>
     <delete-supplier :editInfos='editAll'></delete-supplier>
     <delete-type :editInfos='editAll'></delete-type>
-    <div class="container-sm linklist">
+    <div class="container-sm" style="margin-top: 30px;">
       <div>
         <div id="searchEngine">
           <div style="margin-left: 1.25%; margin-right: -1.25%">
@@ -278,13 +278,16 @@
         <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
       </div>
     </b-modal>
+    <b-button v-show="scrolled" @click='goTop' pill variant='outline-dark' class='bottom-right'>Go Top</b-button>
   </div>
 </template>
 
 <script>
-  import { required } from "vuelidate/lib/validators";
     /* Querys */
-  import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY, SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, ALL_SERVERS_QUERY, PROFILE_QUERY, OS_QUERY, ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_ } from '@/assets/js/query/graphql'
+  import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
+  SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
+  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, SERVERS_QUERY}
+  from '@/assets/js/query/graphql'
 
     /* Deletes */
   import deleteClient from '@/components/client/deleteClientModal.vue'
@@ -299,42 +302,37 @@
   import deleteSupplier from '@/components/supplier/deleteSupplierModal.vue'
   import deleteType from '@/components/type/deleteTypeModal.vue'
 
+    /* Edits */
   import EditServer from "@/components/server/editServerModal.vue"
+  import EditHoster from "@/components/hosters/editHosterModal.vue"
+  import EditClient from "@/components/client/editClientModal.vue"
+  import EditOs from "@/components/os/editOsModal.vue"
+  import EditEnv from "@/components/env/editEnvModal.vue"
+  import EditType from "@/components/type/editTypeModal.vue"
+  import EditProfile from "@/components/profile/editProfileModal.vue"
+  import EditServerUser from "@/components/serverUser/editServerUserModal.vue"
+  import EditDc from "@/components/dc/editDcModal.vue"
+  import EditSupplier from "@/components/supplier/editSupplierModal.vue"
+  import EditService from "@/components/service/editServiceModal.vue"
+  import EditVar from "@/components/globalVars/editVarModal.vue"
+
+    /* Adds */
   import AddServer from "@/components/server/addServerModal.vue"
   import ArchiveServer from "@/components/server/archiveServerModal.vue"
-
   import AddHoster from "@/components/hosters/addHosterModal.vue"
-  import EditHoster from "@/components/hosters/editHosterModal.vue"
-
   import AddClient from "@/components/client/addClientModal.vue"
-  import EditClient from "@/components/client/editClientModal.vue"
-
   import AddOs from "@/components/os/addOsModal.vue"
-  import EditOs from "@/components/os/editOsModal.vue"
-
   import AddEnv from "@/components/env/addEnvModal.vue"
-  import EditEnv from "@/components/env/editEnvModal.vue"
-
   import AddType from "@/components/type/addTypeModal.vue"
-  import EditType from "@/components/type/editTypeModal.vue"
-
   import AddProfile from "@/components/profile/addProfileModal.vue"
-  import EditProfile from "@/components/profile/editProfileModal.vue"
-
   import AddServerUser from "@/components/serverUser/addServerUserModal.vue"
-  import EditServerUser from "@/components/serverUser/editServerUserModal.vue"
-
   import AddDc from "@/components/dc/addDcModal.vue"
-  import EditDc from "@/components/dc/editDcModal.vue"
-
   import AddSupplier from "@/components/supplier/addSupplierModal.vue"
-  import EditSupplier from "@/components/supplier/editSupplierModal.vue"
-
   import AddService from "@/components/service/addServiceModal.vue"
-  import EditService from "@/components/service/editServiceModal.vue"
-
   import AddVar from "@/components/globalVars/addVarModal.vue"
-  import EditVar from "@/components/globalVars/editVarModal.vue"
+
+    /* others */
+  import { required } from "vuelidate/lib/validators";
 
   export default {
     name: 'Home',
@@ -543,7 +541,8 @@
         hide_suggest: true,
         editAll: {},
         boolDelete: true,
-        idDelete: 0
+        full: false,
+        scrolled: false
       }
     },
     watch: {
@@ -555,37 +554,58 @@
         this.servers = this.saveServers;
       }
     },
-      mounted() {
-        this.getServer();
-        this.getCred();
-        this.getClient()
-        this.getOs();
-        this.getType();
-        this.getEnv();
-        this.getProfile();
-        this.getServerUser();
-        this.getDc();
-        this.getOffer();
-        this.getService();
-        this.getHoster();
-        this.getSuppliers();
-        this.getVars();
-        this.timeout();
-        this.getSearchByUrl();
-      },
+    mounted() {
+      this.getServer(0);
+      this.getCred();
+      this.getClient()
+      this.getOs();
+      this.getType();
+      this.getEnv();
+      this.getProfile();
+      this.getServerUser();
+      this.getDc();
+      this.getOffer();
+      this.getService();
+      this.getHoster();
+      this.getSuppliers();
+      this.getVars();
+      this.timeout();
+      this.getSearchByUrl();
+    },
+    created () {
+      window.addEventListener('scroll', this.scroll);
+    },
+    beforeDestroy () {
+      window.removeEventListener('scroll', this.scroll);
+    },
     methods: {
-      async getServer() {
-        this.servers = []
-        var start = 0, tmp = null
-        do {
-          tmp = await this.$apollo.mutate({
-            mutation:ALL_SERVERS_QUERY,
-            variables: {start: start, where: {"archived": false}}
-          })
-          for (let i = 0; tmp['data']['servers'][i]; i++)
-            this.servers.push(tmp['data']['servers'][i])
-          start += 100
-        } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
+      goTop() {
+        var change = document.scrollingElement.scrollTop / 10
+        if (change <= 15) change = 15
+        if (document.scrollingElement.scrollTop > 0) {
+          document.scrollingElement.scrollTop -= change
+          setTimeout(this.goTop, 10)
+        } else {
+          document.scrollingElement.scrollTop = 0
+        }
+      },
+      scroll() {
+        this.scrolled = !!(document.scrollingElement.scrollTop)
+        if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+          if (this.full == false)
+            this.getServer(this.servers.length)
+        }
+      },
+      async getServer(start) {
+        var length = this.servers.length
+        var tmp = await this.$apollo.mutate({
+          mutation:SERVERS_QUERY,
+          variables: {start: start, where: {"archived": false}}
+        })
+        for (let i = 0; tmp['data']['servers'][i]; i++)
+          this.servers.push(tmp['data']['servers'][i])
+        if (length == this.servers.length)
+          this.full = true
       },
       async getCred() {
         this.creds = []
@@ -1032,9 +1052,7 @@
         if (this.tags[this.tags.length - 1] == this.inputSearch) this.inputSearch = ''
         switch (this.tags[1].toLowerCase()) {
           case "server":
-            alert('ouais ouais ouais')
             if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
-              alert("oui")
               this.get_all_infos(check[0]);
               this.$bvModal.show('editServerModal');
             }
@@ -1686,9 +1704,6 @@
 .tableServer {
     cursor: pointer;
 }
-.linklist {
-  margin-top: 30px;
-}
 .searchSelect {
   margin-top: 5px;
   width: 150px;
@@ -1723,5 +1738,12 @@
   margin-right: 10%;
   color: black;
   cursor: pointer;
+}
+.bottom-right {
+  position: fixed;
+  right: 5px;
+  bottom: 5px;
+  /* margin-bottom: 5px;
+  margin-right: 5px; */
 }
 </style>
