@@ -96,7 +96,6 @@ export default {
           }
           if (array.length < 2) {
             for (let i = 0; i < array.length; i++) {
-              console.log(space.test(array[i]))
               if (word.test(array[i]) == true && space.test(array[i]) == false && metaChars.test(array[i]) == false) {
                 result = true
                 continue

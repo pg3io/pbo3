@@ -246,8 +246,17 @@
                       </b-button>
                     </td>
                   </tr>
+                  <tr>
+                    <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                      <font-awesome-icon icon="plus"/>
+                    </td>
+                    <td v-else colspan='12'>
+                      Nothing else to show
+                    </td>
+                  </tr>
                 </tbody>
               </table>
+              <br><br><br><br>
             </div>
           </div>
           <div v-if='!Object.keys(servers).length'>
@@ -278,7 +287,11 @@
         <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
       </div>
     </b-modal>
+<<<<<<< HEAD
     <b-button v-show="scrolled" @click='goTop' pill variant='outline-dark' class='bottom-right'>Go Top</b-button>
+=======
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
   </div>
 </template>
 
@@ -581,12 +594,20 @@
     methods: {
       goTop() {
         var change = document.scrollingElement.scrollTop / 10
+<<<<<<< HEAD
         if (change <= 15) change = 15
+=======
+        if (change < 15) change = 20
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
         if (document.scrollingElement.scrollTop > 0) {
           document.scrollingElement.scrollTop -= change
           setTimeout(this.goTop, 10)
         } else {
           document.scrollingElement.scrollTop = 0
+<<<<<<< HEAD
+=======
+          this.scrolled = false
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
         }
       },
       scroll() {
@@ -1741,9 +1762,14 @@
 }
 .bottom-right {
   position: fixed;
+<<<<<<< HEAD
   right: 5px;
   bottom: 5px;
   /* margin-bottom: 5px;
   margin-right: 5px; */
+=======
+  right: 2%;
+  bottom: 2%;
+>>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
 }
 </style>

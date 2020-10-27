@@ -97,16 +97,12 @@ export default {
           if (array.length < 2) {
             for (let i = 0; i < array.length; i++) {
               if (word.test(array[i]) == true && space.test(array[i]) == false && metaChars.test(array[i]) == false) {
-                for (let index = 0; index < i; index++) {
-                  if(array[i].toLowerCase() == array[index].toLowerCase()) {
-                    this.valueExists = true
-                    return false
-                  }
-                }
                 result = true
+                continue
               }
               if (listItem.test(array[i]) == true && indentStart.test(array[i]) == true && metaChars.test(array[i]) == false && end.test(array[i]) == true && word.test(array[i]) == true) {
                 result = true
+                continue
               }
               else {
                 this.validValue = true
