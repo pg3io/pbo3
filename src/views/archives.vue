@@ -68,6 +68,9 @@
                   <th class="th-sm">
                     Info
                   </th>
+                  <th class="th-sm">
+                    Delete
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -132,6 +135,11 @@
                       </b-button>
                     </router-link>
                   </td>
+                  <td v-if="server">
+                    <b-button size="sm" v-b-modal.deleteArchivedModal @click="get_server(server)" variant="outline-dark" pill>
+                      <font-awesome-icon icon="trash-alt" />
+                    </b-button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -143,26 +151,39 @@
           </div>
         </div>
       </div>
+      <delete-archived :deleteInfos='deleteInfos'></delete-archived>
     </div>
 </template>
 
 <script>
 import { ARCHIVED_SERVERS_QUERY } from '@/assets/js/query/graphql'
+import DeleteArchived from '@/components/archives/deleteArchivedModal.vue'
 
 export default {
   name: 'Archives',
+  components: {
+    DeleteArchived
+  },
   data() {
     return {
       search: '',
       servers: [],
       currentSort:'id',
       currentSortDir:'asc',
+      deleteInfos: {
+        id: null,
+        hostname: null
+      }
     }
   },
   mounted() {
     this.getServer();
   },
   methods: {
+    get_server(server) {
+      this.deleteInfos.id = server.id
+      this.deleteInfos.hostname = server.hostname
+    },
     async getServer() {
       this.servers = []
       var start = 0, tmp = null
@@ -282,7 +303,9 @@ export default {
 .searchBar {
   height: 35px;
   margin-top: 2px;
-  width: 1110px;
+  max-width: 1110px;
+  margin-left: 10px;
+  width: 100%;
   float: left;
 }
 .searchFilter {

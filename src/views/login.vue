@@ -20,6 +20,9 @@
               </b-button>
             </b-input-group-append>
           </b-input-group>
+          <div id="errorMessage"  role="alert" style="display: none">
+            Wrong username or password!
+          </div>
           <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
         </form>
       </div>
@@ -47,8 +50,13 @@ export default {
     },
     ...mapActions(['login']),
     loginUser() {
+      document.getElementById("errorMessage").style.display = "none"
       this.login(this.authDetails)
-        .then(() => this.$router.push('/'))
+        .then(() => {
+          if (document.getElementById("errorMessage").style.display != "block") {
+            window.location = "/"
+          }
+        })
     }
   }
 }
@@ -72,6 +80,16 @@ body {
   justify-content: center;
   padding-top: 40px;
   padding-bottom: 40px;
+}
+
+#errorMessage {
+  color: #e10000;
+  width: 100%;
+  max-width: 330px;
+  margin: 0 auto;
+  padding-top: 0;
+  margin-bottom: 10px;
+  margin-top: 0;
 }
 
 .form-signin {
