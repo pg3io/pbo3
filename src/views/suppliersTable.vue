@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="supplierTable" class="container-sm">
-      <table v-if="servers" class="table tablemobile table-striped table-bordered table-hover text-center bg-light">
+      <table v-if="servers" class="table tablemobile table-striped table-bordered table-hover text-center bg-light table-sm">
         <thead class="thead-dark">
           <tr>
             <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-left th-sm tableServer">
