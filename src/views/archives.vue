@@ -303,7 +303,9 @@ export default {
 .searchBar {
   height: 35px;
   margin-top: 2px;
-  width: 1110px;
+  max-width: 1110px;
+  margin-left: 10px;
+  width: 100%;
   float: left;
 }
 .searchFilter {
