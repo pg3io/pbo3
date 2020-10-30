@@ -423,25 +423,26 @@
     },
     data () {
       return {
-        editServices: null,
-        server: null,
         servers: [],
-        fullServers: [],
-        hosters: null,
-        saveServers: [],
-        first: true,
+        hosters: [],
         clients: [],
-        creds: [],
         types: [],
         envs: [],
         dcs: [],
-        offers: [],
         suppliers: [],
-        supplier: null,
         vars: [],
-        var: null,
         profiles: [],
         serverUsers: [],
+        services: [],
+        os: [],
+        editServices: null,
+        offers: [],
+        creds: [],
+        server: null,
+        saveServers: [],
+        first: true,
+        supplier: null,
+        var: null,
         hoster: null,
         service: null,
         profile: null,
@@ -450,9 +451,7 @@
         client: null,
         env: null,
         type: null,
-        services: [],
         options: [],
-        os: [],
         filter: '',
         loading: 0,
         bar: '',
@@ -514,7 +513,6 @@
           'client',
           'os',
           'hoster',
-          'supplier'
         ],
         lock: false,
         suggests: {
@@ -566,19 +564,19 @@
     },
     mounted() {
       this.getServer(0);
-      this.getCred();
-      this.getClient()
-      this.getOs();
-      this.getType();
-      this.getEnv();
-      this.getProfile();
-      this.getServerUser();
-      this.getDc();
-      this.getOffer();
-      this.getService();
-      this.getHoster();
-      this.getSuppliers();
-      this.getVars();
+      // this.getCred();
+      // this.getClient()
+      // this.getOs();
+      // this.getType();
+      // this.getEnv();
+      // this.getProfile();
+      // this.getServerUser();
+      // this.getDc();
+      // this.getOffer();
+      // this.getService();
+      // this.getHoster();
+      // this.getSuppliers();
+      // this.getVars();
       this.timeout();
       this.getSearchByUrl();
     },
@@ -608,14 +606,14 @@
         }
       },
       async get_server() {
-        var start = this.fullServers.length, tmp = ''
+        var start = this.saveServers.length, tmp = ''
         do {
           tmp = await this.$apollo.mutate({
             mutation:ALL_SERVER_QUERY,
             variables: {start: start, where: {"archived": false}}
           })
           for (let i = 0; tmp['data']['servers'][i]; i++)
-            this.fullServers.push(tmp['data']['servers'][i])
+            this.saveServers.push(tmp['data']['servers'][i])
           start += 100
         } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
       },
@@ -631,8 +629,7 @@
           this.full = true
       },
       async getCred() {
-        this.creds = []
-        var start = 0, tmp = null
+        var start = this.creds.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:CRED_QUERY,
@@ -644,8 +641,7 @@
         } while(tmp && tmp['data'] && tmp['data']['creds'] && tmp['data']['creds'].length);
       },
       async getClient() {
-        this.clients = []
-        var start = 0, tmp = null
+        var start = this.clients.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:CLIENTS_QUERY,
@@ -657,8 +653,7 @@
         } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
       },
       async getOs() {
-        this.os = []
-        var start = 0, tmp = null
+        var start = this.os.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:OS_QUERY,
@@ -670,8 +665,7 @@
         } while(tmp && tmp['data'] && tmp['data']['os']&& tmp['data']['os'].length);
       },
       async getType() {
-        this.types = []
-        var start = 0, tmp = null
+        var start = this.types.lentgh, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:TYPE_QUERY,
@@ -683,8 +677,7 @@
         } while(tmp && tmp['data'] && tmp['data']['types'] && tmp['data']['types'].length)
       },
       async getEnv() {
-        this.envs = []
-        var start = 0, tmp = null
+        var start = this.envs.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:ENV_QUERY,
@@ -696,8 +689,7 @@
         } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
       },
       async getProfile() {
-        this.profiles = []
-        var start = 0, tmp = null
+        var start = this.profiles.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:PROFILE_QUERY,
@@ -709,8 +701,7 @@
         } while(tmp && tmp['data'] && tmp['data']['profiles'] && tmp['data']['profiles'].length)
       },
       async getServerUser() {
-        this.serverUsers = []
-        var start = 0, tmp = null
+        var start = this.serverUsers.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:SERVER_USER_QUERY,
@@ -722,8 +713,7 @@
         } while(tmp && tmp['data'] && tmp['data']['serverUsers'] && tmp['data']['serverUsers'].length)
       },
       async getDc() {
-        this.dcs = []
-        var start = 0, tmp = null
+        var start = this.dcs.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:DC_QUERY_,
@@ -735,8 +725,7 @@
         } while(tmp && tmp['data'] && tmp['data']['dcs'] && tmp['data']['dcs'].length)
       },
       async getOffer() {
-        this.offers = []
-        var start = 0, tmp = null
+        var start = this.offers.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:OFFER_QUERY,
@@ -748,8 +737,7 @@
         } while(tmp && tmp['data'] && tmp['data']['offers'] && tmp['data']['offers'].length)
       },
       async getService() {
-        this.services = []
-        var start = 0, tmp = null
+        var start = this.services.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:SERVICES_QUERY,
@@ -761,8 +749,7 @@
         } while(tmp && tmp['data'] && tmp['data']['services'] && tmp['data']['services'].length)
       },
       async getHoster() {
-        this.hosters = []
-        var start = 0, tmp = null
+        var start = this.hosters.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:HOSTERS_QUERY,
@@ -774,8 +761,7 @@
         } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
       },
       async getSuppliers() {
-        this.suppliers = []
-        var start = 0, tmp = null
+        var start = this.suppliers.lentgh, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:SUPPLIER_QUERY,
@@ -787,8 +773,7 @@
         } while(tmp && tmp['data'] && tmp['data']['suppliers'] && tmp['data']['suppliers'].length)
       },
       async getVars() {
-        this.vars = []
-        var start = 0, tmp = null
+        var start = this.vars.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:GLOBALVAR_QUERY,
@@ -977,6 +962,8 @@
       },
       filteredServer: function(opt, string, mutate = false) {
         var rank = 0, i = -1, result = [];
+        if(!string.length)
+          return this.saveServers
         while (string && this.saveServers[++i])
           if (((opt == "all" || opt == "hostname") && this.saveServers[i].hostname && this.saveServers[i].hostname.toLowerCase() == string.toLowerCase()) ||
           ((opt == "all" || opt =="ip") && this.saveServers[i].ip && this.saveServers[i].ip.toLowerCase() == string.toLowerCase()) ||
@@ -1401,53 +1388,53 @@
         return (null);
       },
       getFullSuggests(search){
-        this.showSuggest = [];
+        this.queryWanted(search);
         for (let i = 0, temp = {}; search == 'server' && this.servers[i]; i++)
-          if ((temp = this.servers[i].hostname).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.servers[i].hostname).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.servers[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'client' && this.clients[i]; i++)
-          if ((temp = this.clients[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.clients[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.clients[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'os' && this.os[i]; i++)
-          if ((temp = this.os[i].os_name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.os[i].os_name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.os[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'hoster' && this.hosters[i]; i++)
-          if ((temp = this.hosters[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.hosters[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.hosters[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'dc' && this.dcs[i]; i++)
-          if ((temp = this.dcs[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.dcs[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.dcs[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'env' && this.envs[i]; i++)
-          if ((temp = this.envs[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.envs[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.envs[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'profile' && this.profiles[i]; i++)
-          if ((temp = this.profiles[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.profiles[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.profiles[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'serveruser' && this.serverUsers[i]; i++)
-          if ((temp = this.serverUsers[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.serverUsers[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.serverUsers[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'type' && this.types[i]; i++)
-          if ((temp = this.types[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.types[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.types[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'service' && this.services[i]; i++)
-          if ((temp = this.services[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.services[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.services[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'supplier' && this.suppliers[i]; i++)
-          if ((temp = this.suppliers[i].name).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.suppliers[i].name).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.suppliers[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         for (let i = 0, temp = {}; search == 'var' && this.vars[i]; i++)
-          if ((temp = this.vars[i].key).startsWith(this.inputSearch.toLowerCase()) ||
+          if ((temp = this.vars[i].key).startsWith(this.inputSearch.toLowerCase()) || !this.inputSearch.length ||
           (temp = this.vars[i].id).startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest.push(temp);
         this.showSuggest = [...new Set(this.showSuggest)];
@@ -1459,11 +1446,65 @@
             final[rank++] = this.suggests.funcOptions[i];
         return final;
       },
-      suggest_oneTag: function() {
+      queryWanted(search) {
+        switch (search) {
+          case 'hoster':
+            (!this.hosters.length) ? this.getHoster() : 0;
+            break;
+          case 'client':
+            (!this.clients.length) ? this.getClient() : 0;
+            break;
+          case 'os':
+            (!this.os.length) ? this.getOs() : 0;
+            break;
+          case 'env':
+            (!this.envs.length) ? this.getEnv() : 0;
+            break;
+          case 'type':
+            (!this.types.length) ? this.getType() : 0;
+            break;
+          case 'profile':
+            (!this.profiles.length) ? this.getProfile() : 0;
+            break;
+          case 'server':
+            this.get_server();
+            break;
+          case 'serverUser':
+            (!this.serverUsers.length) ? this.getServerUser() : 0;
+            break;
+          case 'dc':
+            (!this.dcs.length) ? this.getDc() : 0;
+            break;
+          case 'service':
+            (!this.services.length) ? this.getService() : 0;
+            break;
+          case 'supplier':
+            (!this.suppliers.length) ? this.getSuppliers() : 0;
+            break;
+          case 'var':
+            (!this.vars.length) ? this.getVars() : 0;
+            break;
+          default:
+            this.getVars()
+            this.getSuppliers()
+            this.getService()
+            this.getDc()
+            this.getServerUser()
+            this.get_server()
+            this.getProfile()
+            this.getType()
+            this.getEnv()
+            this.getOs()
+            this.getClient();
+            this.getHoster();
+            break;
+        }
+      },
+      suggest_oneTag() {
         var i = -1, tag = this.tags[0], result = this.search_orFunc(tag);
         if (this.tags[1] && result == 'func') {
-          this.showSuggest = [];
           if (this.tags[0] != 'add' && this.tags[0] != 'show' && this.tags.length < 3) this.getFullSuggests(this.tags[1]);
+          else this.showSuggest = [];
           return;
         }
         if (result == 'search')
@@ -1542,6 +1583,8 @@
       },
       filteredService: function(opt, string) {
         var rank = 0, i = -1, result = [];
+        if(!string.length)
+          return this.services
         for (i = 0; string && this.services[i]; i++)
           if ((opt == "all" || opt == "name") && this.services[i].name && this.services[i].name.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "location") && this.services[i].location && this.services[i].location.toLowerCase() == string.toLowerCase() ||
@@ -1557,6 +1600,8 @@
       },
       filteredSupplier: function(opt, string) {
         var rank = 0, i = -1, result = [];
+        if(!string.length)
+          return this.suppliers
         for (i = 0; string && this.suppliers[i]; i++)
           if ((opt == "all" || opt == "name") && this.suppliers[i].name && this.suppliers[i].name.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "id") && this.suppliers[i].id && this.suppliers[i].id.toLowerCase() == string.toLowerCase())
@@ -1570,6 +1615,8 @@
       },
       filteredVar: function(opt, string) {
         var rank = 0, i = -1, result = [];
+        if(!string.length)
+          return this.vars
         for (i = 0; string && this.vars[i]; i++)
           if ((opt == "all" || opt == "key") && this.vars[i].key && this.vars[i].key.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "id") && this.vars[i].id && this.vars[i].id.toLowerCase() == string.toLowerCase())
@@ -1583,6 +1630,8 @@
       },
       filteredDc: function(opt, string) {
         var rank = 0, i = -1, result = [];
+        if(!string.length)
+          return this.dcs
         for (i = 0; string && this.dcs[i]; i++)
           if ((opt == "all" || opt == "name") && this.dcs[i].name && this.dcs[i].name.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "location") && this.dcs[i].location && this.dcs[i].location.toLowerCase() == string.toLowerCase() ||
@@ -1598,6 +1647,8 @@
       },
       filteredClient: function(opt, string) {
         var rank = 0, i = -1, result = [];
+        if(!string.length)
+          return this.clients
         for (i = 0; string && this.clients[i]; i++)
           if ((opt == "all" || opt == "name") && this.clients[i].name && this.clients[i].name.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "info") && this.clients[i].info && this.clients[i].info.toLowerCase() == string.toLowerCase() ||
@@ -1613,6 +1664,8 @@
       },
       filteredCred: function(opt, string) {
         var rank = 0, i = 0, result = [];
+        if(!string.length)
+          return this.creds
         for (i = 0; string && this.creds[i]; i++)
           if ((opt == "all" || opt == "name") && this.creds[i].name && this.creds[i].name.toLowerCase() == string.toLowerCase() ||
           (opt == "all" || opt == "auth") && this.creds[i].auth && this.creds[i].auth.toLowerCase() == string.toLowerCase() ||
@@ -1636,6 +1689,8 @@
       },
       filteredEnv: function(opt, string) {
         var rank = 0, result = [];
+        if(!string.length)
+          return this.envs
         for (let i = 0; string && this.envs[i]; i++)
           if ((opt == "all" || opt == "name") && this.envs[i].name && this.envs[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.envs[i].id && this.envs[i].id.toLowerCase() == string.toLowerCase())
@@ -1649,6 +1704,8 @@
       },
       filteredHoster: function(opt, string) {
         var result = [], rank = 0;
+        if(!string.length)
+          return this.hosters
         for (let i = 0; string && this.hosters[i]; i++)
           if ((opt == "all" || opt == "name") && this.hosters[i].name && this.hosters[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "url_admin") && this.hosters[i].url_admin && this.hosters[i].url_admin.toLowerCase() == string.toLowerCase()
@@ -1664,6 +1721,8 @@
       },
       filteredOs: function(opt, string) {
         var result = [], rank = 0;
+        if(!string.length)
+          return this.os
         for (let i = 0; string && this.os[i]; i++)
           if ((opt == "all" || opt == "os_name") && this.os[i].os_name && this.os[i].os_name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "os_version") && this.os[i].os_version && this.os[i].os_version.toLowerCase() == string.toLowerCase()
@@ -1681,6 +1740,8 @@
       },
       filteredProfile: function(opt, string) {
         var result = [], rank = 0;
+        if(!string.length)
+          return this.profiles
         for (let i = 0; string && this.profiles[i]; i++)
           if ((opt == "all" || opt == "name") && this.profiles[i].name && this.profiles[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "infos") && this.profiles[i].infos && this.profiles[i].infos.toLowerCase() == string.toLowerCase()
@@ -1696,6 +1757,8 @@
       },
       filteredServerUser: function(opt, string) {
         var result = [], rank = 0;
+        if(!string.length)
+          return this.serverUsers
         for (let i = 0; string && this.serverUsers[i]; i++)
           if ((opt == "all" || opt == "name") && this.serverUsers[i].name && this.serverUsers[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.serverUsers[i].id && this.serverUsers[i].id.toLowerCase() == string.toLowerCase())
@@ -1709,6 +1772,8 @@
       },
       filteredType: function(opt, string) {
         var result = [], rank = 0;
+        if(!string.length)
+          return this.types
         for (let i = 0; string && this.types[i]; i++)
           if ((opt == "all" || opt == "name") && this.types[i].name && this.types[i].name.toLowerCase() == string.toLowerCase()
           || (opt == "all" || opt == "id") && this.types[i].id && this.types[i].id.toLowerCase() == string.toLowerCase())
