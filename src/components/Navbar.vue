@@ -16,12 +16,12 @@
             </template>
             <b-dropdown-item class="rlink" @click="go_to('/hosters')">
               <router-link class="rlink" tag="a" to="/hosters">
-                Hoster
+                Hosters
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/clients')">
               <router-link class="rlink" tag="a" to="/clients">
-                Client
+                Clients
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/os')">
@@ -31,17 +31,17 @@
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/envs')">
               <router-link class="rlink" tag="a" to="/envs">
-                Env
+                Envs
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/types')">
               <router-link class="rlink" tag="a" to="/types">
-                Type
+                Types
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/profiles')">
               <router-link class="rlink" tag="a" to="/profiles">
-                Profile
+                Profiles
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/serverUsers')">
@@ -51,12 +51,12 @@
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/dcs')">
               <router-link class="rlink" tag="a" to="/dcs">
-                Dc
+                Dcs
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/services')">
               <router-link class="rlink" tag="a" to="/services">
-                Service
+                Services
               </router-link>
             </b-dropdown-item>
             <b-dropdown-item @click="go_to('/suppliers')">

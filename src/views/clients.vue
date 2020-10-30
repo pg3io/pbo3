@@ -16,7 +16,7 @@
       </div>
       <div>
         <div>
-          <table id="tableClient" v-if="Object.keys(clients).length !== 0" class="table tablemobile table-striped table-bordered table-hover bg-light text-center table-responsive">
+          <table id="tableClient" v-if="Object.keys(clients).length !== 0" class="table table-striped table-bordered table-hover bg-light text-center table-sm">
             <thead class="thead-dark">
               <tr>
                 <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
@@ -32,8 +32,8 @@
             <tbody v-if="filteredClients">
               <tr v-for="client in filteredClients" :key="client.id">
                 <td v-if="client">{{client.id}}</td>
-                <td v-if="client" class="text-left">{{client.name}}</td>
-                <td v-if="client" class="text-left">
+                <td v-if="client" class="text-">{{client.name}}</td>
+                <td v-if="client" class="text-center">
                   <p v-if="client.supplier">{{client.supplier.name}}</p>
                 </td>
                 <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>

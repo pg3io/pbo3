@@ -14,7 +14,7 @@
           </b-input-group>
         </div>
       </div>
-      <table id="tableEnv" v-if="Object.keys(envs).length !== 0" class="table table-striped table-bordered table-hover text-center bg-light">
+      <table id="tableEnv" v-if="Object.keys(envs).length !== 0" class="table table-striped table-bordered table-hover text-center bg-light table-sm">
         <thead class="thead-dark">
           <tr>
             <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
