@@ -287,11 +287,7 @@
         <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
       </div>
     </b-modal>
-<<<<<<< HEAD
-    <b-button v-show="scrolled" @click='goTop' pill variant='outline-dark' class='bottom-right'>Go Top</b-button>
-=======
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
->>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
   </div>
 </template>
 
@@ -299,8 +295,8 @@
     /* Querys */
   import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
   SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
-  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, SERVERS_QUERY}
-  from '@/assets/js/query/graphql'
+  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, SERVERS_QUERY,
+  ALL_SERVER_QUERY } from '@/assets/js/query/graphql'
 
     /* Deletes */
   import deleteClient from '@/components/client/deleteClientModal.vue'
@@ -430,6 +426,7 @@
         editServices: null,
         server: null,
         servers: [],
+        fullServers: [],
         hosters: null,
         saveServers: [],
         first: true,
@@ -594,20 +591,13 @@
     methods: {
       goTop() {
         var change = document.scrollingElement.scrollTop / 10
-<<<<<<< HEAD
-        if (change <= 15) change = 15
-=======
         if (change < 15) change = 20
->>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
         if (document.scrollingElement.scrollTop > 0) {
           document.scrollingElement.scrollTop -= change
           setTimeout(this.goTop, 10)
         } else {
           document.scrollingElement.scrollTop = 0
-<<<<<<< HEAD
-=======
           this.scrolled = false
->>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
         }
       },
       scroll() {
@@ -616,6 +606,18 @@
           if (this.full == false)
             this.getServer(this.servers.length)
         }
+      },
+      async get_server() {
+        var start = this.fullServers.length, tmp = ''
+        do {
+          tmp = await this.$apollo.mutate({
+            mutation:ALL_SERVER_QUERY,
+            variables: {start: start, where: {"archived": false}}
+          })
+          for (let i = 0; tmp['data']['servers'][i]; i++)
+            this.fullServers.push(tmp['data']['servers'][i])
+          start += 100
+        } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
       },
       async getServer(start) {
         var length = this.servers.length
@@ -1459,9 +1461,9 @@
       },
       suggest_oneTag: function() {
         var i = -1, tag = this.tags[0], result = this.search_orFunc(tag);
-        if (this.tags[1]) {
-          if (result == 'func' && this.tags[0] != 'add' && this.tags[0] != 'show' && this.tags.length < 3) this.getFullSuggests(this.tags[1]);
-          else if (result == 'func') this.showSuggest = [];
+        if (this.tags[1] && result == 'func') {
+          this.showSuggest = [];
+          if (this.tags[0] != 'add' && this.tags[0] != 'show' && this.tags.length < 3) this.getFullSuggests(this.tags[1]);
           return;
         }
         if (result == 'search')
@@ -1762,14 +1764,7 @@
 }
 .bottom-right {
   position: fixed;
-<<<<<<< HEAD
-  right: 5px;
-  bottom: 5px;
-  /* margin-bottom: 5px;
-  margin-right: 5px; */
-=======
   right: 2%;
   bottom: 2%;
->>>>>>> b64427cfe91a1ae38b76386951f5944c541cdca4
 }
 </style>

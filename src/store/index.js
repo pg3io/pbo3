@@ -52,7 +52,12 @@ export default new Vuex.Store({
         localStorage.setItem('apollo-token', token)
         dispatch('setUser')
       } catch (e) {
-        console.log(e)
+        console.error("POST https://pbo3.pk3.io:1337/graphql 401 (UNAUTHORIZED)")
+        console.error(e)
+        if (data == null) {
+          document.getElementById("errorMessage").style.display = "block";
+          document.getElementById("password").style.marginBottom = 0;
+        }
       }
     },
     async setUser ({ commit }) {
