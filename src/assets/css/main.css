@@ -193,6 +193,11 @@ body {
   width: 120px;
 }
 
+.bottom-right {
+  position: fixed;
+  right: 2%;
+  bottom: 2%;
+}
 @media only screen and (max-width: 480px) {
   /* horizontal scrollbar for tables if mobile screen */
   .tablemobile {

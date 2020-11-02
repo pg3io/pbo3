@@ -32,6 +32,14 @@
             <td v-if="serverUser"><b-button v-b-modal.editServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
             <td v-if="serverUser"><b-button v-b-modal.deleteServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
+          <tr>
+            <td colspan="4" @click="getServerUser" v-if="!full" style="cursor: pointer;">
+              <font-awesome-icon icon="plus"/>
+            </td>
+            <td v-else colspan='4'>
+              Nothing else to show
+            </td>
+          </tr>
         </tbody>
       </table>
       <spinner v-else></spinner>
@@ -39,6 +47,7 @@
     <add-server-user :addInfos='addInfos'></add-server-user>
     <edit-server-user v-bind:editInfos="editInfos" :serverUser='ServerUser' ></edit-server-user>
     <delete-server-user v-bind:editInfos="editInfos" ></delete-server-user>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
 
@@ -60,6 +69,8 @@ export default {
   data () {
     return {
       serverUsers: [],
+      full: false,
+      scrolled: false,
       ServerUser: {
         id: null,
         name: null,
@@ -79,19 +90,40 @@ export default {
   mounted() {
     this.getServerUser();
   },
+  created () {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scroll);
+  },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getServerUser()
+      }
+    },
     async getServerUser() {
-      this.serverUsers = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:SERVER_USER_QUERY,
-          variables: {start: start}
-        })
-        for (let i = 0; tmp['data']['serverUsers'][i]; i++)
-          this.serverUsers.push(tmp['data']['serverUsers'][i])
-        start += 50
-      } while(tmp && tmp['data'] && tmp['data']['serverUsers'] && tmp['data']['serverUsers'].length)
+      var start = this.serverUsers.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:SERVER_USER_QUERY,
+        variables: {limit: 20, start: start}
+      })
+      for (let i = 0; tmp['data']['serverUsers'][i]; i++)
+        this.serverUsers.push(tmp['data']['serverUsers'][i])
+      if (this.serverUsers.length < 20 || !tmp['data']['serverUsers'].length)
+        this.full = true
     },
     split: function (string) {
       return string.split(".");

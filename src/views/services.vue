@@ -32,6 +32,14 @@
             <td v-if="service"><b-button v-b-modal.editServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
             <td v-if="service"><b-button v-b-modal.deleteServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
+          <tr>
+            <td colspan="4" @click="getService" v-if="!full" style="cursor: pointer;">
+              <font-awesome-icon icon="plus"/>
+            </td>
+            <td v-else colspan='4'>
+              Nothing else to show
+            </td>
+          </tr>
         </tbody>
       </table>
       <spinner v-else></spinner>
@@ -39,6 +47,7 @@
     <add-service :addInfos='addInfos'></add-service>
     <edit-service v-bind:editInfos="editInfos" :service='Service' ></edit-service>
     <delete-service v-bind:editInfos="editInfos" ></delete-service>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
 
@@ -60,6 +69,8 @@ export default {
   data () {
     return {
       services: [],
+      full: false,
+      scrolled: false,
       Service: {
         id: null,
         name: null
@@ -79,19 +90,40 @@ export default {
   mounted() {
     this.getService();
   },
+  created () {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scroll);
+  },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getService();
+      }
+    },
     async getService() {
-      this.services = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:SERVICES_QUERY,
-          variables: {start: start}
-        })
-        for (let i = 0; tmp['data']['services'][i]; i++)
-          this.services.push(tmp['data']['services'][i])
-        start += 50
-      } while(tmp && tmp['data'] && tmp['data']['services'] && tmp['data']['services'].length)
+      var start = this.services.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:SERVICES_QUERY,
+        variables: {limit: 20, start: start}
+      })
+      for (let i = 0; tmp['data']['services'][i]; i++)
+        this.services.push(tmp['data']['services'][i])
+      if (this.services.length < 20 || !tmp['data']['services'].length)
+        this.full = true
     },
     split: function (string) {
       return string.split(".");

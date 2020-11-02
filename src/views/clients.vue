@@ -39,6 +39,14 @@
                 <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
                 <td v-if="client"><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
               </tr>
+              <tr>
+                <td colspan="5" @click="getClient" v-if="!full" style="cursor: pointer;">
+                  <font-awesome-icon icon='plus'/>
+                </td>
+                <td colspan="5" v-else>
+                  Nothing else to show
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -48,6 +56,8 @@
     <add-client v-bind:addInfos="editInfos"></add-client>
     <edit-client v-bind:editInfos="editInfos" :client='Client'></edit-client>
     <delete-client v-bind:editInfos="editInfos" ></delete-client>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
+    <br><br><br><br>
   </div>
 </template>
 
@@ -69,6 +79,8 @@ export default {
   data () {
     return {
       clients: [],
+      full: false,
+      scrolled: false,
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -91,22 +103,43 @@ export default {
       }
     }
   },
+  created() {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.scroll);
+  },
   mounted() {
     this.getClient();
   },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getClient();
+      }
+    },
     async getClient() {
-      this.clients = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:CLIENTS_QUERY,
-          variables: {start: start}
-        })
-        for (let i = 0; tmp['data']['clients'][i]; i++)
-          this.clients.push(tmp['data']['clients'][i])
-        start += 50
-      } while(tmp && tmp['data'] && tmp['data']['clients'] && tmp['data']['clients'].length);
+      var start = this.clients.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:CLIENTS_QUERY,
+        variables: {limit: 20, start: start}
+      })
+      for (let i = 0; tmp['data']['clients'][i]; i++)
+        this.clients.push(tmp['data']['clients'][i])
+      if (this.clients.length < 20 || !tmp['data']['clients'].length)
+        this.full = true
     },
     split: function (string) {
       return string.split(".");

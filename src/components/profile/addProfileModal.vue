@@ -80,7 +80,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:PROFILE_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['profiles'][i]; i++)
           this.profiles.push(tmp['data']['profiles'][i])

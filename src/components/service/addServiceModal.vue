@@ -69,7 +69,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:SERVICES_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['services'][i]; i++)
           this.services.push(tmp['data']['services'][i])
