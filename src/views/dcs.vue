@@ -21,8 +21,8 @@
             <th v-else @click="sort('id', 1)" class="text-center th-sm s-m-1">Id</th>
             <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-3">Name<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-3">Name</th>
-            <th v-if="currentSort === 'location'" @click="sort('location', 1)" class="text-center th-sm b-m-3">Name<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('location', 1)" class="text-center th-sm b-m-3">Name</th>
+            <th v-if="currentSort === 'location'" @click="sort('location', 1)" class="text-center th-sm b-m-3">Location<font-awesome-icon class="float-right" icon="sort" /></th>
+            <th v-else @click="sort('location', 1)" class="text-center th-sm b-m-3">Location</th>
             <th v-if="currentSort === 'hoster.name'" @click="sort('hoster.name', 2)" class="th-sm b-m-3">Hoster<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('hoster.name', 2)" class="th-sm b-m-3">Hoster</th>
             <th class="s-m-1">Edit</th>
