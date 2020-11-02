@@ -163,7 +163,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:GLOBALVAR_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['globalVars'][i]; i++)
           this.vars.push(tmp['data']['globalVars'][i])

@@ -34,6 +34,14 @@
             <td v-if="v"><b-button v-b-modal.editVarModal @click="get_var(v)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
             <td v-if="v"><b-button v-b-modal.deleteVarModal @click="get_var(v)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
+          <tr>
+            <td colspan="5" @click="getVars" v-if="!full" style="cursor: pointer;">
+              <font-awesome-icon icon="plus"/>
+            </td>
+            <td v-else colspan='5'>
+              Nothing else to show
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -41,6 +49,7 @@
     <add-var :addInfos="addInfos"></add-var>
     <edit-var :editInfos="editInfos" :var='this.var'></edit-var>
     <delete-var :editInfos="editInfos"></delete-var>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
 
@@ -62,6 +71,8 @@ export default {
   data() {
     return {
       vars: [],
+      full: false,
+      scrolled: false,
       var: null,
       currentSort: 'id',
       currentSortDir: 'asc',
@@ -80,7 +91,30 @@ export default {
   mounted() {
     this.getVars();
   },
+  created () {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scroll);
+  },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getVars();
+      }
+    },
     get_var: function(v) {
       this.editInfos.id = v.id
       this.editInfos.key = v.key
@@ -88,17 +122,15 @@ export default {
       this.var = v
     },
     async getVars() {
-      this.vars = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:GLOBALVAR_QUERY,
-          variables: {start: start}
-        })
-        for (let i = 0; tmp['data']['globalVars'][i]; i++)
-          this.vars.push(tmp['data']['globalVars'][i])
-        start += 50
-      } while(tmp && tmp['data'] && tmp['data']['globalVars'] && tmp['data']['globalVars'].length)
+      var start = this.vars.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:GLOBALVAR_QUERY,
+        variables: {limit: 20, start: start}
+      })
+      for (let i = 0; tmp['data']['globalVars'][i]; i++)
+        this.vars.push(tmp['data']['globalVars'][i])
+      if (this.vars.length < 20 || !tmp['data']['globalVars'].length)
+        this.full = true;
     },
     split: function (string) {
       return string.split(".");

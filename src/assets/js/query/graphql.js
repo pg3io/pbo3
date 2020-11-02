@@ -85,8 +85,8 @@ query allServer($start: Int!, $where: JSON!) {
 `
 
 const ALL_SERVER_QUERY = gql`
-query allServer($start: Int!) {
-  servers(limit: 100, start: $start) {
+query allServer($limit: Int!, $start: Int!) {
+  servers(limit: $limit, start: $start) {
     id,
     hostname,
     date,
@@ -415,8 +415,8 @@ query Server($id: ID!) {
 }`
 
 const HOSTERS_QUERY = gql`
-query Hoster($start: Int!) {
-  hosters(limit: 50, start: $start) {
+query Hoster($limit: Int!, $start: Int!) {
+  hosters(limit: $limit, start: $start) {
         id,
         name,
         url_admin
@@ -425,8 +425,8 @@ query Hoster($start: Int!) {
 `
 
 const CLIENTS_QUERY = gql`
-query Clients($start: Int!) {
-  clients(limit: 50, start: $start) {
+query Clients($limit: Int!, $start: Int!) {
+  clients(limit: $limit, start: $start) {
       id,
       name,
       infos,
@@ -439,8 +439,8 @@ query Clients($start: Int!) {
 `
 
 const OS_QUERY = gql`
-query Os($start: Int!) {
-  os(limit: 50, start: $start) {
+query Os($limit: Int!, $start: Int!) {
+  os(limit: $limit, start: $start) {
       id,
       os_name,
       os_version,
@@ -450,24 +450,24 @@ query Os($start: Int!) {
 `
 
 const TYPE_QUERY = gql`
-query Type($start: Int!) {
-  types(limit: 50, start: $start) {
+query Type($limit: Int!, $start: Int!) {
+  types(limit: $limit, start: $start) {
       id,
       name
   }
 }
 `
 const ENV_QUERY = gql`
-query Env($start: Int!) {
-  envs(limit: 50, start: $start) {
+query Env($limit: Int!, $start: Int!) {
+  envs(limit: $limit, start: $start) {
       id,
       name
   }
 }
 `
 const PROFILE_QUERY = gql`
-query Profile($start: Int!) {
-  profiles(limit: 50, start: $start) {
+query Profile($limit: Int!, $start: Int!) {
+  profiles(limit: $limit, start: $start) {
     id,
     name,
     infos
@@ -475,8 +475,8 @@ query Profile($start: Int!) {
 }
 `
 const SERVER_USER_QUERY = gql`
-query ServerUser($start: Int!) {
-  serverUsers(limit: 50, start: $start) {
+query ServerUser($limit: Int!, $start: Int!) {
+  serverUsers(limit: $limit, start: $start) {
     id,
     name
   }
@@ -496,8 +496,8 @@ query Dc {
 }
 `
 const DC_QUERY_ = gql `
-query Dc($start: Int!) {
-  dcs(limit: 50, start: $start) {
+query Dc($limit: Int!, $start: Int!) {
+  dcs(limit: $limit, start: $start) {
     id,
     name,
     location,
@@ -510,8 +510,8 @@ query Dc($start: Int!) {
 `
 
 const CRED_QUERY = gql`
-query Cred($start: Int!) {
-  creds(limit: 50, start: $start) {
+query Cred($limit: Int!, $start: Int!) {
+  creds(limit: $limit, start: $start) {
     id,
     name,
     auth,
@@ -524,8 +524,8 @@ query Cred($start: Int!) {
 `
 
 const OFFER_QUERY = gql`
-query Offer($start: Int!) {
-  offers(limit: 50, start: $start) {
+query Offer($limit: Int!, $start: Int!) {
+  offers(limit: $limit, start: $start) {
     id,
     name,
     hoster {
@@ -538,8 +538,8 @@ query Offer($start: Int!) {
 `
 
 const SERVICES_QUERY = gql`
-query Services($start: Int!) {
-  services(limit: 50, start: $start) {
+query Services($limit: Int!, $start: Int!) {
+  services(limit: $limit, start: $start) {
     id,
     name
   }
@@ -547,8 +547,8 @@ query Services($start: Int!) {
 `
 
 const SUPPLIER_QUERY = gql`
-query Suppliers($start: Int!) {
-  suppliers(limit: 50, start: $start) {
+query Suppliers($limit: Int!, $start: Int!) {
+  suppliers(limit: $limit, start: $start) {
     id,
     name
   }
@@ -556,8 +556,8 @@ query Suppliers($start: Int!) {
 `
 
 const GLOBALVAR_QUERY = gql`
-query GlobalVars($start: Int!) {
-  globalVars(limit: 50, start: $start) {
+query GlobalVars($limit: Int!, $start: Int!) {
+  globalVars(limit: $limit, start: $start) {
     id,
     key,
     value

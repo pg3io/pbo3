@@ -67,7 +67,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:TYPE_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['types'][i]; i++)
           this.types.push(tmp['data']['types'][i])

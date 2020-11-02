@@ -141,6 +141,14 @@
                     </b-button>
                   </td>
                 </tr>
+                <tr>
+                  <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                    <font-awesome-icon icon="plus"/>
+                  </td>
+                  <td v-else colspan='12'>
+                    Nothing else to show
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -152,6 +160,7 @@
         </div>
       </div>
       <delete-archived :deleteInfos='deleteInfos'></delete-archived>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
     </div>
 </template>
 
@@ -168,6 +177,8 @@ export default {
     return {
       search: '',
       servers: [],
+      full: false,
+      scrolled: false,
       currentSort:'id',
       currentSortDir:'asc',
       deleteInfos: {
@@ -179,23 +190,44 @@ export default {
   mounted() {
     this.getServer();
   },
+  created () {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scroll);
+  },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getServer(this.servers.length)
+      }
+    },
     get_server(server) {
       this.deleteInfos.id = server.id
       this.deleteInfos.hostname = server.hostname
     },
     async getServer() {
-      this.servers = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:ARCHIVED_SERVERS_QUERY,
-          variables: {start: start, where: {"archived": true}}
-        })
-        for (let i = 0; tmp['data']['servers'][i]; i++)
-          this.servers.push(tmp['data']['servers'][i])
-        start += 100
-      } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
+      var start = this.servers.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:ARCHIVED_SERVERS_QUERY,
+        variables: {limit: 100, start: start, where: {"archived": true}}
+      })
+      for (let i = 0; tmp['data']['servers'][i]; i++)
+        this.servers.push(tmp['data']['servers'][i])
+      if (this.servers.length < 100 || !tmp['data']['servers'].length)
+        this.full = true;
     },
     icon:function(name){
       return 'fl-' + name

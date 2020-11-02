@@ -545,6 +545,21 @@
             'hoster',
           ]
         },
+        show_things: [
+          'Hosters',
+          'Clients',
+          'Os',
+          'Envs',
+          'Types',
+          'Profiles',
+          'Servers',
+          'ServerUsers',
+          'Dcs',
+          'Services',
+          'Suppliers',
+          'Vars',
+          'archives'
+        ],
         hoverSuggest: "",
         hide_suggest: true,
         editAll: {},
@@ -564,19 +579,6 @@
     },
     mounted() {
       this.getServer(0);
-      // this.getCred();
-      // this.getClient()
-      // this.getOs();
-      // this.getType();
-      // this.getEnv();
-      // this.getProfile();
-      // this.getServerUser();
-      // this.getDc();
-      // this.getOffer();
-      // this.getService();
-      // this.getHoster();
-      // this.getSuppliers();
-      // this.getVars();
       this.timeout();
       this.getSearchByUrl();
     },
@@ -589,7 +591,6 @@
     methods: {
       goTop() {
         var change = document.scrollingElement.scrollTop / 10
-        if (change < 15) change = 20
         if (document.scrollingElement.scrollTop > 0) {
           document.scrollingElement.scrollTop -= change
           setTimeout(this.goTop, 10)
@@ -610,7 +611,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:ALL_SERVER_QUERY,
-            variables: {start: start, where: {"archived": false}}
+            variables: {limit: 100, start: start, where: {"archived": false}}
           })
           for (let i = 0; tmp['data']['servers'][i]; i++)
             this.saveServers.push(tmp['data']['servers'][i])
@@ -633,7 +634,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:CRED_QUERY,
-            variables: {start: start}
+            variables: {limit:40, start: start}
           })
           for (let i = 0; tmp['data']['creds'][i]; i++)
             this.creds.push(tmp['data']['creds'][i])
@@ -645,7 +646,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:CLIENTS_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['clients'][i]; i++)
             this.clients.push(tmp['data']['clients'][i])
@@ -657,7 +658,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:OS_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['os'][i]; i++)
             this.os.push(tmp['data']['os'][i])
@@ -665,11 +666,11 @@
         } while(tmp && tmp['data'] && tmp['data']['os']&& tmp['data']['os'].length);
       },
       async getType() {
-        var start = this.types.lentgh, tmp = null
+        var start = this.types.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:TYPE_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['types'][i]; i++)
             this.types.push(tmp['data']['types'][i])
@@ -681,7 +682,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:ENV_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['envs'][i]; i++)
             this.envs.push(tmp['data']['envs'][i])
@@ -693,7 +694,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:PROFILE_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['profiles'][i]; i++)
             this.profiles.push(tmp['data']['profiles'][i])
@@ -705,7 +706,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:SERVER_USER_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['serverUsers'][i]; i++)
             this.serverUsers.push(tmp['data']['serverUsers'][i])
@@ -717,7 +718,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:DC_QUERY_,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['dcs'][i]; i++)
             this.dcs.push(tmp['data']['dcs'][i])
@@ -729,7 +730,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:OFFER_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['offers'][i]; i++)
             this.offers.push(tmp['data']['offers'][i])
@@ -741,7 +742,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:SERVICES_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['services'][i]; i++)
             this.services.push(tmp['data']['services'][i])
@@ -753,7 +754,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:HOSTERS_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['hosters'][i]; i++)
             this.hosters.push(tmp['data']['hosters'][i])
@@ -761,11 +762,11 @@
         } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
       },
       async getSuppliers() {
-        var start = this.suppliers.lentgh, tmp = null
+        var start = this.suppliers.length, tmp = null
         do {
           tmp = await this.$apollo.mutate({
             mutation:SUPPLIER_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['suppliers'][i]; i++)
             this.suppliers.push(tmp['data']['suppliers'][i])
@@ -777,7 +778,7 @@
         do {
           tmp = await this.$apollo.mutate({
             mutation:GLOBALVAR_QUERY,
-            variables: {start: start}
+            variables: {limit: 50, start: start}
           })
           for (let i = 0; tmp['data']['globalVars'][i]; i++)
             this.vars.push(tmp['data']['globalVars'][i])
@@ -1154,16 +1155,11 @@
         this.inputSearch = "";
       },
       gotoPath(path) {
-        var lock = 0, newPath = '';
-        if (path == 'var')
+        if (path == 'vars')
           return this.$router.push('globalVars')
-        if (path[path.length - 1] != 's') newPath = '/' + path + 's';
-        else newPath = '/' + path;
-        for (let i = 0; this.suggests.funcOptions[i]; i++)
-          if (this.suggests.funcOptions[i].toLowerCase() == path)
-            lock++;
-        if (lock)
-          this.$router.push(newPath);
+        for (let i = 0; this.show_things[i]; i++)
+          if (this.show_things[i].toLowerCase() == path)
+            return this.$router.push('/' + path);
       },
       deleteMutation() {
         var check = null, temp = this.tags[2]
@@ -1447,58 +1443,18 @@
         return final;
       },
       queryWanted(search) {
-        switch (search) {
-          case 'hoster':
-            (!this.hosters.length) ? this.getHoster() : 0;
-            break;
-          case 'client':
-            (!this.clients.length) ? this.getClient() : 0;
-            break;
-          case 'os':
-            (!this.os.length) ? this.getOs() : 0;
-            break;
-          case 'env':
-            (!this.envs.length) ? this.getEnv() : 0;
-            break;
-          case 'type':
-            (!this.types.length) ? this.getType() : 0;
-            break;
-          case 'profile':
-            (!this.profiles.length) ? this.getProfile() : 0;
-            break;
-          case 'server':
-            this.get_server();
-            break;
-          case 'serverUser':
-            (!this.serverUsers.length) ? this.getServerUser() : 0;
-            break;
-          case 'dc':
-            (!this.dcs.length) ? this.getDc() : 0;
-            break;
-          case 'service':
-            (!this.services.length) ? this.getService() : 0;
-            break;
-          case 'supplier':
-            (!this.suppliers.length) ? this.getSuppliers() : 0;
-            break;
-          case 'var':
-            (!this.vars.length) ? this.getVars() : 0;
-            break;
-          default:
-            this.getVars()
-            this.getSuppliers()
-            this.getService()
-            this.getDc()
-            this.getServerUser()
-            this.get_server()
-            this.getProfile()
-            this.getType()
-            this.getEnv()
-            this.getOs()
-            this.getClient();
-            this.getHoster();
-            break;
-        }
+        var all = ['hoster', 'client', 'os', 'env', 'type', 'profile', 'server',
+         'serveruser', 'dc', 'var', 'service', 'supplier'];
+        var querys = {'hoster': this.getHoster, 'client': this.getClient,
+        'os': this.getOs, 'env': this.getEnv, 'type': this.getType,
+        'profile': this.getProfile, 'server': this.get_server,
+        'serveruser': this.getServerUser, 'dc': this.getDc, 'var': this.getVars,
+         'service': this.getService, 'supplier': this.getSuppliers};
+        if (search == 'server')
+          for (let i = 0; all[i]; i++)
+            querys[all[i]]();
+        else
+          querys[search]();
       },
       suggest_oneTag() {
         var i = -1, tag = this.tags[0], result = this.search_orFunc(tag);
@@ -1514,6 +1470,12 @@
           for (let y = 0; result && result[y]; y++)
             if (result[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
               this.showSuggest[++i] = result[y];
+          if (this.tags[0] && this.tags[0] == 'show') {
+            this.showSuggest = []
+            for (let i = 0, a = 0; this.show_things[i]; i++)
+              if (this.show_things[i].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
+                this.showSuggest[a++] = this.show_things[i];
+          }
         }
       },
       suggest_gesture: function() {
@@ -1826,10 +1788,5 @@
   margin-right: 10%;
   color: black;
   cursor: pointer;
-}
-.bottom-right {
-  position: fixed;
-  right: 2%;
-  bottom: 2%;
 }
 </style>

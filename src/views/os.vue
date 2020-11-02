@@ -45,6 +45,14 @@
             <td v-if="o"><b-button v-b-modal.editOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
             <td v-if="o"><b-button v-b-modal.deleteOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
+          <tr>
+            <td colspan='7' @click="getOs" v-if="!full" style="cursor: pointer;">
+              <font-awesome-icon icon="plus"/>
+            </td>
+            <td v-else colspan="7">
+              Nothing else to show
+            </td>
+          </tr>
         </tbody>
       </table>
       <spinner v-else></spinner>
@@ -52,6 +60,8 @@
     <add-os :addInfos='addInfos'></add-os>
     <edit-os v-bind:editInfos="editInfos" ></edit-os>
     <delete-os v-bind:editInfos="editInfos" ></delete-os>
+    <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
+    <br><br><br><br>
   </div>
 </template>
 
@@ -73,6 +83,8 @@ export default {
   data () {
     return {
       os: [],
+      full: false,
+      scrolled: false,
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -92,19 +104,40 @@ export default {
   mounted() {
     this.getOs();
   },
+  created () {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scroll);
+  },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getOs()
+      }
+    },
     async getOs() {
-      this.os = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:OS_QUERY,
-          variables: {start: start}
-        })
-        for (let i = 0; tmp['data']['os'][i]; i++)
-          this.os.push(tmp['data']['os'][i])
-        start += 50
-      } while(tmp && tmp['data'] && tmp['data']['os']&& tmp['data']['os'].length);
+      var start = this.os.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:OS_QUERY,
+        variables: {limit: 20, start: start}
+      })
+      for (let i = 0; tmp['data']['os'][i]; i++)
+        this.os.push(tmp['data']['os'][i])
+      if (this.os.length < 20 || !tmp['data']['os'].length)
+        this.full = true
     },
     icon:function(name){
       return 'fl-' + name

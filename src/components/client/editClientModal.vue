@@ -103,7 +103,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:CLIENTS_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['clients'][i]; i++)
           this.clients.push(tmp['data']['clients'][i])
@@ -116,7 +116,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:SUPPLIER_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['suppliers'][i]; i++)
           this.suppliers.push(tmp['data']['suppliers'][i])

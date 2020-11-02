@@ -32,6 +32,14 @@
             <td v-if="env"><b-button v-b-modal.editEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
             <td v-if="env"><b-button v-b-modal.deleteEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
           </tr>
+          <tr>
+            <td colspan="4" @click="getEnv" v-if="!full" style="cursor: pointer;">
+              <font-awesome-icon icon='plus'/>
+            </td>
+            <td v-else colspan="4">
+              Nothing else to show
+            </td>
+          </tr>
         </tbody>
       </table>
       <spinner v-else></spinner>
@@ -39,6 +47,7 @@
     <add-env :addInfos='addInfos'></add-env>
     <edit-env v-bind:editInfos="editInfos" :env='Env'></edit-env>
     <delete-env v-bind:editInfos="editInfos" ></delete-env>
+    <b-button v-show="scrolled" @click="goTop" pill variant='outline-dark' class='bottom-right' size='lg'><font-awesome-icon icon='chevron-up'/></b-button>
   </div>
 </template>
 
@@ -60,6 +69,8 @@ export default {
   data () {
     return {
       envs: [],
+      full: false,
+      scrolled: false,
       search: '',
       currentSort:'id',
       currentSortDir:'asc',
@@ -79,19 +90,40 @@ export default {
   mounted() {
     this.getEnv();
   },
+  created () {
+    window.addEventListener('scroll', this.scroll);
+  },
+  beforeDestroy () {
+    window.removeEventListener('scroll', this.scroll);
+  },
   methods: {
+    goTop() {
+      var change = document.scrollingElement.scrollTop / 10
+      if (document.scrollingElement.scrollTop > 0) {
+        document.scrollingElement.scrollTop -= change
+        setTimeout(this.goTop, 10)
+      } else {
+        document.scrollingElement.scrollTop = 0
+        this.scrolled = false
+      }
+    },
+    scroll() {
+      this.scrolled = !!(document.scrollingElement.scrollTop)
+      if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
+        if (this.full == false)
+          this.getEnv()
+      }
+    },
     async getEnv() {
-      this.envs = []
-      var start = 0, tmp = null
-      do {
-        tmp = await this.$apollo.mutate({
-          mutation:ENV_QUERY,
-          variables: {start: start}
-        })
-        for (let i = 0; tmp['data']['envs'][i]; i++)
-          this.envs.push(tmp['data']['envs'][i])
-        start += 50
-      } while(tmp && tmp['data'] && tmp['data']['envs'] && tmp['data']['envs'].length)
+      var start = this.envs.length, tmp = null
+      tmp = await this.$apollo.mutate({
+        mutation:ENV_QUERY,
+        variables: {limit: 20, start: start}
+      })
+      for (let i = 0; tmp['data']['envs'][i]; i++)
+        this.envs.push(tmp['data']['envs'][i])
+      if (this.envs.length < 20 || !tmp['data']['envs'])
+        this.full = true
     },
     split: function (string) {
       return string.split(".");

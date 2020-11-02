@@ -420,7 +420,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:CRED_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['creds'][i]; i++)
           this.creds.push(tmp['data']['creds'][i])
@@ -433,7 +433,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:CLIENTS_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['clients'][i]; i++)
           this.clients.push(tmp['data']['clients'][i])
@@ -446,7 +446,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:OS_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['os'][i]; i++)
           this.os.push(tmp['data']['os'][i])
@@ -459,7 +459,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:TYPE_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['types'][i]; i++)
           this.types.push(tmp['data']['types'][i])
@@ -472,7 +472,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:ENV_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['envs'][i]; i++)
           this.envs.push(tmp['data']['envs'][i])
@@ -485,7 +485,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:PROFILE_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['profiles'][i]; i++)
           this.profiles.push(tmp['data']['profiles'][i])
@@ -498,7 +498,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:SERVER_USER_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['serverUsers'][i]; i++)
           this.serverUsers.push(tmp['data']['serverUsers'][i])
@@ -511,7 +511,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:DC_QUERY_,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['dcs'][i]; i++)
           this.dcs.push(tmp['data']['dcs'][i])
@@ -524,7 +524,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:OFFER_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['offers'][i]; i++)
           this.offers.push(tmp['data']['offers'][i])
@@ -537,7 +537,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:HOSTERS_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['hosters'][i]; i++)
           this.hosters.push(tmp['data']['hosters'][i])

@@ -67,7 +67,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:ENV_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['envs'][i]; i++)
           this.envs.push(tmp['data']['envs'][i])

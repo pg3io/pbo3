@@ -100,7 +100,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:DC_QUERY_,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['dcs'][i]; i++)
           this.dcs.push(tmp['data']['dcs'][i])
@@ -113,7 +113,7 @@ export default {
       do {
         tmp = await this.$apollo.mutate({
           mutation:HOSTERS_QUERY,
-          variables: {start: start}
+          variables: {limit: 50, start: start}
         })
         for (let i = 0; tmp['data']['hosters'][i]; i++)
           this.hosters.push(tmp['data']['hosters'][i])
