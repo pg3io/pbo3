@@ -579,7 +579,6 @@
     },
     mounted() {
       this.getServer();
-      // this.timeout();
       this.getSearchByUrl();
     },
     created () {
@@ -609,10 +608,14 @@
       async get_server() {
         var start = this.saveServers.length, tmp = ''
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:ALL_SERVER_QUERY,
-            variables: {limit: 100, start: start, where: {"archived": false}}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:ALL_SERVER_QUERY,
+              variables: {limit: 100, start: start, where: {"archived": false}}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['servers'][i]; i++)
             this.saveServers.push(tmp['data']['servers'][i])
           start += 100
@@ -625,7 +628,7 @@
             mutation:ALL_SERVER_QUERY,
             variables: {limit: 50, start: start, where: {"archived": false}}
           })
-        } catch(err) {
+        } catch {
           this.stopLoading();
           return this.full = true
         }
@@ -639,10 +642,14 @@
       async getCred() {
         var start = this.creds.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:CRED_QUERY,
-            variables: {limit:40, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:CRED_QUERY,
+              variables: {limit:40, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['creds'][i]; i++)
             this.creds.push(tmp['data']['creds'][i])
           start += 50
@@ -651,10 +658,14 @@
       async getClient() {
         var start = this.clients.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:CLIENTS_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:CLIENTS_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['clients'][i]; i++)
             this.clients.push(tmp['data']['clients'][i])
           start += 50
@@ -663,10 +674,14 @@
       async getOs() {
         var start = this.os.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:OS_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:OS_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['os'][i]; i++)
             this.os.push(tmp['data']['os'][i])
           start += 50
@@ -675,10 +690,14 @@
       async getType() {
         var start = this.types.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:TYPE_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:TYPE_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['types'][i]; i++)
             this.types.push(tmp['data']['types'][i])
           start += 50
@@ -687,10 +706,14 @@
       async getEnv() {
         var start = this.envs.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:ENV_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:ENV_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['envs'][i]; i++)
             this.envs.push(tmp['data']['envs'][i])
           start += 50
@@ -699,10 +722,14 @@
       async getProfile() {
         var start = this.profiles.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:PROFILE_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:PROFILE_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['profiles'][i]; i++)
             this.profiles.push(tmp['data']['profiles'][i])
           start += 50
@@ -711,10 +738,14 @@
       async getServerUser() {
         var start = this.serverUsers.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:SERVER_USER_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:SERVER_USER_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['serverUsers'][i]; i++)
             this.serverUsers.push(tmp['data']['serverUsers'][i])
           start += 50
@@ -723,10 +754,14 @@
       async getDc() {
         var start = this.dcs.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:DC_QUERY_,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:DC_QUERY_,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['dcs'][i]; i++)
             this.dcs.push(tmp['data']['dcs'][i])
           start += 50
@@ -735,10 +770,14 @@
       async getOffer() {
         var start = this.offers.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:OFFER_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:OFFER_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['offers'][i]; i++)
             this.offers.push(tmp['data']['offers'][i])
           start += 50
@@ -747,10 +786,14 @@
       async getService() {
         var start = this.services.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:SERVICES_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:SERVICES_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['services'][i]; i++)
             this.services.push(tmp['data']['services'][i])
           start += 50
@@ -759,10 +802,14 @@
       async getHoster() {
         var start = this.hosters.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:HOSTERS_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:HOSTERS_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['hosters'][i]; i++)
             this.hosters.push(tmp['data']['hosters'][i])
           start += 50
@@ -771,10 +818,14 @@
       async getSuppliers() {
         var start = this.suppliers.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:SUPPLIER_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:SUPPLIER_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['suppliers'][i]; i++)
             this.suppliers.push(tmp['data']['suppliers'][i])
           start += 50
@@ -783,10 +834,14 @@
       async getVars() {
         var start = this.vars.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:GLOBALVAR_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:GLOBALVAR_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['globalVars'][i]; i++)
             this.vars.push(tmp['data']['globalVars'][i])
           start += 50
@@ -1315,7 +1370,7 @@
         }
         this.makeOption(((this.tags[0]) ? this.tags[0] : this.inputSearch).toLowerCase());
         if (!this.servers.length)
-          this.timeout();
+          this.stopLoading();
       },
       remove_tag: function(tag) {
         var i = -1;

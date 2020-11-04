@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editDcModal" size="xl" ref="edit-dc" :no-close-on-backdrop=true :no-close-on-esc=true title="edit" hide-footer>
+    <b-modal id="editDcModal" size="xl" ref="edit-dc" :no-close-on-backdrop=true :no-close-on-esc=true title="edit" hide-footer @v-show="getAll">
       <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
@@ -89,11 +89,11 @@ export default {
     editInfos: Object,
     dc: Object
   },
-  mounted() {
-    this.getDc();
-    this.getHoster();
-  },
   methods: {
+    getAll() {
+      this.getDc();
+      this.getHoster();
+    },
     async getDc() {
       this.dcs = []
       var start = 0, tmp = null

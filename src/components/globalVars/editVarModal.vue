@@ -135,9 +135,6 @@ export default {
     editInfos: Object,
     var: Object
   },
-  mounted() {
-    this.getVars();
-  },
   data() {
     return {
       vars: [],
@@ -151,6 +148,7 @@ export default {
   },
   methods: {
     fill() {
+      this.getVars();
       this.key = this.editInfos.key
       this.value = this.editInfos.value
     },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editEnvModal" size="xl" ref="edit-env" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="editEnvModal" size="xl" ref="edit-env" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getEnv">
       <b-form @submit.stop.prevent="onSubmit">
         <div class="inputLine">
           <div class="inputField">
@@ -56,9 +56,6 @@ export default {
       validName: true,
       envs: {}
     }
-  },
-  mounted() {
-    this.getEnv();
   },
   methods: {
     async getEnv() {

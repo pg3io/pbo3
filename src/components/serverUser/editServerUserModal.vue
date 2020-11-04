@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editServerUserModal" size="xl" ref="edit-ServerUser" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="editServerUserModal" size="xl" ref="edit-ServerUser" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getServerUser">
       <b-form @submit.stop.prevent="onSubmit">
           <div class="inputLine">
             <div class="inputField">
@@ -56,9 +56,6 @@ export default {
       validName: true,
       serverUsers: {}
     }
-  },
-  mounted() {
-    this.getServerUser();
   },
   methods: {
     async getServerUser() {

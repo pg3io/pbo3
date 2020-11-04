@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="addVarModal" size="xl" ref="add-var" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="addVarModal" size="xl" ref="add-var" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getVars">
       <b-form @submit.stop.prevent="onSubmit">
         <div class="inputLine">
           <div class="inputField">
@@ -133,9 +133,6 @@ export default {
   },
   props: {
     addInfos: Object
-  },
-  mounted() {
-    this.getVars();
   },
   data() {
     return {

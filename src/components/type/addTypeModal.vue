@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="addTypeModal" size="xl" ref="add-type" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="addTypeModal" size="xl" ref="add-type" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getType">
       <b-form @submit.stop.prevent="onSubmit">
           <div class="inputLine">
             <div class="inputField">
@@ -56,9 +56,6 @@ export default {
       types: [],
       validName: true
     }
-  },
-  mounted() {
-    this.getType();
   },
   methods: {
     async getType() {

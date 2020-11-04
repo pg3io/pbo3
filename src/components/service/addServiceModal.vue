@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="addServiceModal" size="xl" ref="add-service" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="addServiceModal" size="xl" ref="add-service" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getService">
       <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
@@ -58,9 +58,6 @@ export default {
       services: [],
       validName: true
     }
-  },
-  mounted() {
-    this.getService();
   },
   methods: {
     async getService() {
