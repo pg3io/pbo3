@@ -49,10 +49,10 @@
               </tr>
             </tbody>
           </table>
-          <br><br><br><br>
         </div>
       </div>
       <spinner v-if='Object.keys(clients).length == 0'></spinner>
+      <br><br><br><br>
     </div>
     <add-client v-bind:addInfos="editInfos"></add-client>
     <edit-client v-bind:editInfos="editInfos" :client='Client'></edit-client>
@@ -113,6 +113,14 @@ export default {
     this.getClient();
   },
   methods: {
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -132,14 +140,21 @@ export default {
     },
     async getClient() {
       var start = this.clients.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:CLIENTS_QUERY,
-        variables: {limit: 20, start: start}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:CLIENTS_QUERY,
+          variables: {limit: 20, start: start}
+        })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['clients'][i]; i++)
         this.clients.push(tmp['data']['clients'][i])
-      if (!tmp['data']['clients'].length || this.clients.length - start < 20)
+      if (!tmp['data']['clients'].length || this.clients.length - start < 20) {
         this.full = true
+        this.stopLoading()
+      }
     },
     split: function (string) {
       return string.split(".");

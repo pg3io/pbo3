@@ -256,7 +256,6 @@
                   </tr>
                 </tbody>
               </table>
-              <br><br><br><br>
             </div>
           </div>
           <div v-if='!Object.keys(servers).length'>
@@ -264,6 +263,7 @@
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
           </div>
+          <br><br><br><br>
         </div>
       </div>
     </div>
@@ -579,7 +579,7 @@
     },
     mounted() {
       this.getServer();
-      this.timeout();
+      // this.timeout();
       this.getSearchByUrl();
     },
     created () {
@@ -620,14 +620,21 @@
       },
       async getServer() {
         var start = this.servers.length
-        var tmp = await this.$apollo.mutate({
-          mutation:ALL_SERVER_QUERY,
-          variables: {limit: 50, start: start, where: {"archived": false}}
-        })
+        try {
+          var tmp = await this.$apollo.mutate({
+            mutation:ALL_SERVER_QUERY,
+            variables: {limit: 50, start: start, where: {"archived": false}}
+          })
+        } catch(err) {
+          this.stopLoading();
+          return this.full = true
+        }
         for (let i = 0; tmp['data']['servers'][i]; i++)
           this.servers.push(tmp['data']['servers'][i])
-        if (this.servers.length - start < 50 || !tmp['data']['servers'].length)
+        if (this.servers.length - start < 50 || !tmp['data']['servers'].length) {
           this.full = true
+          this.stopLoading();
+        }
       },
       async getCred() {
         var start = this.creds.length, tmp = null
@@ -796,9 +803,6 @@
         this.getOption();
         this.hide_suggest = true;
         this.$router.push(savePath);
-      },
-      timeout() {
-          setTimeout(this.stopLoading, 2200);
       },
       stopLoading() {
         var loader = document.getElementById("loader");

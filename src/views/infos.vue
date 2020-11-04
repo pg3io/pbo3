@@ -125,19 +125,21 @@ export default {
     async getServer() {
       this.servers = []
       var tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:ALL_SERVERS_QUERY,
-        variables: {start: 0, where: {"hostname": this.$route.path.split("/")[2]}}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:ALL_SERVERS_QUERY,
+          variables: {start: 0, where: {"hostname": this.$route.path.split("/")[2]}}
+        })
+      } catch {
+        this.stopLoading()
+        return
+      }
         this.servers = tmp['data']['servers'][0]
     },
     setTitle() {
       var path = this.split(this.$route.path)
       var server_name = path[2]
       document.title = 'PBO3 - ' + server_name
-    },
-    timeout() {
-        setTimeout(this.stopLoading, 500)
     },
     stopLoading() {
       var loader = document.getElementById("loader");
@@ -156,7 +158,6 @@ export default {
   },
   mounted() {
     this.getServer();
-    this.timeout()
     this.setTitle()
   },
 }

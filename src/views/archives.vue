@@ -151,13 +151,13 @@
                 </tr>
               </tbody>
             </table>
-            <br><br><br><br>
           </div>
           <div v-if='Object.keys(servers).length == 0'>
               <div id="loader" class="spinner-fast centerDiv">
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
           </div>
+          <br><br><br><br>
         </div>
       </div>
       <delete-archived :deleteInfos='deleteInfos'></delete-archived>
@@ -215,20 +215,35 @@ export default {
           this.getServer(this.servers.length)
       }
     },
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     get_server(server) {
       this.deleteInfos.id = server.id
       this.deleteInfos.hostname = server.hostname
     },
     async getServer() {
       var start = this.servers.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:ARCHIVED_SERVERS_QUERY,
-        variables: {limit: 50, start: start, where: {"archived": true}}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:ARCHIVED_SERVERS_QUERY,
+          variables: {limit: 50, start: start, where: {"archived": true}}
+        })
+      } catch {
+        this.stopLoading();
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['servers'][i]; i++)
         this.servers.push(tmp['data']['servers'][i])
-      if (!tmp['data']['servers'].length || this.servers.length - start < 50)
+      if (!tmp['data']['servers'].length || this.servers.length - start < 50) {
         this.full = true;
+        this.stopLoading();
+      }
     },
     icon:function(name){
       return 'fl-' + name

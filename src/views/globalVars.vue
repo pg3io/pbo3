@@ -44,9 +44,9 @@
           </tr>
         </tbody>
       </table>
-      <br><br><br><br>
     </div>
     <spinner v-if="!vars || !vars.length"></spinner>
+    <br><br><br><br>
     <add-var :addInfos="addInfos"></add-var>
     <edit-var :editInfos="editInfos" :var='this.var'></edit-var>
     <delete-var :editInfos="editInfos"></delete-var>
@@ -99,6 +99,14 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -124,14 +132,21 @@ export default {
     },
     async getVars() {
       var start = this.vars.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:GLOBALVAR_QUERY,
-        variables: {limit: 20, start: start}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:GLOBALVAR_QUERY,
+          variables: {limit: 20, start: start}
+        })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['globalVars'][i]; i++)
         this.vars.push(tmp['data']['globalVars'][i])
-      if (!tmp['data']['globalVars'].length || this.vars.length - start < 20)
+      if (!tmp['data']['globalVars'].length || this.vars.length - start < 20) {
         this.full = true;
+        this.stopLoading()
+      }
     },
     split: function (string) {
       return string.split(".");

@@ -132,14 +132,21 @@ export default {
     },
     async getDc() {
       var start = this.dcs.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:DC_QUERY_,
-        variables: {limit: 20, start: start}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:DC_QUERY_,
+          variables: {limit: 20, start: start}
+        })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['dcs'][i]; i++)
         this.dcs.push(tmp['data']['dcs'][i])
-      if (!tmp['data']['dcs'].length || this.dcs.length - start < 20)
+      if (!tmp['data']['dcs'].length || this.dcs.length - start < 20) {
         this.full = true
+        this.stopLoading()
+      }
     },
     split: function (string) {
       return string.split(".");

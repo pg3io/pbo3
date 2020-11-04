@@ -98,6 +98,14 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -117,14 +125,21 @@ export default {
     },
     async getEnv() {
       var start = this.envs.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:ENV_QUERY,
-        variables: {limit: 20, start: start}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:ENV_QUERY,
+          variables: {limit: 20, start: start}
+        })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['envs'][i]; i++)
         this.envs.push(tmp['data']['envs'][i])
-      if (!tmp['data']['envs'] || this.envs.length - start < 20)
+      if (!tmp['data']['envs'] || this.envs.length - start < 20) {
         this.full = true
+        this.stopLoading()
+      }
     },
     split: function (string) {
       return string.split(".");
