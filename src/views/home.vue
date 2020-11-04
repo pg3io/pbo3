@@ -247,7 +247,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                    <td colspan="12" @click="getServer()" v-if="!full" style="cursor: pointer;">
                       <font-awesome-icon icon="plus"/>
                     </td>
                     <td v-else colspan='12'>
@@ -295,8 +295,8 @@
     /* Querys */
   import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
   SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
-  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, SERVERS_QUERY,
-  ALL_SERVER_QUERY } from '@/assets/js/query/graphql'
+  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, ALL_SERVER_QUERY }
+  from '@/assets/js/query/graphql'
 
     /* Deletes */
   import deleteClient from '@/components/client/deleteClientModal.vue'
@@ -578,7 +578,7 @@
       }
     },
     mounted() {
-      this.getServer(0);
+      this.getServer();
       this.timeout();
       this.getSearchByUrl();
     },
@@ -603,7 +603,7 @@
         this.scrolled = !!(document.scrollingElement.scrollTop)
         if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
           if (this.full == false)
-            this.getServer(this.servers.length)
+            this.getServer()
         }
       },
       async get_server() {
@@ -618,15 +618,15 @@
           start += 100
         } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
       },
-      async getServer(start) {
-        var length = this.servers.length
+      async getServer() {
+        var start = this.servers.length
         var tmp = await this.$apollo.mutate({
-          mutation:SERVERS_QUERY,
-          variables: {start: start, where: {"archived": false}}
+          mutation:ALL_SERVER_QUERY,
+          variables: {limit: 50, start: start, where: {"archived": false}}
         })
         for (let i = 0; tmp['data']['servers'][i]; i++)
           this.servers.push(tmp['data']['servers'][i])
-        if (length == this.servers.length)
+        if (this.servers.length - start < 50 || !tmp['data']['servers'].length)
           this.full = true
       },
       async getCred() {

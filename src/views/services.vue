@@ -122,7 +122,7 @@ export default {
       })
       for (let i = 0; tmp['data']['services'][i]; i++)
         this.services.push(tmp['data']['services'][i])
-      if (this.services.length < 20 || !tmp['data']['services'].length)
+      if (!tmp['data']['services'].length || this.services.length - start < 20)
         this.full = true
     },
     split: function (string) {

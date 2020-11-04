@@ -49,6 +49,7 @@
               </tr>
             </tbody>
           </table>
+          <br><br><br><br>
         </div>
       </div>
       <spinner v-if='Object.keys(clients).length == 0'></spinner>
@@ -57,7 +58,6 @@
     <edit-client v-bind:editInfos="editInfos" :client='Client'></edit-client>
     <delete-client v-bind:editInfos="editInfos" ></delete-client>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
-    <br><br><br><br>
   </div>
 </template>
 
@@ -138,7 +138,7 @@ export default {
       })
       for (let i = 0; tmp['data']['clients'][i]; i++)
         this.clients.push(tmp['data']['clients'][i])
-      if (this.clients.length < 20 || !tmp['data']['clients'].length)
+      if (!tmp['data']['clients'].length || this.clients.length - start < 20)
         this.full = true
     },
     split: function (string) {

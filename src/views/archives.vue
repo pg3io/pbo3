@@ -151,6 +151,7 @@
                 </tr>
               </tbody>
             </table>
+            <br><br><br><br>
           </div>
           <div v-if='Object.keys(servers).length == 0'>
               <div id="loader" class="spinner-fast centerDiv">
@@ -222,11 +223,11 @@ export default {
       var start = this.servers.length, tmp = null
       tmp = await this.$apollo.mutate({
         mutation:ARCHIVED_SERVERS_QUERY,
-        variables: {limit: 100, start: start, where: {"archived": true}}
+        variables: {limit: 50, start: start, where: {"archived": true}}
       })
       for (let i = 0; tmp['data']['servers'][i]; i++)
         this.servers.push(tmp['data']['servers'][i])
-      if (this.servers.length < 100 || !tmp['data']['servers'].length)
+      if (!tmp['data']['servers'].length || this.servers.length - start < 50)
         this.full = true;
     },
     icon:function(name){

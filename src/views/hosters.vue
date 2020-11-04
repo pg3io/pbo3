@@ -46,6 +46,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-hoster :addInfos='addInfos'></add-hoster>
     <edit-hoster :editInfos="editInfos" :hoster='Hoster'></edit-hoster>
@@ -128,7 +129,7 @@ export default {
         })
         for (let i = 0; tmp['data']['hosters'][i]; i++)
           this.hosters.push(tmp['data']['hosters'][i])
-        if (this.hosters.length < 20 || !tmp['data']['hosters'].length)
+        if (!tmp['data']['hosters'].length || this.hosters.length - start < 20)
           this.full = true
     },
     split: function (string) {

@@ -43,6 +43,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-profile :addInfos='addInfos'></add-profile>
     <edit-profile v-bind:editInfos="editInfos" :profile='Profile'></edit-profile>
@@ -125,7 +126,7 @@ export default {
       })
       for (let i = 0; tmp['data']['profiles'][i]; i++)
         this.profiles.push(tmp['data']['profiles'][i])
-      if (this.profiles.length < 20 || !tmp['data']['profiles'])
+      if (!tmp['data']['profiles'] || this.profiles.length - start < 20)
         this.full = true
     },
     split: function (string) {

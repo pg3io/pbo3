@@ -52,6 +52,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-dc :addInfos="addInfos"></add-dc>
     <edit-dc v-bind:editInfos="editInfos" :dc='Dc'></edit-dc>
@@ -137,7 +138,7 @@ export default {
       })
       for (let i = 0; tmp['data']['dcs'][i]; i++)
         this.dcs.push(tmp['data']['dcs'][i])
-      if (this.dcs.length < 20 || !tmp['data']['dcs'].length)
+      if (!tmp['data']['dcs'].length || this.dcs.length - start < 20)
         this.full = true
     },
     split: function (string) {

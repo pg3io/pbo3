@@ -43,6 +43,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-type :addInfos='addInfos'></add-type>
     <edit-type v-bind:editInfos="editInfos" :type='Type'></edit-type>
@@ -122,7 +123,7 @@ export default {
       })
       for (let i = 0; tmp['data']['types'][i]; i++)
         this.types.push(tmp['data']['types'][i])
-      if (this.types.length < 20 || !tmp['data']['types'])
+      if (this.types.length - start < 20 || !tmp['data']['types'])
         this.full = true
     },
     split: function (string) {

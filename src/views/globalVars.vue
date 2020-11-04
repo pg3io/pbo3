@@ -44,6 +44,7 @@
           </tr>
         </tbody>
       </table>
+      <br><br><br><br>
     </div>
     <spinner v-if="!vars || !vars.length"></spinner>
     <add-var :addInfos="addInfos"></add-var>
@@ -129,7 +130,7 @@ export default {
       })
       for (let i = 0; tmp['data']['globalVars'][i]; i++)
         this.vars.push(tmp['data']['globalVars'][i])
-      if (this.vars.length < 20 || !tmp['data']['globalVars'].length)
+      if (!tmp['data']['globalVars'].length || this.vars.length - start < 20)
         this.full = true;
     },
     split: function (string) {

@@ -136,7 +136,7 @@ export default {
       })
       for (let i = 0; tmp['data']['os'][i]; i++)
         this.os.push(tmp['data']['os'][i])
-      if (this.os.length < 20 || !tmp['data']['os'].length)
+      if (!tmp['data']['os'].length || this.os.length - start < 20)
         this.full = true
     },
     icon:function(name){

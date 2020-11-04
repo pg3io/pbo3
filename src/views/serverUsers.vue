@@ -43,6 +43,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-server-user :addInfos='addInfos'></add-server-user>
     <edit-server-user v-bind:editInfos="editInfos" :serverUser='ServerUser' ></edit-server-user>
@@ -122,7 +123,7 @@ export default {
       })
       for (let i = 0; tmp['data']['serverUsers'][i]; i++)
         this.serverUsers.push(tmp['data']['serverUsers'][i])
-      if (this.serverUsers.length < 20 || !tmp['data']['serverUsers'].length)
+      if (!tmp['data']['serverUsers'].length || this.serverUsers.length - start < 20)
         this.full = true
     },
     split: function (string) {

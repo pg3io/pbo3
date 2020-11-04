@@ -43,6 +43,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-supplier :addInfos='addInfos'></add-supplier>
     <edit-supplier v-bind:editInfos="editInfos" :supplier='Supplier'></edit-supplier>
@@ -122,7 +123,7 @@ export default {
       })
       for (let i = 0; tmp['data']['suppliers'][i]; i++)
         this.suppliers.push(tmp['data']['suppliers'][i])
-      if (this.suppliers.length < 20 || !tmp['data']['suppliers'].length)
+      if (this.suppliers.length - start < 20 || !tmp['data']['suppliers'].length)
         this.full = true;
     },
     split: function (string) {

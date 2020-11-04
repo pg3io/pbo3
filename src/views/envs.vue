@@ -43,6 +43,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-env :addInfos='addInfos'></add-env>
     <edit-env v-bind:editInfos="editInfos" :env='Env'></edit-env>
@@ -122,7 +123,7 @@ export default {
       })
       for (let i = 0; tmp['data']['envs'][i]; i++)
         this.envs.push(tmp['data']['envs'][i])
-      if (this.envs.length < 20 || !tmp['data']['envs'])
+      if (!tmp['data']['envs'] || this.envs.length - start < 20)
         this.full = true
     },
     split: function (string) {
