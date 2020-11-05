@@ -88,10 +88,6 @@ export default {
       validName: true
     }
   },
-  mounted() {
-    this.getDc();
-    this.getHoster();
-  },
   methods: {
     async getDc() {
       this.dcs = []
@@ -120,6 +116,8 @@ export default {
       } while(tmp && tmp['data'] && tmp['data']['hosters'] && tmp['data']['hosters'].length)
     },
     reset_infos() {
+      (!this.dcs.length) ? this.getDc() : 0;
+      (!this.hosters.length) ? this.getHoster() : 0;
       this.addInfos.name = null,
       this.addInfos.location = null
       this.addInfos.hoster = null

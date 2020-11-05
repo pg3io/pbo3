@@ -425,19 +425,6 @@ export default {
       ip: '',
     }
   },
-  mounted() {
-    this.getServer();
-    this.getCred();
-    this.getClient()
-    this.getOs();
-    this.getType();
-    this.getEnv();
-    this.getProfile();
-    this.getServerUser();
-    this.getDc();
-    this.getOffer();
-    this.getHoster();
-  },
   methods: {
     async getServer() {
       this.servers = []
@@ -588,6 +575,17 @@ export default {
         this.editServices[index] = { name: server.services[index].name, value: server.services[index].id }
     },
     fill() {
+      this.getServer();
+      this.getCred();
+      this.getClient()
+      this.getOs();
+      this.getType();
+      this.getEnv();
+      this.getProfile();
+      this.getServerUser();
+      this.getDc();
+      this.getOffer();
+      this.getHoster();
       this.editOffer = this.editInfos.offer.id;
       this.editClient = this.editInfos.client.id;
       this.editCred = this.editInfos.cred.id;

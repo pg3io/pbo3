@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="editHosterModal" size="xl" ref="edit-hoster" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getHoster">
       <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
@@ -85,9 +85,6 @@ export default {
       validUrl: true,
       hosters: {}
     }
-  },
-  mounted() {
-    this.getHoster();
   },
   methods: {
     async getHoster() {

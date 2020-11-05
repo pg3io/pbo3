@@ -61,12 +61,12 @@
             <td v-if="server.hostname" class="text-left">
               {{server.hostname}}
             </td>
-            <td v-else> 
+            <td v-else>
             </td>
             <td v-if="server.ip">
               {{server.ip}}
             </td>
-            <td v-else> 
+            <td v-else>
             </td>
             <td v-if="server.client && server.client.name">
               {{server.client.name}}
@@ -76,24 +76,24 @@
             <td v-if="server.dc && server.dc.hoster && server.dc.hoster.name">
               {{server.dc.hoster.name}}
             </td>
-            <td v-else> 
+            <td v-else>
             </td>
             <td v-if="server.type && server.type.name">
               {{server.type.name}}
             </td>
-            <td v-else> 
+            <td v-else>
             </td>
             <td v-if="server.env && server.env.name">
               {{server.env.name}}
             </td>
-            <td v-else> 
+            <td v-else>
             </td>
             <td v-if="server.date">
               {{server.date}}
             </td>
-            <td v-else> 
+            <td v-else>
             </td>
-            <td v-if="!server.os"> 
+            <td v-if="!server.os">
             </td>
             <td v-else-if="server.os.os_name &&server.os.os_name === 'windows'">
               <font-awesome-icon :icon="['fab', 'windows']" />
@@ -105,7 +105,7 @@
           </tr>
         </tbody>
       </table>
-      <spinner v-else></spinner>  
+      <spinner v-else></spinner>
     </div>
   </div>
 </template>
@@ -142,7 +142,7 @@ export default {
         })
         for (let i = 0; tmp['data']['servers'][i]; i++)
           this.servers.push(tmp['data']['servers'][i])
-        start += 50
+        start += 100
       } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length)
     },
     setTitle() {

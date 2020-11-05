@@ -43,6 +43,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-supplier :addInfos='addInfos'></add-supplier>
     <edit-supplier v-bind:editInfos="editInfos" :supplier='Supplier'></edit-supplier>
@@ -97,6 +98,14 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -116,14 +125,21 @@ export default {
     },
     async getSuppliers() {
       var start = this.suppliers.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation: SUPPLIER_QUERY,
-        variables: {limit: 20, start: start}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation: SUPPLIER_QUERY,
+          variables: {limit: 20, start: start}
+        })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['suppliers'][i]; i++)
         this.suppliers.push(tmp['data']['suppliers'][i])
-      if (this.suppliers.length < 20 || !tmp['data']['suppliers'].length)
+      if (this.suppliers.length - start < 20 || !tmp['data']['suppliers'].length) {
         this.full = true;
+        this.stopLoading();
+      }
     },
     split: function (string) {
       return string.split(".");

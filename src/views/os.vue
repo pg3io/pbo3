@@ -111,6 +111,14 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -130,14 +138,21 @@ export default {
     },
     async getOs() {
       var start = this.os.length, tmp = null
-      tmp = await this.$apollo.mutate({
-        mutation:OS_QUERY,
-        variables: {limit: 20, start: start}
-      })
+      try {
+        tmp = await this.$apollo.mutate({
+          mutation:OS_QUERY,
+          variables: {limit: 20, start: start}
+        })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
       for (let i = 0; tmp['data']['os'][i]; i++)
         this.os.push(tmp['data']['os'][i])
-      if (this.os.length < 20 || !tmp['data']['os'].length)
+      if (!tmp['data']['os'].length || this.os.length - start < 20) {
         this.full = true
+        this.stopLoading()
+      }
     },
     icon:function(name){
       return 'fl-' + name

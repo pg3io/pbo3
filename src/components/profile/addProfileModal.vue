@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="addProfileModal" size="xl" ref="add-profile" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="addProfileModal" size="xl" ref="add-profile" title="Add" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getProfile">
       <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
@@ -69,9 +69,6 @@ export default {
       profiles: [],
       validName: true
     }
-  },
-  mounted() {
-    this.getProfile();
   },
   methods: {
     async getProfile() {

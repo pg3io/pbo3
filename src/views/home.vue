@@ -247,7 +247,7 @@
                     </td>
                   </tr>
                   <tr>
-                    <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                    <td colspan="12" @click="getServer()" v-if="!full" style="cursor: pointer;">
                       <font-awesome-icon icon="plus"/>
                     </td>
                     <td v-else colspan='12'>
@@ -256,7 +256,6 @@
                   </tr>
                 </tbody>
               </table>
-              <br><br><br><br>
             </div>
           </div>
           <div v-if='!Object.keys(servers).length'>
@@ -264,6 +263,7 @@
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
           </div>
+          <br><br><br><br>
         </div>
       </div>
     </div>
@@ -295,8 +295,8 @@
     /* Querys */
   import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
   SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
-  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, SERVERS_QUERY,
-  ALL_SERVER_QUERY } from '@/assets/js/query/graphql'
+  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, ALL_SERVER_QUERY }
+  from '@/assets/js/query/graphql'
 
     /* Deletes */
   import deleteClient from '@/components/client/deleteClientModal.vue'
@@ -578,8 +578,7 @@
       }
     },
     mounted() {
-      this.getServer(0);
-      this.timeout();
+      this.getServer();
       this.getSearchByUrl();
     },
     created () {
@@ -603,39 +602,54 @@
         this.scrolled = !!(document.scrollingElement.scrollTop)
         if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
           if (this.full == false)
-            this.getServer(this.servers.length)
+            this.getServer()
         }
       },
       async get_server() {
         var start = this.saveServers.length, tmp = ''
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:ALL_SERVER_QUERY,
-            variables: {limit: 100, start: start, where: {"archived": false}}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:ALL_SERVER_QUERY,
+              variables: {limit: 100, start: start, where: {"archived": false}}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['servers'][i]; i++)
             this.saveServers.push(tmp['data']['servers'][i])
           start += 100
         } while(tmp && tmp['data'] && tmp['data']['servers'] && tmp['data']['servers'].length);
       },
-      async getServer(start) {
-        var length = this.servers.length
-        var tmp = await this.$apollo.mutate({
-          mutation:SERVERS_QUERY,
-          variables: {start: start, where: {"archived": false}}
-        })
+      async getServer() {
+        var start = this.servers.length
+        try {
+          var tmp = await this.$apollo.mutate({
+            mutation:ALL_SERVER_QUERY,
+            variables: {limit: 50, start: start, where: {"archived": false}}
+          })
+        } catch {
+          this.stopLoading();
+          return this.full = true
+        }
         for (let i = 0; tmp['data']['servers'][i]; i++)
           this.servers.push(tmp['data']['servers'][i])
-        if (length == this.servers.length)
+        if (this.servers.length - start < 50 || !tmp['data']['servers'].length) {
           this.full = true
+          this.stopLoading();
+        }
       },
       async getCred() {
         var start = this.creds.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:CRED_QUERY,
-            variables: {limit:40, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:CRED_QUERY,
+              variables: {limit:40, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['creds'][i]; i++)
             this.creds.push(tmp['data']['creds'][i])
           start += 50
@@ -644,10 +658,14 @@
       async getClient() {
         var start = this.clients.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:CLIENTS_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:CLIENTS_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['clients'][i]; i++)
             this.clients.push(tmp['data']['clients'][i])
           start += 50
@@ -656,10 +674,14 @@
       async getOs() {
         var start = this.os.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:OS_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:OS_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['os'][i]; i++)
             this.os.push(tmp['data']['os'][i])
           start += 50
@@ -668,10 +690,14 @@
       async getType() {
         var start = this.types.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:TYPE_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:TYPE_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['types'][i]; i++)
             this.types.push(tmp['data']['types'][i])
           start += 50
@@ -680,10 +706,14 @@
       async getEnv() {
         var start = this.envs.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:ENV_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:ENV_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['envs'][i]; i++)
             this.envs.push(tmp['data']['envs'][i])
           start += 50
@@ -692,10 +722,14 @@
       async getProfile() {
         var start = this.profiles.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:PROFILE_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:PROFILE_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['profiles'][i]; i++)
             this.profiles.push(tmp['data']['profiles'][i])
           start += 50
@@ -704,10 +738,14 @@
       async getServerUser() {
         var start = this.serverUsers.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:SERVER_USER_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:SERVER_USER_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['serverUsers'][i]; i++)
             this.serverUsers.push(tmp['data']['serverUsers'][i])
           start += 50
@@ -716,10 +754,14 @@
       async getDc() {
         var start = this.dcs.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:DC_QUERY_,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:DC_QUERY_,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['dcs'][i]; i++)
             this.dcs.push(tmp['data']['dcs'][i])
           start += 50
@@ -728,10 +770,14 @@
       async getOffer() {
         var start = this.offers.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:OFFER_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:OFFER_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['offers'][i]; i++)
             this.offers.push(tmp['data']['offers'][i])
           start += 50
@@ -740,10 +786,14 @@
       async getService() {
         var start = this.services.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:SERVICES_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:SERVICES_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['services'][i]; i++)
             this.services.push(tmp['data']['services'][i])
           start += 50
@@ -752,10 +802,14 @@
       async getHoster() {
         var start = this.hosters.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:HOSTERS_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:HOSTERS_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['hosters'][i]; i++)
             this.hosters.push(tmp['data']['hosters'][i])
           start += 50
@@ -764,10 +818,14 @@
       async getSuppliers() {
         var start = this.suppliers.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:SUPPLIER_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:SUPPLIER_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['suppliers'][i]; i++)
             this.suppliers.push(tmp['data']['suppliers'][i])
           start += 50
@@ -776,10 +834,14 @@
       async getVars() {
         var start = this.vars.length, tmp = null
         do {
-          tmp = await this.$apollo.mutate({
-            mutation:GLOBALVAR_QUERY,
-            variables: {limit: 50, start: start}
-          })
+          try {
+            tmp = await this.$apollo.mutate({
+              mutation:GLOBALVAR_QUERY,
+              variables: {limit: 50, start: start}
+            })
+          } catch {
+            return
+          }
           for (let i = 0; tmp['data']['globalVars'][i]; i++)
             this.vars.push(tmp['data']['globalVars'][i])
           start += 50
@@ -796,9 +858,6 @@
         this.getOption();
         this.hide_suggest = true;
         this.$router.push(savePath);
-      },
-      timeout() {
-          setTimeout(this.stopLoading, 2200);
       },
       stopLoading() {
         var loader = document.getElementById("loader");
@@ -1311,7 +1370,7 @@
         }
         this.makeOption(((this.tags[0]) ? this.tags[0] : this.inputSearch).toLowerCase());
         if (!this.servers.length)
-          this.timeout();
+          this.stopLoading();
       },
       remove_tag: function(tag) {
         var i = -1;

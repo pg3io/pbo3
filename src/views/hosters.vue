@@ -46,6 +46,7 @@
         </tbody>
       </table>
       <spinner v-else></spinner>
+      <br><br><br><br>
     </div>
     <add-hoster :addInfos='addInfos'></add-hoster>
     <edit-hoster :editInfos="editInfos" :hoster='Hoster'></edit-hoster>
@@ -103,6 +104,14 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -122,14 +131,21 @@ export default {
     },
     async getHoster() {
       var start = this.hosters.length, tmp = null
+      try {
         tmp = await this.$apollo.mutate({
           mutation:HOSTERS_QUERY,
           variables: {limit: 20, start: start}
         })
+      } catch {
+        this.stopLoading()
+        return this.full = true
+      }
         for (let i = 0; tmp['data']['hosters'][i]; i++)
           this.hosters.push(tmp['data']['hosters'][i])
-        if (this.hosters.length < 20 || !tmp['data']['hosters'].length)
+        if (!tmp['data']['hosters'].length || this.hosters.length - start < 20) {
           this.full = true
+          this.stopLoading()
+        }
     },
     split: function (string) {
       return string.split(".");

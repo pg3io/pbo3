@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editClientModal" size="xl" ref="edit-client" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="editClientModal" size="xl" ref="edit-client" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getAll">
       <b-form @submit.stop.prevent="onSubmit">
         <div>
           <div class="inputLine">
@@ -92,11 +92,11 @@ export default {
       validName: true
     }
   },
-  mounted() {
-    this.getClient();
-    this.getSuppliers();
-  },
   methods: {
+    getAll() {
+      this.getClient();
+      this.getSuppliers();
+    },
     async getClient() {
       this.clients = []
       var start = 0, tmp = null

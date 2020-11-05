@@ -170,7 +170,7 @@ query allServer($limit: Int!, $start: Int!) {
 
 const ALL_SERVERS_QUERY = gql`
 query All ($start: Int!, $where: JSON!) {
-  servers(start: $start, where: $where) {
+  servers(limit: 100, start: $start, where: $where) {
     id,
     hostname,
     date,
@@ -252,8 +252,8 @@ query All ($start: Int!, $where: JSON!) {
 }
 `
 const ARCHIVED_SERVERS_QUERY = gql`
-query archived ($start: Int, $where: JSON!) {
-  servers(start: $start, where: $where) {
+query archived ($limit: Int!, $start: Int, $where: JSON!) {
+  servers(limit: $limit, start: $start, where: $where) {
     id,
     hostname,
     date,

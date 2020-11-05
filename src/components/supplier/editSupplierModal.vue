@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-modal id="editSupplierModal" size="xl" ref="edit-supplier" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
+    <b-modal id="editSupplierModal" size="xl" ref="edit-supplier" title="Edit" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer @show="getSuppliers">
       <b-form @submit.stop.prevent="onSubmit">
         <div class="inputLine">
           <div class="inputField">
@@ -55,9 +55,6 @@ export default {
     return {
       validName: true,
     }
-  },
-  mounted() {
-    this.getSuppliers();
   },
   methods: {
     async getSuppliers() {

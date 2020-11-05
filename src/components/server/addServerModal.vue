@@ -1,5 +1,5 @@
 <template>
-  <b-modal size="xl" id="addServerModal" ref="add-server" :no-close-on-backdrop=true :no-close-on-esc=true title="New Server" hide-footer>
+  <b-modal size="xl" id="addServerModal" ref="add-server" :no-close-on-backdrop=true :no-close-on-esc=true title="New Server" hide-footer @show="loadAll">
     <b-form @submit.stop.prevent="onSubmit">
     <div>
       <div class="inputLine">
@@ -388,19 +388,21 @@ export default {
     }
   },
   mounted() {
-    this.getServer();
-    this.getCred();
-    this.getClient()
-    this.getOs();
-    this.getType();
-    this.getEnv();
-    this.getProfile();
-    this.getServerUser();
-    this.getDc();
-    this.getOffer();
-    this.getHoster();
-  },
+    },
   methods: {
+    loadAll() {
+      this.getServer();
+      this.getCred();
+      this.getClient()
+      this.getOs();
+      this.getType();
+      this.getEnv();
+      this.getProfile();
+      this.getServerUser();
+      this.getDc();
+      this.getOffer();
+      this.getHoster();
+    },
     async getServer() {
       this.servers = []
       var start = 0, tmp = null
