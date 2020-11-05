@@ -166,7 +166,7 @@
 </template>
 
 <script>
-import { ARCHIVED_SERVERS_QUERY } from '@/assets/js/query/graphql'
+import { ALL_SERVER_QUERY } from '@/assets/js/query/graphql'
 import DeleteArchived from '@/components/archives/deleteArchivedModal.vue'
 
 export default {
@@ -231,7 +231,7 @@ export default {
       var start = this.servers.length, tmp = null
       try {
         tmp = await this.$apollo.mutate({
-          mutation:ARCHIVED_SERVERS_QUERY,
+          mutation:ALL_SERVER_QUERY,
           variables: {limit: 50, start: start, where: {"archived": true}}
         })
       } catch {

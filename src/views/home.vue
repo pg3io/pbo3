@@ -95,6 +95,11 @@
                   <font-awesome-icon class="float-right" icon="plus" />
                 </b-button>
               </b-input-group-append>
+              <b-input-group-addon v-if="selectedCheckBox.length" style="margin-left: -1px">
+                <b-button variant="outline-dark" @click="askAndDeleteAll(0)">
+                  <font-awesome-icon class="float-right" icon="archive" />
+                </b-button>
+              </b-input-group-addon>
             </b-input-group>
           </div>
           <div id="dropdownSuggest" v-if="!hide_suggest && (showSuggest.length || tags.length)">
@@ -173,7 +178,8 @@
                       Edit
                     </th>
                     <th class="th-sm">
-                      Archive
+                      <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%;">All</label>
+                      <input type="checkbox" id="selectAll" @click="selectAllServers()">
                     </th>
                   </tr>
                 </thead>
@@ -241,9 +247,10 @@
                       </b-button>
                     </td>
                     <td v-if="server">
-                      <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
+                      <input :id="server.id" type='checkbox' @click="changeSelected(server.id)" style="transform: scale(1.5);">
+                      <!-- <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
                         <font-awesome-icon icon="archive"/>
-                      </b-button>
+                      </b-button> -->
                     </td>
                   </tr>
                   <tr>
@@ -267,13 +274,16 @@
         </div>
       </div>
     </div>
-    <b-modal id='delete_Modal' hide-footer  :no-close-on-backdrop=true :no-close-on-esc=true>
+    <b-modal ref="deleteModal" id='delete_Modal' hide-footer :no-close-on-backdrop=true :no-close-on-esc=true>
       <template v-slot:modal-title>
         Delete
       </template>
       <div class='text-center'>
-        <p>
-          Are you sur you want to delete this ?
+        <p v-if="selectedCheckBox.length == 1">
+          Are you sur you want to archive this server?
+        </p>
+        <p v-else>
+          Are you sur you want to archive those {{ selectedCheckBox.length }} servers ?
         </p>
         <p>
           <input id='checkInput' type='checkbox' @click="boolDelete = !boolDelete">
@@ -283,8 +293,8 @@
         </p>
       </div>
       <div class='text-right'>
-        <b-button size='sm' @click="hide_and_delete(true)">cancel</b-button>
-        <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
+        <b-button size='sm' @click="askAndDeleteAll(1)">cancel</b-button>
+        <b-button size='sm' @click="askAndDeleteAll(2)" :disabled="boolDelete" variant='danger'>confirm</b-button>
       </div>
     </b-modal>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
@@ -342,6 +352,7 @@
 
     /* others */
   import { required } from "vuelidate/lib/validators";
+  import gql from 'graphql-tag'
 
   export default {
     name: 'Home',
@@ -565,7 +576,8 @@
         editAll: {},
         boolDelete: true,
         full: false,
-        scrolled: false
+        scrolled: false,
+        selectedCheckBox: []
       }
     },
     watch: {
@@ -588,6 +600,60 @@
       window.removeEventListener('scroll', this.scroll);
     },
     methods: {
+      askAndDeleteAll(noWay) {
+        if (noWay == 0) {
+          this.$refs['deleteModal'].show();
+        } else
+          this.$refs['deleteModal'].hide()
+        if (noWay == 2) {
+          this.selectedCheckBox.forEach(id => {
+            var archived = true, archiveDate = new Date().toISOString().slice(0,10);
+            var tmp = this.$apollo.mutate({
+              mutation: gql`mutation updateServer ($id: ID!, $archiveDate: Date!, $archived: Boolean!){
+                  updateServer(input: {
+                    where: {
+                      id: $id
+                    }
+                    data: {
+                      archiveDate: $archiveDate
+                      archived: $archived
+                    }
+                  }) {
+                  server {
+                    id
+                    archived
+                  }
+                }
+              }`,
+              variables: {id: id, archiveDate: archiveDate, archived: archived}
+            });
+            console.log(tmp)
+          });
+          this.selectedCheckBox = []
+          window.location.reload()
+        }
+      },
+      selectAllServers() {
+        this.selectedCheckBox = []
+        if (document.getElementById('selectAll').checked) {
+          this.servers.forEach(server => {
+            document.getElementById(server.id).checked = true
+            this.selectedCheckBox.push(server.id)
+          });
+        } else {
+          this.servers.forEach(server => {
+            document.getElementById(server.id).checked = false;
+          })
+        }
+      },
+      changeSelected(idServer) {
+        if (this.servers.length == this.selectedCheckBox.length)
+          document.getElementById('selectAll').checked = false
+        for (let i = 0; this.selectedCheckBox[i]; i++)
+          if (this.selectedCheckBox[i] == idServer)
+            return this.selectedCheckBox.splice(i, 1);
+        this.selectedCheckBox.push(idServer);
+      },
       goTop() {
         var change = document.scrollingElement.scrollTop / 10
         if (document.scrollingElement.scrollTop > 0) {
