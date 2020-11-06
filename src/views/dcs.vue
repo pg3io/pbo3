@@ -10,6 +10,9 @@
               <b-button v-b-modal.addDcModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteDcs">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -26,7 +29,10 @@
             <th v-if="currentSort === 'hoster.name'" @click="sort('hoster.name', 2)" class="th-sm b-m-3">Hoster<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('hoster.name', 2)" class="th-sm b-m-3">Hoster</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllDcs()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredDcs">
@@ -39,7 +45,9 @@
             </td>
             <td v-else></td>
             <td v-if="dc"><b-button v-b-modal.editDcModal @click="get_dc(dc)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="dc"><b-button v-b-modal.deleteDcModal @click="get_dc(dc)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="dc">
+              <input :id="dc.id" type='checkbox' @click="changeSelected(dc.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="6" @click="getDc" v-if="!full" style="cursor: pointer;">
@@ -56,7 +64,7 @@
     </div>
     <add-dc :addInfos="addInfos"></add-dc>
     <edit-dc v-bind:editInfos="editInfos" :dc='Dc'></edit-dc>
-    <delete-dc v-bind:editInfos="editInfos"></delete-dc>
+    <delete-dc v-bind:editInfos="selectedCheckBox"></delete-dc>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -100,7 +108,8 @@ export default {
         name: null,
         location: null,
         hoster: null
-      }
+      },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -113,6 +122,40 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteDcs() {
+      this.$bvModal.show('deleteDcModal');
+    },
+    selectAllDcs() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.dcs.forEach(dc => {
+          document.getElementById(dc.id).checked = true
+          this.selectedCheckBox.push(dc.id)
+        });
+      } else {
+        this.dcs.forEach(dc => {
+          document.getElementById(dc.id).checked = false;
+        })
+      }
+    },
+    stopLoading() {
+      var loader = document.getElementById("loader");
+      var message = document.getElementById("message");
+      if (loader && message) {
+        loader.style.display = "none";
+        message.style.display = "block";
+      }
+    },
+    changeSelected(idServer) {
+      if (this.dcs.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.dcs.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {

@@ -1,6 +1,7 @@
 <template>
   <b-modal id="deleteSupplierModal" ref="delete-supplier" title="Delete" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-    <p class="my-4">Are you sure you want to delete this ?</p>
+    <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to delete this supplier ?</p>
+    <p class="my-4" v-else>Are you sure you want to delete those suppliers ?</p>
     <b-form-checkbox v-model="checked">I confirm I want to delete supplier: <strong>{{editInfos.name}}</strong></b-form-checkbox>
     <div class="inputConfirm">
       <b-button variant="outline-dark" @click="hideServerModal('delete-supplier')">Cancel</b-button>
@@ -16,7 +17,7 @@ import { deleteSupplier } from '@/assets/js/deleteMutations/deleteSupplier'
 export default {
   name: 'DeleteSupplier',
   props: {
-    editInfos: Object
+    editInfos: Array
   },
   data () {
     return {
@@ -25,13 +26,13 @@ export default {
   },
   methods: {
     deleteSupplier() {
-      const id = this.editInfos.id
-      this.$apollo.mutate({
-        mutation: deleteSupplier,
-        variables: {id}
-      })
+      this.editInfos.forEach(id => {
+        this.$apollo.mutate({
+          mutation: deleteSupplier,
+          variables: {id}
+        });
+      });
       window.location.reload(true);
-      this.$parent.editInfos.id = null;
     },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();

@@ -10,6 +10,9 @@
               <b-button v-b-modal.addServiceModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteServices">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -22,7 +25,10 @@
             <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-1">Name<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-1">Name</th>
             <th class="">Edit</th>
-            <th>Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllServices()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredServices">
@@ -30,7 +36,9 @@
             <td v-if="service" class="">{{service.id}}</td>
             <td v-if="service" class="text-left">{{service.name}}</td>
             <td v-if="service"><b-button v-b-modal.editServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="service"><b-button v-b-modal.deleteServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="service">
+              <input :id="service.id" type='checkbox' @click="changeSelected(service.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="4" @click="getService" v-if="!full" style="cursor: pointer;">
@@ -46,7 +54,7 @@
     </div>
     <add-service :addInfos='addInfos'></add-service>
     <edit-service v-bind:editInfos="editInfos" :service='Service' ></edit-service>
-    <delete-service v-bind:editInfos="editInfos" ></delete-service>
+    <delete-service v-bind:editInfos="selectedCheckBox" ></delete-service>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -85,6 +93,7 @@ export default {
       addInfos: {
         name: null,
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -97,6 +106,32 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteServices() {
+      this.$bvModal.show('deleteServiceModal');
+    },
+    selectAllServices() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.services.forEach(service => {
+          document.getElementById(service.id).checked = true
+          this.selectedCheckBox.push(service.id)
+        });
+      } else {
+        this.services.forEach(service => {
+          document.getElementById(service.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.services.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.services.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

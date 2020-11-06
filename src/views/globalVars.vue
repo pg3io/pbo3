@@ -10,6 +10,9 @@
               <b-button v-b-modal.addVarModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteVars">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -23,7 +26,10 @@
             <th v-else @click="sort('key', 1)" class="text-center th-sm b-m-2">Key</th>
             <th class="th-sm b-m-2">Value</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllVars()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -32,7 +38,9 @@
             <td v-if="v" class="text-left">{{v.key}}</td>
             <td v-if="v" class="text-left pre-formatted">{{v.value}}</td>
             <td v-if="v"><b-button v-b-modal.editVarModal @click="get_var(v)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="v"><b-button v-b-modal.deleteVarModal @click="get_var(v)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="v">
+              <input :id="v.id" type='checkbox' @click="changeSelected(v.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="5" @click="getVars" v-if="!full" style="cursor: pointer;">
@@ -49,7 +57,7 @@
     <br><br><br><br>
     <add-var :addInfos="addInfos"></add-var>
     <edit-var :editInfos="editInfos" :var='this.var'></edit-var>
-    <delete-var :editInfos="editInfos"></delete-var>
+    <delete-var :editInfos="selectedCheckBox"></delete-var>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -86,7 +94,8 @@ export default {
         id: 0,
         key: null,
         value: null
-      }
+      },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -99,6 +108,32 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteVars() {
+      this.$bvModal.show('deleteVarModal');
+    },
+    selectAllVars() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.vars.forEach(v => {
+          document.getElementById(v.id).checked = true
+          this.selectedCheckBox.push(v.id)
+        });
+      } else {
+        this.vars.forEach(v => {
+          document.getElementById(v.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.vars.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.vars.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

@@ -1241,73 +1241,73 @@
             break;
           case "hoster":
             if ((check = this.filteredHoster('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteHosterModal');
             }
             break;
           case "client":
             if ((check = this.filteredClient('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteClientModal');
             }
             break;
           case "os":
             if ((check = this.filteredOs('os_name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteOsModal');
             }
             break;
           case "env":
             if ((check = this.filteredEnv('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteEnvModal');
             }
             break;
           case "type":
             if ((check = this.filteredType('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteTypeModal');
             }
             break;
           case "profile":
             if ((check = this.filteredProfile('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteProfileModal');
             }
             break;
           case "serveruser":
             if ((check = this.filteredServerUser('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteServerUserModal');
             }
             break;
           case "dc":
             if ((check = this.filteredDc('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteDcModal');
             }
             break;
           case "service":
             if ((check = this.filteredService('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteServiceModal');
             }
             break;
           case "supplier":
             if ((check = this.filteredSupplier('name', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteSupplierModal');
             }
             break;
           case "var":
             if ((check = this.filteredVar('key', temp)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteVarModal');
             }
             break;
           default:
             if ((check = this.filteredServer("hostname", this.tags[1], 1)).length == 1) {
-              this.selectedCheckBox.push.push(check[0].id);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('archiveServerModal');
             }
             break;

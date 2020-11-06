@@ -10,6 +10,9 @@
               <b-button v-b-modal.addServerUserModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteServerUsers">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -22,7 +25,10 @@
             <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-1">Name<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-1">Name</th>
             <th class="">Edit</th>
-            <th>Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllServerUsers()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredServerUsers">
@@ -30,7 +36,9 @@
             <td v-if="serverUser" class="">{{serverUser.id}}</td>
             <td v-if="serverUser" class="text-left">{{serverUser.name}}</td>
             <td v-if="serverUser"><b-button v-b-modal.editServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="serverUser"><b-button v-b-modal.deleteServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="serverUser">
+              <input :id="serverUser.id" type='checkbox' @click="changeSelected(serverUser.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="4" @click="getServerUser" v-if="!full" style="cursor: pointer;">
@@ -47,7 +55,7 @@
     </div>
     <add-server-user :addInfos='addInfos'></add-server-user>
     <edit-server-user v-bind:editInfos="editInfos" :serverUser='ServerUser' ></edit-server-user>
-    <delete-server-user v-bind:editInfos="editInfos" ></delete-server-user>
+    <delete-server-user v-bind:editInfos="selectedCheckBox" ></delete-server-user>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -86,6 +94,7 @@ export default {
       addInfos: {
         name: null,
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -98,6 +107,32 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteServerUsers() {
+      this.$bvModal.show('deleteServerUserModal');
+    },
+    selectAllServerUsers() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.serverUsers.forEach(serverUser => {
+          document.getElementById(serverUser.id).checked = true
+          this.selectedCheckBox.push(serverUser.id)
+        });
+      } else {
+        this.serverUsers.forEach(serverUser => {
+          document.getElementById(serverUser.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.serverUsers.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.serverUsers.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

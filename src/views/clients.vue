@@ -145,6 +145,8 @@ export default {
         if (this.selectedCheckBox[i] == idServer)
           return this.selectedCheckBox.splice(i, 1);
       this.selectedCheckBox.push(idServer);
+      if (this.clients.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
     },
     stopLoading() {
       var loader = document.getElementById("loader");

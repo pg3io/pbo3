@@ -1,7 +1,8 @@
 <template>
   <b-modal id="deleteTypeModal" ref="delete-type" title="Delete" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
-    <p class="my-4">Are you sure you want to delete this ?</p>
-    <b-form-checkbox v-model="checked">I confirm I want to delete type: <strong>{{editInfos.name}}</strong></b-form-checkbox>
+    <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to delete this type?</p>
+    <p class="my-4" v-else>Are you sure you want to delete those types?</p>
+    <b-form-checkbox v-model="checked">I confirm I want to delete</b-form-checkbox>
     <div class="inputConfirm">
       <b-button variant="outline-dark" @click="hideServerModal('delete-env')">Cancel</b-button>
       <b-button :disabled='disabled' variant="outline-danger" @click="deleteType()">Delete</b-button>
@@ -16,7 +17,7 @@ import { deleteType } from '@/assets/js/deleteMutations/deleteType'
 export default {
   name: 'DeleteType',
   props: {
-    editInfos: Object
+    editInfos: Array
   },
   data () {
     return {
@@ -25,13 +26,13 @@ export default {
   },
   methods: {
     deleteType() {
-      const id = this.editInfos.id;
-      this.$apollo.mutate({
-        mutation: deleteType,
-        variables: {id}
-      })
+      this.editInfos.forEach(id => {
+        this.$apollo.mutate({
+          mutation: deleteType,
+          variables: {id}
+        });
+      });
       window.location.reload(true);
-      this.$parent.editInfos.id = null;
     },
     hideServerModal: function(modal) {
       this.$refs[modal].hide();

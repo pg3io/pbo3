@@ -167,16 +167,14 @@ export default {
     },
     addVar() {
       var value = '';
-      if (this.addInfos.value.split("\n").length == 1) {
-        value = this.addInfos.value.split(' ')[this.addInfos.value.split(' ').length]
-      }
-      else {
+      if (this.addInfos.value.split("\n").length == 1)
+        value = this.addInfos.value.replace(/\s/g, '');
+      else
         value = this.addInfos.value
-      }
       const key = this.addInfos.key;
       this.$apollo.mutate({
         mutation: createVar,
-        variables: {key, value}
+        variables: {key: key, value: value}
       });
       window.location.reload(true);
     },

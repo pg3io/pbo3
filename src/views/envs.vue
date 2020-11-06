@@ -10,7 +10,7 @@
               <b-button v-b-modal.addEnvModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
-              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteEnv">
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteEnvs">
                 <font-awesome-icon icon="trash-alt"/>
               </b-button>
             </b-input-group-append>
@@ -107,7 +107,7 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
-    deleteEnv() {
+    deleteEnvs() {
       this.$bvModal.show('deleteEnvModal');
     },
     selectAllEnvs() {
@@ -130,6 +130,8 @@ export default {
         if (this.selectedCheckBox[i] == idServer)
           return this.selectedCheckBox.splice(i, 1);
       this.selectedCheckBox.push(idServer);
+      if (this.envs.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
     },
     stopLoading() {
       var loader = document.getElementById("loader");
