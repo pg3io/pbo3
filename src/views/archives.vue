@@ -6,6 +6,11 @@
             <b-input-group>
               <b-form-input type="text" v-model="search" autocomplete="off">
               </b-form-input>
+              <b-input-group-addon v-if="selectedCheckBox.length">
+                <b-button variant="outline-dark" @click="deleteServers">
+                  <font-awesome-icon icon="trash-alt" />
+                </b-button>
+              </b-input-group-addon>
             </b-input-group>
           </div>
         </div>
@@ -69,7 +74,8 @@
                     Info
                   </th>
                   <th class="th-sm">
-                    Delete
+                    <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%;">All</label>
+                    <input type="checkbox" id="selectAll" @click="selectAllServers()">
                   </th>
                 </tr>
               </thead>
@@ -136,9 +142,7 @@
                     </router-link>
                   </td>
                   <td v-if="server">
-                    <b-button size="sm" v-b-modal.deleteArchivedModal @click="get_server(server)" variant="outline-dark" pill>
-                      <font-awesome-icon icon="trash-alt" />
-                    </b-button>
+                    <input :id="server.id" type='checkbox' @click="changeSelected(server.id)" style="transform: scale(1.5);">
                   </td>
                 </tr>
                 <tr>
@@ -160,7 +164,7 @@
           <br><br><br><br>
         </div>
       </div>
-      <delete-archived :deleteInfos='deleteInfos'></delete-archived>
+      <delete-archived :deleteInfos="selectedCheckBox"></delete-archived>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
     </div>
 </template>
@@ -185,7 +189,8 @@ export default {
       deleteInfos: {
         id: null,
         hostname: null
-      }
+      },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -198,6 +203,27 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    selectAllServers() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.servers.forEach(server => {
+          document.getElementById(server.id).checked = true
+          this.selectedCheckBox.push(server.id)
+        });
+      } else {
+        this.servers.forEach(server => {
+          document.getElementById(server.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.servers.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+    },
     goTop() {
       var change = document.scrollingElement.scrollTop / 10
       if (document.scrollingElement.scrollTop > 0) {
@@ -223,9 +249,8 @@ export default {
         message.style.display = "block";
       }
     },
-    get_server(server) {
-      this.deleteInfos.id = server.id
-      this.deleteInfos.hostname = server.hostname
+    deleteServers() {
+      this.$bvModal.show('deleteArchivedModal');
     },
     async getServer() {
       var start = this.servers.length, tmp = null

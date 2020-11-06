@@ -41,7 +41,7 @@
     </b-modal>
     <add-server :addInfos='editAll' :services='services'></add-server>
     <edit-server :editInfos='editInfos' :server='server' :services='services' :options='options'></edit-server>
-    <archive-server :editInfos='editInfos'></archive-server>
+    <archive-server :editInfos='selectedCheckBox'></archive-server>
     <add-hoster :addInfos='editAll'></add-hoster>
     <add-client :addInfos='editAll'></add-client>
     <add-var :addInfos='editAll'></add-var>
@@ -96,7 +96,7 @@
                 </b-button>
               </b-input-group-append>
               <b-input-group-addon v-if="selectedCheckBox.length" style="margin-left: -1px">
-                <b-button variant="outline-dark" @click="askAndDeleteAll(0)">
+                <b-button variant="outline-dark" @click="archiveServers">
                   <font-awesome-icon class="float-right" icon="archive" />
                 </b-button>
               </b-input-group-addon>
@@ -248,9 +248,6 @@
                     </td>
                     <td v-if="server">
                       <input :id="server.id" type='checkbox' @click="changeSelected(server.id)" style="transform: scale(1.5);">
-                      <!-- <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
-                        <font-awesome-icon icon="archive"/>
-                      </b-button> -->
                     </td>
                   </tr>
                   <tr>
@@ -274,29 +271,6 @@
         </div>
       </div>
     </div>
-    <b-modal ref="deleteModal" id='delete_Modal' hide-footer :no-close-on-backdrop=true :no-close-on-esc=true>
-      <template v-slot:modal-title>
-        Delete
-      </template>
-      <div class='text-center'>
-        <p v-if="selectedCheckBox.length == 1">
-          Are you sur you want to archive this server?
-        </p>
-        <p v-else>
-          Are you sur you want to archive those {{ selectedCheckBox.length }} servers ?
-        </p>
-        <p>
-          <input id='checkInput' type='checkbox' @click="boolDelete = !boolDelete">
-          <label for="checkInput">
-            Verify
-          </label>
-        </p>
-      </div>
-      <div class='text-right'>
-        <b-button size='sm' @click="askAndDeleteAll(1)">cancel</b-button>
-        <b-button size='sm' @click="askAndDeleteAll(2)" :disabled="boolDelete" variant='danger'>confirm</b-button>
-      </div>
-    </b-modal>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -352,7 +326,6 @@
 
     /* others */
   import { required } from "vuelidate/lib/validators";
-  import gql from 'graphql-tag'
 
   export default {
     name: 'Home',
@@ -600,38 +573,8 @@
       window.removeEventListener('scroll', this.scroll);
     },
     methods: {
-      askAndDeleteAll(noWay) {
-        if (noWay == 0) {
-          this.$refs['deleteModal'].show();
-        } else
-          this.$refs['deleteModal'].hide()
-        if (noWay == 2) {
-          this.selectedCheckBox.forEach(id => {
-            var archived = true, archiveDate = new Date().toISOString().slice(0,10);
-            var tmp = this.$apollo.mutate({
-              mutation: gql`mutation updateServer ($id: ID!, $archiveDate: Date!, $archived: Boolean!){
-                  updateServer(input: {
-                    where: {
-                      id: $id
-                    }
-                    data: {
-                      archiveDate: $archiveDate
-                      archived: $archived
-                    }
-                  }) {
-                  server {
-                    id
-                    archived
-                  }
-                }
-              }`,
-              variables: {id: id, archiveDate: archiveDate, archived: archived}
-            });
-            console.log(tmp)
-          });
-          this.selectedCheckBox = []
-          window.location.reload()
-        }
+      archiveServers() {
+        this.$bvModal.show('archiveServerModal');
       },
       selectAllServers() {
         this.selectedCheckBox = []
@@ -1290,8 +1233,9 @@
         var check = null, temp = this.tags[2]
         switch (this.tags[1].toLowerCase()) {
           case "server":
+            this.selectedCheckBox = []
             if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
-              this.get_all_infos(check[0]);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('archiveServerModal');
             }
             break;
