@@ -41,7 +41,7 @@
     </b-modal>
     <add-server :addInfos='editAll' :services='services'></add-server>
     <edit-server :editInfos='editInfos' :server='server' :services='services' :options='options'></edit-server>
-    <archive-server :editInfos='editInfos'></archive-server>
+    <archive-server :editInfos='selectedCheckBox'></archive-server>
     <add-hoster :addInfos='editAll'></add-hoster>
     <add-client :addInfos='editAll'></add-client>
     <add-var :addInfos='editAll'></add-var>
@@ -64,17 +64,17 @@
     <edit-service :editInfos='editAll' :service='service'></edit-service>
     <edit-dc :editInfos='editAll' :dc='dc'></edit-dc>
     <edit-var :editInfos='editAll' :var='this.var'></edit-var>
-    <delete-client :editInfos='editAll'></delete-client>
-    <delete-dc :editInfos='editAll'></delete-dc>
-    <delete-env :editInfos='editAll'></delete-env>
-    <delete-var :editInfos='editAll'></delete-var>
-    <delete-hoster :editInfos='editAll'></delete-hoster>
-    <delete-os :editInfos='editAll'></delete-os>
-    <delete-profile :editInfos='editAll'></delete-profile>
-    <delete-serverUser :editInfos='editAll'></delete-serverUser>
-    <delete-service :editInfos='editAll'></delete-service>
-    <delete-supplier :editInfos='editAll'></delete-supplier>
-    <delete-type :editInfos='editAll'></delete-type>
+    <delete-client :editInfos='selectedCheckBox'></delete-client>
+    <delete-dc :editInfos='selectedCheckBox'></delete-dc>
+    <delete-env :editInfos='selectedCheckBox'></delete-env>
+    <delete-var :editInfos='selectedCheckBox'></delete-var>
+    <delete-hoster :editInfos='selectedCheckBox'></delete-hoster>
+    <delete-os :editInfos='selectedCheckBox'></delete-os>
+    <delete-profile :editInfos='selectedCheckBox'></delete-profile>
+    <delete-serverUser :editInfos='selectedCheckBox'></delete-serverUser>
+    <delete-service :editInfos='selectedCheckBox'></delete-service>
+    <delete-supplier :editInfos='selectedCheckBox'></delete-supplier>
+    <delete-type :editInfos='selectedCheckBox'></delete-type>
     <div class="container-sm" style="margin-top: 30px;">
       <div>
         <div id="searchEngine">
@@ -95,6 +95,11 @@
                   <font-awesome-icon class="float-right" icon="plus" />
                 </b-button>
               </b-input-group-append>
+              <b-input-group-addon v-if="selectedCheckBox.length" style="margin-left: -1px">
+                <b-button variant="outline-dark" @click="archiveServers">
+                  <font-awesome-icon class="float-right" icon="archive" />
+                </b-button>
+              </b-input-group-addon>
             </b-input-group>
           </div>
           <div id="dropdownSuggest" v-if="!hide_suggest && (showSuggest.length || tags.length)">
@@ -173,7 +178,8 @@
                       Edit
                     </th>
                     <th class="th-sm">
-                      Archive
+                      <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%;">All</label>
+                      <input type="checkbox" id="selectAll" @click="selectAllServers()">
                     </th>
                   </tr>
                 </thead>
@@ -241,9 +247,7 @@
                       </b-button>
                     </td>
                     <td v-if="server">
-                      <b-button v-b-modal.archiveServerModal @click="get_all_infos(server)" size="sm" variant="outline-dark" pill>
-                        <font-awesome-icon icon="archive"/>
-                      </b-button>
+                      <input :id="server.id" type='checkbox' @click="changeSelected(server.id)" style="transform: scale(1.5);">
                     </td>
                   </tr>
                   <tr>
@@ -267,26 +271,6 @@
         </div>
       </div>
     </div>
-    <b-modal id='delete_Modal' hide-footer  :no-close-on-backdrop=true :no-close-on-esc=true>
-      <template v-slot:modal-title>
-        Delete
-      </template>
-      <div class='text-center'>
-        <p>
-          Are you sur you want to delete this ?
-        </p>
-        <p>
-          <input id='checkInput' type='checkbox' @click="boolDelete = !boolDelete">
-          <label for="checkInput">
-            Verify
-          </label>
-        </p>
-      </div>
-      <div class='text-right'>
-        <b-button size='sm' @click="hide_and_delete(true)">cancel</b-button>
-        <b-button size='sm' @click="hide_and_delete(false)" :disabled="boolDelete" variant='danger'>confirm</b-button>
-      </div>
-    </b-modal>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -565,7 +549,8 @@
         editAll: {},
         boolDelete: true,
         full: false,
-        scrolled: false
+        scrolled: false,
+        selectedCheckBox: []
       }
     },
     watch: {
@@ -588,6 +573,30 @@
       window.removeEventListener('scroll', this.scroll);
     },
     methods: {
+      archiveServers() {
+        this.$bvModal.show('archiveServerModal');
+      },
+      selectAllServers() {
+        this.selectedCheckBox = []
+        if (document.getElementById('selectAll').checked) {
+          this.servers.forEach(server => {
+            document.getElementById(server.id).checked = true
+            this.selectedCheckBox.push(server.id)
+          });
+        } else {
+          this.servers.forEach(server => {
+            document.getElementById(server.id).checked = false;
+          })
+        }
+      },
+      changeSelected(idServer) {
+        if (this.servers.length == this.selectedCheckBox.length)
+          document.getElementById('selectAll').checked = false
+        for (let i = 0; this.selectedCheckBox[i]; i++)
+          if (this.selectedCheckBox[i] == idServer)
+            return this.selectedCheckBox.splice(i, 1);
+        this.selectedCheckBox.push(idServer);
+      },
       goTop() {
         var change = document.scrollingElement.scrollTop / 10
         if (document.scrollingElement.scrollTop > 0) {
@@ -1222,93 +1231,83 @@
       },
       deleteMutation() {
         var check = null, temp = this.tags[2]
+        this.selectedCheckBox = []
         switch (this.tags[1].toLowerCase()) {
           case "server":
             if ((check = this.filteredServer("hostname", temp, 1)).length == 1) {
-              this.get_all_infos(check[0]);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('archiveServerModal');
             }
             break;
           case "hoster":
             if ((check = this.filteredHoster('name', temp)).length == 1) {
-              this.editAll = {name: check[0].name, url_admin: check[0].url_admin, id: check[0].id};
-              this.hoster = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteHosterModal');
             }
             break;
           case "client":
             if ((check = this.filteredClient('name', temp)).length == 1) {
-              this.editAll = {name: check[0].name, infos: check[0].infos, id: check[0].id, supplier: check[0].supplier};
-              this.client = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteClientModal');
             }
             break;
           case "os":
             if ((check = this.filteredOs('os_name', temp)).length == 1) {
-              this.editAll = {os_name: check[0].os_name, os_version: check[0].os_version, version_name: check[0].version_name};
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteOsModal');
             }
             break;
           case "env":
             if ((check = this.filteredEnv('name', temp)).length == 1) {
-              this.editAll = {id: check[0].id, name: check[0].name};
-              this.env = check[0]
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteEnvModal');
             }
             break;
           case "type":
             if ((check = this.filteredType('name', temp)).length == 1) {
-              this.editAll = {id: check[0].id, name: check[0].name};
-              this.type = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteTypeModal');
             }
             break;
           case "profile":
             if ((check = this.filteredProfile('name', temp)).length == 1) {
-              this.editAll = {id: check[0].id, name: check[0].name, infos: check[0].infos};
-              this.profile = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteProfileModal');
             }
             break;
           case "serveruser":
             if ((check = this.filteredServerUser('name', temp)).length == 1) {
-              this.editAll = {id: check[0].id, name: check[0].name};
-              this.serverUser = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteServerUserModal');
             }
             break;
           case "dc":
             if ((check = this.filteredDc('name', temp)).length == 1) {
-              this.editAll = {hoster: check[0].hoster,
-              name: check[0].name, location: check[0].location};
-              this.dc = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteDcModal');
             }
             break;
           case "service":
             if ((check = this.filteredService('name', temp)).length == 1) {
-              this.editAll = {id: check[0].id, name: check[0].name};
-              this.service = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteServiceModal');
             }
             break;
           case "supplier":
             if ((check = this.filteredSupplier('name', temp)).length == 1) {
-              this.editAll = {id: check[0].id, name: check[0].name};
-              this.supplier = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteSupplierModal');
             }
             break;
           case "var":
             if ((check = this.filteredVar('key', temp)).length == 1) {
-              this.editAll = {id: check[0].id, key: check[0].key, value: check[0].value};
-              this.var = check[0];
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('deleteVarModal');
             }
             break;
           default:
             if ((check = this.filteredServer("hostname", this.tags[1], 1)).length == 1) {
-              this.get_all_infos(check[0]);
+              this.selectedCheckBox.push(check[0].id);
               this.$bvModal.show('archiveServerModal');
             }
             break;

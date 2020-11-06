@@ -1,11 +1,12 @@
 <template>
   <b-modal id="archiveServerModal" ref="archive-server" title="Archive" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
     <b-form @submit.stop.prevent="onSubmit">
-      <p class="my-4">Are you sure you want to archive this server?</p>
-      <b-form-checkbox v-model="checked">I confirm I want to archive server: <strong>{{editInfos.hostname}}</strong></b-form-checkbox>
+      <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to archive this server ?</p>
+      <p class="my-4" v-else>Are you sure you want to archive those servers ?</p>
+      <b-form-checkbox v-model="checked">I confirm I want to archive</b-form-checkbox>
       <b-form-datepicker
           class = "datepicker"
-          v-model="editInfos.archiveDate"
+          v-model="archiveDate"
           right
           locale="en-US"
         ></b-form-datepicker>
@@ -18,60 +19,46 @@
 </template>
 
 <script>
-
-import { updateServer } from '@/assets/js/updateMutations/updateServer'
+import gql from 'graphql-tag'
 
 export default {
   name: 'ArchiveServer',
   props: {
-    editInfos: Object
+    editInfos: Array
   },
   data () {
     return {
       checked: false,
-      listServices: [],
+      archiveDate: null
     }
   },
   methods: {
-    editToList() {
-      this.listServices = []
-      for (let index = 0; index < this.editInfos.services.length; index++) {
-        this.listServices[index] = this.editInfos.services[index].id;
-      }
-    },
     onSubmit() {
-      this.editServer();
-    },
-    hideServerModal: function(modal) {
-      this.$refs[modal].hide();
-    },
-    editServer() {
-      if(this.listServices.length == 0) {
-        this.editToList();
-      }
-      const id = this.editInfos.id,
-      hostname = this.editInfos.hostname,
-      ip = this.editInfos.ip,
-      infos = this.editInfos.infos != null ? this.editInfos.infos : '',
-      ansible = this.editInfos.ansible != null ? this.editInfos.ansible : '',
-      raid = this.editInfos.raid,
-      offer = this.editInfos.offer != 0 ? this.editInfos.offer.id : 0,
-      client = this.editInfos.client != 0 ? this.editInfos.client.id : 0,
-      cred = this.editInfos.cred != 0 ? this.editInfos.cred.id : 0,
-      type = this.editInfos.type != 0 ? this.editInfos.type.id : 0,
-      env = this.editInfos.env != 0 ? this.editInfos.env.id : 0,
-      dc = this.editInfos.dc != 0 ? this.editInfos.dc.id : 0,
-      profile = this.editInfos.profile != 0 ? this.editInfos.profile.id : 0,
-      server_user = this.editInfos.server_user != 0 ? this.editInfos.server_user.id : 0,
-      os = this.editInfos.os != 0 ? this.editInfos.os.id : 0,
-      date = this.editInfos.date != null ? this.editInfos.date : new Date().toISOString().slice(0,10),
-      archiveDate = this.editInfos.archiveDate,
-      archived = true,
-      services = this.listServices.length != 0 ? this.listServices : [];
-      this.$apollo.mutate({
-        mutation: updateServer,
-        variables: {id, hostname, ip, infos, raid, offer, client, cred, type, env, dc, profile, server_user, os, services, date, archiveDate, archived, ansible}
+      if (this.archiveDate == null)
+        this.archiveDate = new Date().toISOString().slice(0,10);
+      var archived = true;
+      this.editInfos.forEach(id => {
+        this.$apollo.mutate({
+          mutation: gql`mutation updateServer ($id: ID!, $archiveDate: Date!, $archived: Boolean!){
+              updateServer(input: {
+                where: {
+                  id: $id
+                }
+                data: {
+                  archiveDate: $archiveDate
+                  archived: $archived
+                }
+              }) {
+              server {
+                id
+                archived
+              }
+            }
+          }`,
+          variables: {id: id, archiveDate: this.archiveDate, archived: archived}
+        });
       });
+      this.$refs['archive-server'].hide();
       window.location.reload(true);
     }
   },

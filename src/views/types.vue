@@ -10,6 +10,9 @@
               <b-button v-b-modal.addTypeModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteTypes">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -19,10 +22,13 @@
           <tr>
             <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('id', 1)" class="text-center th-sm s-m-1">Id</th>
-            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-1">Type<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-1">Type</th>
+            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm">Type<font-awesome-icon class="float-right" icon="sort" /></th>
+            <th v-else @click="sort('name', 1)" class="text-center th-sm">Type</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllTypes()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredTypes">
@@ -30,7 +36,9 @@
             <td v-if="type" class="">{{type.id}}</td>
             <td v-if="type" class="text-left">{{type.name}}</td>
             <td v-if="type"><b-button v-b-modal.editTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="type"><b-button v-b-modal.deleteTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="type">
+              <input :id="type.id" type='checkbox' @click="changeSelected(type.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="4" @click="getType" v-if="!full" style="cursor: pointer;">
@@ -47,7 +55,7 @@
     </div>
     <add-type :addInfos='addInfos'></add-type>
     <edit-type v-bind:editInfos="editInfos" :type='Type'></edit-type>
-    <delete-type v-bind:editInfos="editInfos" ></delete-type>
+    <delete-type v-bind:editInfos="selectedCheckBox" ></delete-type>
     <b-button v-show="scrolled" size='lg' @click="goTop" pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up"/></b-button>
   </div>
 </template>
@@ -86,6 +94,7 @@ export default {
       addInfos: {
         name: null,
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -98,6 +107,32 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteTypes() {
+      this.$bvModal.show('deleteTypeModal');
+    },
+    selectAllTypes() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.types.forEach(type => {
+          document.getElementById(type.id).checked = true
+          this.selectedCheckBox.push(type.id)
+        });
+      } else {
+        this.types.forEach(type => {
+          document.getElementById(type.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.types.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.types.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

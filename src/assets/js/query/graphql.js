@@ -85,8 +85,8 @@ query allServer($start: Int!, $where: JSON!) {
 `
 
 const ALL_SERVER_QUERY = gql`
-query allServer($limit: Int!, $start: Int!) {
-  servers(limit: $limit, start: $start) {
+query allServer($limit: Int!, $start: Int!, $where: JSON!) {
+  servers(limit: $limit, start: $start, where: $where) {
     id,
     hostname,
     date,

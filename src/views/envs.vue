@@ -10,6 +10,9 @@
               <b-button v-b-modal.addEnvModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteEnvs">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -22,7 +25,10 @@
             <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-1">Name<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-1">Name</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllEnvs()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredEnvs">
@@ -30,7 +36,9 @@
             <td v-if="env" class="">{{env.id}}</td>
             <td v-if="env" class="text-left">{{env.name}}</td>
             <td v-if="env"><b-button v-b-modal.editEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="env"><b-button v-b-modal.deleteEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="env">
+              <input :id="env.id" type='checkbox' @click="changeSelected(env.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="4" @click="getEnv" v-if="!full" style="cursor: pointer;">
@@ -47,7 +55,7 @@
     </div>
     <add-env :addInfos='addInfos'></add-env>
     <edit-env v-bind:editInfos="editInfos" :env='Env'></edit-env>
-    <delete-env v-bind:editInfos="editInfos" ></delete-env>
+    <delete-env v-bind:editInfos="selectedCheckBox" ></delete-env>
     <b-button v-show="scrolled" @click="goTop" pill variant='outline-dark' class='bottom-right' size='lg'><font-awesome-icon icon='chevron-up'/></b-button>
   </div>
 </template>
@@ -86,6 +94,7 @@ export default {
       addInfos: {
         name: null,
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -98,6 +107,32 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteEnvs() {
+      this.$bvModal.show('deleteEnvModal');
+    },
+    selectAllEnvs() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.envs.forEach(env => {
+          document.getElementById(env.id).checked = true
+          this.selectedCheckBox.push(env.id)
+        });
+      } else {
+        this.envs.forEach(env => {
+          document.getElementById(env.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.envs.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.envs.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

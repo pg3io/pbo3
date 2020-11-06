@@ -10,6 +10,9 @@
               <b-button v-b-modal.addProfileModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteProfiles">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -19,10 +22,13 @@
           <tr>
             <th v-if="currentSort === 'id'" @click="sort('id', 1)" class="text-center th-sm s-m-1">Id<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('id', 1)" class="text-center th-sm s-m-1">Id</th>
-            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm b-m-1">Name<font-awesome-icon class="float-right" icon="sort" /></th>
-            <th v-else @click="sort('name', 1)" class="text-center th-sm b-m-1">Name</th>
+            <th v-if="currentSort === 'name'" @click="sort('name', 1)" class="text-center th-sm">Name<font-awesome-icon class="float-right" icon="sort" /></th>
+            <th v-else @click="sort('name', 1)" class="text-center th-sm">Name</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllProfiles()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredProfiles">
@@ -30,7 +36,9 @@
             <td v-if="profile">{{profile.id}}</td>
             <td v-if="profile" class="text-left">{{profile.name}}</td>
             <td v-if="profile"><b-button v-b-modal.editProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="profile"><b-button v-b-modal.deleteProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="profile">
+              <input :id="profile.id" type='checkbox' @click="changeSelected(profile.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="4" @click="getProfile" v-if="!full" style="cursor: pointer;">
@@ -47,7 +55,7 @@
     </div>
     <add-profile :addInfos='addInfos'></add-profile>
     <edit-profile v-bind:editInfos="editInfos" :profile='Profile'></edit-profile>
-    <delete-profile v-bind:editInfos="editInfos" ></delete-profile>
+    <delete-profile v-bind:editInfos="selectedCheckBox" ></delete-profile>
     <b-button class='bottom-right' pill variant='outline-dark' v-show="scrolled" @click="goTop" size="lg"><font-awesome-icon icon='chevron-up'/></b-button>
   </div>
 </template>
@@ -89,6 +97,7 @@ export default {
         name: null,
         infos: null
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -101,6 +110,32 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteProfiles() {
+      this.$bvModal.show('deleteProfileModal');
+    },
+    selectAllProfiles() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.profiles.forEach(profile => {
+          document.getElementById(profile.id).checked = true
+          this.selectedCheckBox.push(profile.id)
+        });
+      } else {
+        this.profiles.forEach(profile => {
+          document.getElementById(profile.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.profiles.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+      if (this.profiles.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = true
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");
