@@ -10,6 +10,9 @@
               <b-button v-b-modal.addOsModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteOs">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -27,7 +30,10 @@
             <th v-else @click="sort('version_name', 1)" class="th-sm b-m-3">Version Name</th>
             <th class="s-m-1">Icon</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllOs()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="os">
@@ -43,7 +49,10 @@
               <span v-if="o" :class="icon(o.os_name)"></span>
             </td>
             <td v-if="o"><b-button v-b-modal.editOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="o"><b-button v-b-modal.deleteOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <!-- <td v-if="o"><b-button v-b-modal.deleteOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td> -->
+            <td v-if="o">
+              <input :id="o.id" type='checkbox' @click="changeSelected(o.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan='7' @click="getOs" v-if="!full" style="cursor: pointer;">
@@ -59,7 +68,7 @@
     </div>
     <add-os :addInfos='addInfos'></add-os>
     <edit-os v-bind:editInfos="editInfos" ></edit-os>
-    <delete-os v-bind:editInfos="editInfos" ></delete-os>
+    <delete-os v-bind:editInfos="selectedCheckBox" ></delete-os>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
     <br><br><br><br>
   </div>
@@ -99,6 +108,7 @@ export default {
         os_version: null,
         version_name: null
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -111,6 +121,30 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteOs() {
+      this.$bvModal.show('deleteOsModal');
+    },
+    selectAllOs() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.os.forEach(os => {
+          document.getElementById(os.id).checked = true
+          this.selectedCheckBox.push(os.id)
+        });
+      } else {
+        this.os.forEach(os => {
+          document.getElementById(os.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.os.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

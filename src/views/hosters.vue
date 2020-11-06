@@ -10,6 +10,9 @@
               <b-button v-b-modal.addHosterModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteHoster">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -24,7 +27,10 @@
             <th v-if="currentSort === 'url_admin'" @click="sort('url_admin', 1)" class="th-sm b-m-2">Url Admin<font-awesome-icon class="float-right" icon="sort" /></th>
             <th v-else @click="sort('url_admin', 1)" class="th-sm b-m-2">Url Admin</th>
             <th class="s-m-1">Edit</th>
-            <th class="s-m-1">Delete</th>
+            <th class="s-m-1" style="cursor: default;">
+              <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+              <input type="checkbox" id="selectAll" @click="selectAllHosters()" style="cursor: pointer;">
+            </th>
           </tr>
         </thead>
         <tbody v-if="filteredHosters">
@@ -33,7 +39,9 @@
             <td v-if="hoster" class="text-left">{{hoster.name}}</td>
             <td v-if="hoster" class="text-left">{{hoster.url_admin}}</td>
             <td v-if="hoster"><b-button v-b-modal.editHosterModal @click="get_hoster(hoster)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <td v-if="hoster"><b-button v-b-modal.deleteHosterModal @click="get_hoster(hoster)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+            <td v-if="hoster">
+              <input :id="hoster.id" type='checkbox' @click="changeSelected(hoster.id)" style="transform: scale(1.5);">
+            </td>
           </tr>
           <tr>
             <td colspan="5" @click="getHoster" v-if="!full" style="cursor: pointer;">
@@ -50,7 +58,7 @@
     </div>
     <add-hoster :addInfos='addInfos'></add-hoster>
     <edit-hoster :editInfos="editInfos" :hoster='Hoster'></edit-hoster>
-    <delete-hoster v-bind:editInfos="editInfos" ></delete-hoster>
+    <delete-hoster v-bind:editInfos="selectedCheckBox" ></delete-hoster>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -92,6 +100,7 @@ export default {
         name: null,
         url_admin: null
       },
+      selectedCheckBox: []
     }
   },
   mounted() {
@@ -104,6 +113,30 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    deleteHoster() {
+      this.$bvModal.show("deleteHosterModal")
+    },
+    selectAllHosters() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.hosters.forEach(hoster => {
+          document.getElementById(hoster.id).checked = true
+          this.selectedCheckBox.push(hoster.id)
+        });
+      } else {
+        this.hosters.forEach(hoster => {
+          document.getElementById(hoster.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.hosters.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");

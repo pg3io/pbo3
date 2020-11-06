@@ -10,6 +10,9 @@
               <b-button v-b-modal.addClientModal class="add" variant="outline-dark">
                 <font-awesome-icon class="float-right" icon="plus"/>
               </b-button>
+              <b-button variant="outline-dark" v-if="selectedCheckBox.length" @click="deleteClient">
+                <font-awesome-icon icon="trash-alt"/>
+              </b-button>
             </b-input-group-append>
           </b-input-group>
         </div>
@@ -26,7 +29,10 @@
                 <th v-if="currentSort === 'supplier.name'" @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier<font-awesome-icon class="float-right" icon="sort" /></th>
                 <th v-else @click="sort('supplier.name', 1)" class="text-center th-sm b-m-2">Supplier</th>
                 <th class="s-m-1">Edit</th>
-                <th class="s-m-1">Delete</th>
+                <th class="s-m-1" style="cursor: default;">
+                  <label for="selectAll" style="margin-right: 10%; margin-bottom: -25%; cursor: pointer;">All</label>
+                  <input type="checkbox" id="selectAll" @click="selectAllClients()" style="cursor: pointer;">
+                </th>
               </tr>
             </thead>
             <tbody v-if="filteredClients">
@@ -37,7 +43,9 @@
                   <p v-if="client.supplier">{{client.supplier.name}}</p>
                 </td>
                 <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-                <td v-if="client"><b-button v-b-modal.deleteClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td>
+                <td v-if="client">
+                  <input :id="client.id" type='checkbox' @click="changeSelected(client.id)" style="transform: scale(1.5);">
+                </td>
               </tr>
               <tr>
                 <td colspan="5" @click="getClient" v-if="!full" style="cursor: pointer;">
@@ -56,7 +64,7 @@
     </div>
     <add-client v-bind:addInfos="editInfos"></add-client>
     <edit-client v-bind:editInfos="editInfos" :client='Client'></edit-client>
-    <delete-client v-bind:editInfos="editInfos" ></delete-client>
+    <delete-client v-bind:editInfos="selectedCheckBox" ></delete-client>
     <b-button v-show="scrolled" size='lg' @click='goTop' pill variant='outline-dark' class='bottom-right'><font-awesome-icon icon="chevron-up" /></b-button>
   </div>
 </template>
@@ -100,7 +108,8 @@ export default {
         name: null,
         infos: null,
         supplier: null
-      }
+      },
+      selectedCheckBox: []
     }
   },
   created() {
@@ -113,6 +122,30 @@ export default {
     this.getClient();
   },
   methods: {
+    deleteClient() {
+      this.$bvModal.show('deleteClientModal')
+    },
+    selectAllClients() {
+      this.selectedCheckBox = []
+      if (document.getElementById('selectAll').checked) {
+        this.clients.forEach(client => {
+          document.getElementById(client.id).checked = true
+          this.selectedCheckBox.push(client.id)
+        });
+      } else {
+        this.clients.forEach(client => {
+          document.getElementById(client.id).checked = false;
+        })
+      }
+    },
+    changeSelected(idServer) {
+      if (this.clients.length == this.selectedCheckBox.length)
+        document.getElementById('selectAll').checked = false
+      for (let i = 0; this.selectedCheckBox[i]; i++)
+        if (this.selectedCheckBox[i] == idServer)
+          return this.selectedCheckBox.splice(i, 1);
+      this.selectedCheckBox.push(idServer);
+    },
     stopLoading() {
       var loader = document.getElementById("loader");
       var message = document.getElementById("message");
