@@ -2,7 +2,7 @@
   <div>
     <b-modal id="deleteArchivedModal" ref="delete-archived" :no-close-on-backdrop=true :no-close-on-esc=true title="Delete" hide-footer>
       <p class="my-4" v-if="deleteInfos.length == 1">Are you sure you want to delete this server?</p>
-      <p class="my-4" v-else>Are you sure you want to delete those servers ?</p>
+      <p class="my-4" v-else>Are you sure you want to delete those {{ deleteInfos.length }} servers ?</p>
       <b-form-checkbox v-model="checked">I confirm I want to delete</b-form-checkbox>
       <div class="inputConfirm">
         <b-button variant="outline-dark" @click="hideServerModal('delete-archived')">Cancel</b-button>
@@ -37,6 +37,7 @@ export default {
       window.location.reload(true);
     },
     hideServerModal: function(modal) {
+      this.$parent.selectedCheckBox = [];
       this.$refs[modal].hide();
     },
   },

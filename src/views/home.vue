@@ -424,7 +424,6 @@
         creds: [],
         server: null,
         saveServers: [],
-        first: true,
         supplier: null,
         var: null,
         hoster: null,
@@ -564,6 +563,8 @@
     },
     mounted() {
       this.getServer();
+      this.get_server();
+      this.getService();
       this.getSearchByUrl();
     },
     created () {
@@ -574,6 +575,10 @@
     },
     methods: {
       archiveServers() {
+        document.getElementById('selectAll').checked = false;
+        this.servers.forEach(server => {
+          document.getElementById(server.id).checked = false;
+        })
         this.$bvModal.show('archiveServerModal');
       },
       selectAllServers() {
@@ -858,7 +863,7 @@
       },
       getSearchByUrl() {
         var actPath = this.$route.path, savePath = actPath;
-        if (!this.servers.length || !actPath || !this.first || actPath == '/' || !actPath.startsWith('/search='))
+        if (!this.servers.length || !actPath || actPath == '/' || !actPath.startsWith('/search='))
           return (!this.servers.length) ? setTimeout(this.getSearchByUrl, 100) : null;
         actPath = actPath.substring(8).split('+');
         for (let i = 0; actPath[i]; i++)
@@ -1033,6 +1038,7 @@
         var rank = 0, i = -1, result = [];
         if(!string.length)
           return this.saveServers
+        alert(this.saveServers.length)
         while (string && this.saveServers[++i])
           if (((opt == "all" || opt == "hostname") && this.saveServers[i].hostname && this.saveServers[i].hostname.toLowerCase() == string.toLowerCase()) ||
           ((opt == "all" || opt =="ip") && this.saveServers[i].ip && this.saveServers[i].ip.toLowerCase() == string.toLowerCase()) ||
@@ -1358,10 +1364,6 @@
         if (this.servers != this.saveServers) this.mountUrl();
       },
       getOption() {
-        if (this.first) {
-          this.saveServers = this.servers;
-          this.first = false;
-        }
         if ((!this.tags || !this.tags.length) && (!this.inputSearch || !this.inputSearch.length)) {
           if (this.servers.length != this.saveServers.length) this.servers = this.saveServers;
           if (this.$route.path != '/') this.$router.push('/');
@@ -1567,7 +1569,7 @@
           this.hoverSuggest = this.showSuggest[(key == 'ArrowLeft' || key == 'ArrowUp') ? max - 1 : 0]
       },
       subtag_gesture: function() {
-        if (this.servers.length != this.saveServers.length && this.tags.length < 2 && !this.first)
+        if (this.servers.length != this.saveServers.length && this.tags.length < 2)
           this.servers = this.saveServers;
         if (this.inputSearch.length || !this.tags.length)
           return;

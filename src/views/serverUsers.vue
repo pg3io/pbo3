@@ -108,6 +108,10 @@ export default {
   },
   methods: {
     deleteServerUsers() {
+      document.getElementById('selectAll').checked = false;
+      this.serverUsers.forEach(serverUser => {
+        document.getElementById(serverUser.id).checked = false;
+      })
       this.$bvModal.show('deleteServerUserModal');
     },
     selectAllServerUsers() {

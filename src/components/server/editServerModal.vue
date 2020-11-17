@@ -88,11 +88,11 @@
       </div>
       <div class="inputLine">
         <div class="inputField">
-          <b-form-group label-cols="3" label="Dc:" label-for="input-horizontal">
+          <b-form-group label-cols="3" label="Hoster - Dc:" label-for="input-horizontal">
             <b-form-select v-model="editDc">
               <b-form-select-option selected :value="editInfos.dc.id" v-if="editInfos.dc.hoster">
                 <p v-if='editInfos.dc.hoster'>
-                  {{ editInfos.dc.name }} - {{ editInfos.dc.hoster.name}}
+                  {{ editInfos.dc.hoster.name}} - {{ editInfos.dc.name }}
                 </p>
                 <p v-else>
                   {{ editInfos.dc.name }}
@@ -100,7 +100,7 @@
               </b-form-select-option>
               <b-form-select-option v-for="dc in dcs" v-bind:key="dc.id" :value="dc.id" v-if="dc.id != editInfos.dc.id">
                 <p v-if='dc.hoster'>
-                  {{ dc.name }} - {{ dc.hoster.name}}
+                  {{ dc.hoster.name}} - {{ dc.name }}
                 </p>
                 <p v-else>
                   {{ dc.name }}

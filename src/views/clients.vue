@@ -123,6 +123,10 @@ export default {
   },
   methods: {
     deleteClient() {
+      document.getElementById('selectAll').checked = false;
+      this.clients.forEach(client => {
+        document.getElementById(client.id).checked = false;
+      })
       this.$bvModal.show('deleteClientModal')
     },
     selectAllClients() {

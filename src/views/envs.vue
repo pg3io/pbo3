@@ -108,6 +108,10 @@ export default {
   },
   methods: {
     deleteEnvs() {
+      this.envs.forEach(env => {
+        document.getElementById(env.id).checked = false;
+      })
+      document.getElementById('selectAll').checked = false;
       this.$bvModal.show('deleteEnvModal');
     },
     selectAllEnvs() {

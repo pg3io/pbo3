@@ -108,6 +108,10 @@ export default {
   },
   methods: {
     deleteTypes() {
+      document.getElementById('selectAll').checked = false;
+      this.types.forEach(type => {
+        document.getElementById(type.id).checked = false;
+      })
       this.$bvModal.show('deleteTypeModal');
     },
     selectAllTypes() {

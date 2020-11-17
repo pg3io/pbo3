@@ -2,7 +2,7 @@
   <b-modal id="archiveServerModal" ref="archive-server" title="Archive" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
     <b-form @submit.stop.prevent="onSubmit">
       <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to archive this server ?</p>
-      <p class="my-4" v-else>Are you sure you want to archive those servers ?</p>
+      <p class="my-4" v-else>Are you sure you want to archive those {{ editInfos.length }} servers ?</p>
       <b-form-checkbox v-model="checked">I confirm I want to archive</b-form-checkbox>
       <b-form-datepicker
           class = "datepicker"
@@ -33,6 +33,10 @@ export default {
     }
   },
   methods: {
+    hideServerModal(modal) {
+      this.$parent.selectedCheckBox = [];
+      this.$refs[modal].hide();
+    },
     onSubmit() {
       if (this.archiveDate == null)
         this.archiveDate = new Date().toISOString().slice(0,10);

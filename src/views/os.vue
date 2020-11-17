@@ -122,6 +122,10 @@ export default {
   },
   methods: {
     deleteOs() {
+      document.getElementById('selectAll').checked = false
+      this.os.forEach(os => {
+        document.getElementById(os.id).checked = false;
+      })
       this.$bvModal.show('deleteOsModal');
     },
     selectAllOs() {
