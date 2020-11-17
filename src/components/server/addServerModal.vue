@@ -72,11 +72,11 @@
       </div>
       <div class="inputLine">
         <div class="inputField">
-          <b-form-group label-cols="3" label="Dc" label-for="input-horizontal">
+          <b-form-group label-cols="3" label="Hoster - Dc:" label-for="input-horizontal">
             <b-form-select id="dc-input" name="dc-input" v-model="$v.addInfos.dc.$model">
               <b-form-select-option v-for="dc in dcs" v-bind:key="dc.id" :value="dc.id">
                 <p v-if='dc.hoster'>
-                  {{ dc.name }} - {{ dc.hoster.name}}
+                  {{ dc.hoster.name}} - {{ dc.name }}
                 </p>
                 <p v-else>
                   {{ dc.name }}
