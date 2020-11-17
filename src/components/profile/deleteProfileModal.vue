@@ -1,7 +1,7 @@
 <template>
   <b-modal id="deleteProfileModal" ref="delete-profile" title="Delete" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
     <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to delete this profile ?</p>
-    <p class="my-4" v-else>Are you sure you want to delete those profiles ?</p>
+    <p class="my-4" v-else>Are you sure you want to delete those {{ editInfos.length }} profiles ?</p>
     <b-form-checkbox v-model="checked">I confirm I want to delete</b-form-checkbox>
     <div class="inputConfirm">
       <b-button variant="outline-dark" @click="hideServerModal('delete-profile')">Cancel</b-button>
@@ -36,6 +36,7 @@ export default {
       this.$parent.editInfos.id = null;
     },
     hideServerModal: function(modal) {
+      this.$parent.selectedCheckBox = [];
       this.$refs[modal].hide();
     },
   },

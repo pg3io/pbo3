@@ -108,6 +108,10 @@ export default {
   },
   methods: {
     deleteSuppliers() {
+      document.getElementById('selectAll').checked = false;
+      this.suppliers.forEach(supplier => {
+        document.getElementById(supplier.id).checked = false;
+      })
       this.$bvModal.show('deleteSupplierModal');
     },
     selectAllSuppliers() {

@@ -107,6 +107,10 @@ export default {
   },
   methods: {
     deleteServices() {
+      document.getElementById('selectAll').checked = false;
+      this.services.forEach(service => {
+        document.getElementById(service.id).checked = false;
+      })
       this.$bvModal.show('deleteServiceModal');
     },
     selectAllServices() {

@@ -109,6 +109,10 @@ export default {
   },
   methods: {
     deleteVars() {
+      document.getElementById('selectAll').checked = false;
+      this.vars.forEach(v => {
+        document.getElementById(v.id).checked = false;
+      })
       this.$bvModal.show('deleteVarModal');
     },
     selectAllVars() {

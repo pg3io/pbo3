@@ -111,6 +111,10 @@ export default {
   },
   methods: {
     deleteProfiles() {
+      document.getElementById('selectAll').checked = false;
+      this.profiles.forEach(profile => {
+        document.getElementById(profile.id).checked = false;
+      })
       this.$bvModal.show('deleteProfileModal');
     },
     selectAllProfiles() {

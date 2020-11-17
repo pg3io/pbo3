@@ -114,6 +114,10 @@ export default {
   },
   methods: {
     deleteHoster() {
+      this.hosters.forEach(hoster => {
+        document.getElementById(hoster.id).checked = false;
+      })
+      document.getElementById('selectAll').checked = false;
       this.$bvModal.show("deleteHosterModal")
     },
     selectAllHosters() {

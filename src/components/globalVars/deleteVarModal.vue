@@ -2,7 +2,7 @@
   <div>
     <b-modal id="deleteVarModal" ref="delete-var" :no-close-on-backdrop=true :no-close-on-esc=true title="Delete" hide-footer>
       <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to delete this var ?</p>
-      <p class="my-4" v-else>Are you sure you want to delete those vars ?</p>
+      <p class="my-4" v-else>Are you sure you want to delete those {{ editInfos.length }} vars ?</p>
       <b-form-checkbox v-model="checked">I confirm I want to delete variable: <strong>{{editInfos.key}}</strong></b-form-checkbox>
       <div class="inputConfirm">
         <b-button variant="outline-dark" @click="hideServerModal('delete-var')">Cancel</b-button>
@@ -37,6 +37,7 @@ export default {
       window.location.reload(true);
     },
     hideServerModal: function(modal) {
+      this.$parent.selectedCheckBox = [];
       this.$refs[modal].hide();
     },
   },

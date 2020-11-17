@@ -123,6 +123,10 @@ export default {
   },
   methods: {
     deleteDcs() {
+      this.dcs.forEach(dc => {
+        document.getElementById(dc.id).checked = false;
+      })
+      document.getElementById('selectAll').checked = false;
       this.$bvModal.show('deleteDcModal');
     },
     selectAllDcs() {

@@ -250,6 +250,10 @@ export default {
       }
     },
     deleteServers() {
+      this.servers.forEach(server => {
+        document.getElementById(server.id).checked = false;
+      })
+      document.getElementById('selectAll').checked = false;
       this.$bvModal.show('deleteArchivedModal');
     },
     async getServer() {

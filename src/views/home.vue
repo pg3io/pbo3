@@ -575,6 +575,10 @@
     },
     methods: {
       archiveServers() {
+        document.getElementById('selectAll').checked = false;
+        this.servers.forEach(server => {
+          document.getElementById(server.id).checked = false;
+        })
         this.$bvModal.show('archiveServerModal');
       },
       selectAllServers() {

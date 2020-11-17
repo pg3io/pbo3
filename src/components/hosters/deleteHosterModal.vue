@@ -1,7 +1,7 @@
 <template>
   <b-modal id="deleteHosterModal" ref="delete-hoster" title="Delete" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
     <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to delete this hoster?</p>
-    <p class="my-4" v-else>Are you sure you want to delete those hosters?</p>
+    <p class="my-4" v-else>Are you sure you want to delete those {{ editInfos.length }} hosters?</p>
     <b-form-checkbox v-model="checked">I confirm I want to delete</b-form-checkbox>
     <div class="inputConfirm">
       <b-button variant="outline-dark" @click="hideServerModal('delete-hoster')">Cancel</b-button>
@@ -35,6 +35,7 @@ export default {
       window.location.reload(true);
     },
     hideServerModal: function(modal) {
+      this.$parent.selectedCheckBox = [];
       this.$refs[modal].hide();
     },
   },

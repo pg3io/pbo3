@@ -1,10 +1,10 @@
 <template>
   <b-modal id="deleteTypeModal" ref="delete-type" title="Delete" :no-close-on-backdrop=true :no-close-on-esc=true hide-footer>
     <p class="my-4" v-if="editInfos.length == 1">Are you sure you want to delete this type?</p>
-    <p class="my-4" v-else>Are you sure you want to delete those types?</p>
+    <p class="my-4" v-else>Are you sure you want to delete those {{ editInfos.length }} types?</p>
     <b-form-checkbox v-model="checked">I confirm I want to delete</b-form-checkbox>
     <div class="inputConfirm">
-      <b-button variant="outline-dark" @click="hideServerModal('delete-env')">Cancel</b-button>
+      <b-button variant="outline-dark" @click="hideServerModal('delete-type')">Cancel</b-button>
       <b-button :disabled='disabled' variant="outline-danger" @click="deleteType()">Delete</b-button>
     </div>
   </b-modal>
@@ -35,6 +35,7 @@ export default {
       window.location.reload(true);
     },
     hideServerModal: function(modal) {
+      this.$parent.selectedCheckBox = [];
       this.$refs[modal].hide();
     },
   },
