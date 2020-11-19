@@ -1,8 +1,92 @@
 import gql from 'graphql-tag'
 
+const searchServers = gql`
+query searchServer($start: Int!, $sort: String!, $where: JSON!) {
+  servers(limit: 50, start: $start, sort: $sort, where: $where) {
+    id,
+    hostname,
+    date,
+    archiveDate,
+    archived,
+    ansible_vars,
+    offer {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    ip,
+    raid,
+    infos,
+    client {
+      id,
+      name,
+      infos,
+      supplier {
+        id,
+        name
+      }
+    },
+    os {
+      id,
+      os_name,
+      os_version,
+      version_name
+    },
+    cred {
+      id,
+      name,
+      auth,
+      token_hash,
+      url_admin_custom,
+      login,
+      password_hash,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    },
+    type {
+      id,
+      name
+    },
+    env {
+      id,
+      name
+    },
+    dc {
+      id,
+      name,
+      hoster {
+        id,
+        name,
+        url_admin
+      }
+    }
+    profile {
+      id,
+      name,
+      infos
+    },
+    server_user {
+      id,
+      name
+    },
+    services {
+      id,
+      name
+    }
+  }
+}
+`
+
 const SERVERS_QUERY = gql`
 query allServer($start: Int!, $where: JSON!) {
-  servers(limit: 40, start: $start, sort: "hostname:asc", where: $where) {
+  servers(limit: 40, start: $start, sort: "id:desc", where: $where) {
     id,
     hostname,
     date,
@@ -86,7 +170,7 @@ query allServer($start: Int!, $where: JSON!) {
 
 const ALL_SERVER_QUERY = gql`
 query allServer($limit: Int!, $start: Int!, $where: JSON!) {
-  servers(limit: $limit, start: $start, sort: "hostname:asc", where: $where) {
+  servers(limit: $limit, start: $start, sort: "id:desc", where: $where) {
     id,
     hostname,
     date,
@@ -170,7 +254,7 @@ query allServer($limit: Int!, $start: Int!, $where: JSON!) {
 
 const ALL_SERVERS_QUERY = gql`
 query All ($start: Int!, $where: JSON!) {
-  servers(limit: 100, start: $start, sort: "hostname:asc", where: $where) {
+  servers(limit: 100, start: $start, sort: "id:desc", where: $where) {
     id,
     hostname,
     date,
@@ -253,7 +337,7 @@ query All ($start: Int!, $where: JSON!) {
 `
 const ARCHIVED_SERVERS_QUERY = gql`
 query archived ($limit: Int!, $start: Int, $where: JSON!) {
-  servers(limit: $limit, start: $start, sort: "hostname:asc", where: $where) {
+  servers(limit: $limit, start: $start, sort: "id:desc", where: $where) {
     id,
     hostname,
     date,
@@ -336,7 +420,7 @@ query archived ($limit: Int!, $start: Int, $where: JSON!) {
 
 const SERVER_QUERY = gql`
 query Server($id: ID!) {
-  server(id: $id, sort: "hostname:asc") {
+  server(id: $id, sort: "id:desc") {
     id,
     hostname,
     ansible_vars,
@@ -414,12 +498,35 @@ query Server($id: ID!) {
   }
 }`
 
+const searchHosters = gql`
+query Hoster($start: Int!, $where: JSON!) {
+  hosters(limit: 50, start: $start, sort: "name:asc", where: $where) {
+        id,
+        name,
+        url_admin
+  }
+}
+`
+
 const HOSTERS_QUERY = gql`
 query Hoster($limit: Int!, $start: Int!) {
   hosters(limit: $limit, start: $start, sort: "name:asc") {
         id,
         name,
         url_admin
+  }
+}
+`
+const searchClients = gql`
+query Clients($start: Int!, $where: JSON!) {
+  clients(limit: 50, start: $start, sort: "name:asc", where: $where) {
+      id,
+      name,
+      infos,
+      supplier {
+        id,
+        name
+      }
   }
 }
 `
@@ -434,6 +541,16 @@ query Clients($limit: Int!, $start: Int!) {
         id,
         name
       }
+  }
+}
+`
+const searchOs = gql`
+query Os($start: Int!, $where: JSON!) {
+  os(limit: 50, start: $start, sort: "os_name:asc", where: $where) {
+      id,
+      os_name,
+      os_version,
+      version_name
   }
 }
 `
@@ -584,5 +701,9 @@ export {
   SERVICES_QUERY,
   ARCHIVED_SERVERS_QUERY,
   SUPPLIER_QUERY,
-  GLOBALVAR_QUERY
+  GLOBALVAR_QUERY,
+  searchServers,
+  searchHosters,
+  searchClients,
+  searchOs
 }
