@@ -262,10 +262,13 @@
               </table>
             </div>
           </div>
-          <div v-if='!Object.keys(servers).length'>
+          <div v-if='!Object.keys(servers).length && !loadLock'>
               <div id="loader" class="spinner-fast centerDiv">
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
+          </div>
+          <div v-else>
+            <div class="text-center"><h1>No servers found</h1></div>
           </div>
           <br><br><br><br>
         </div>
@@ -280,7 +283,9 @@
   import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
   SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
   ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, ALL_SERVER_QUERY,
-  searchServers, searchClients, searchOs, searchHosters }
+  searchServers, searchClients, searchOs, searchHosters, searchTypes,
+  searchEnvs, searchProfiles, searchServerUsers, searchDcs, searchCreds,
+  searchOffers, searchServices, searchSuppliers, searchGlobalVars }
   from '@/assets/js/query/graphql'
 
     /* Deletes */
@@ -527,6 +532,7 @@
             'client',
             'os',
             'hoster',
+            'type',
           ]
         },
         show_things: [
@@ -536,13 +542,12 @@
           'Envs',
           'Types',
           'Profiles',
-          'Servers',
           'ServerUsers',
           'Dcs',
           'Services',
           'Suppliers',
           'Vars',
-          'archives'
+          'Archives'
         ],
         hoverSuggest: "",
         hide_suggest: true,
@@ -550,7 +555,8 @@
         boolDelete: true,
         full: false,
         scrolled: false,
-        selectedCheckBox: []
+        selectedCheckBox: [],
+        loadLock: false
       }
     },
     watch: {
@@ -649,9 +655,9 @@
         }
         for (let i = 0; tmp['data']['servers'][i]; i++)
           this.servers.push(tmp['data']['servers'][i])
+        this.stopLoading();
         if (this.servers.length - start < 50 || !tmp['data']['servers'].length)
           this.full = true
-        this.stopLoading();
       },
       async getCred() {
         var start = this.creds.length, tmp = null
@@ -1536,7 +1542,7 @@
       },
       getSpecialSearch(search) {
         var myJson = {}, final = [], start = 0, tmp = (search == 'os') ? 'os_name' : 'name';
-        var mutationWanted = {'client': searchClients, 'os': searchOs, 'hoster': searchHosters};
+        var mutationWanted = {'client': searchClients, 'os': searchOs, 'hoster': searchHosters, 'type': searchTypes};
         myJson[tmp + '_contains'] = this.inputSearch;
         do {
           this.$apollo.mutate({
@@ -1578,41 +1584,62 @@
         return tmp;
       },
       suggest_oneTag() {
-      // var i = -1, tag = this.tags[0], result = this.search_orFunc(tag);
-      // if (this.tags[1] && result == 'func') {
-      //   if (this.tags[0] != 'add' && this.tags[0] != 'show' && this.tags.length < 3) this.getFullSuggests(this.tags[1]);
-      //   else this.showSuggest = [];
-      //   return;
-      // }
-      // if (result == 'search')
-      //   this.getServersSuggests(tag);
-      // else if (result == 'func') {
-      //   result = this.get_funcOptions(this.tags[0]);
-      //   for (let y = 0; result && result[y]; y++)
-      //     if (result[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
-      //       this.showSuggest[++i] = result[y];
-      //   if (this.tags[0] && this.tags[0] == 'show') {
-      //     this.showSuggest = []
-      //     for (let i = 0, a = 0; this.show_things[i]; i++)
-      //       if (this.show_things[i].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
-      //         this.showSuggest[a++] = this.show_things[i];
-      //   }
-      // }
-        var _type = this.search_orFunc(this.tags[0].toLowerCase())
+        var _type = this.search_orFunc(this.tags[0].toLowerCase());
         if (_type == null)
           return;
-        if (this.tags[1])
-          return this.suggest_oneMoreTag(_type);
-        if (_type == 'func') {return}
+        if (this.tags[1]) {
+          if (_type == 'func' && this.tags[0] == 'edit' && this.inputSearch.length > 1)
+            this.suggest_oneMoreTag();
+          return
+        }
+        if (_type == 'func') {
+          this.showSuggest = [];
+          for (let y = 0; this.tags[0] == 'show' && this.show_things[y]; y++)
+            if (this.show_things[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
+              this.showSuggest.push(this.show_things[y]);
+          for (let y = 0; this.tags[0] != 'show' && this.suggests.funcOptions[y]; y++)
+            if (this.suggests.funcOptions[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
+              this.showSuggest.push(this.suggests.funcOptions[y].toLowerCase())
+          for (let y = 0; this.showSuggest[y]; y++)
+            if (this.showSuggest[y] == this.hoverSuggest)
+              return
+          this.hoverSuggest = this.showSuggest[0];
+        }
         else if (this.inputSearch.length > 1){
           this.tags[0] = this.tags[0].toLowerCase();
-          if (this.tags[0] == 'client' || this.tags[0] == 'hoster' || this.tags[0] == 'os')
+          if (this.tags[0] == 'client' || this.tags[0] == 'hoster' || this.tags[0] == 'os' || this.tags[0] == 'type')
             this.servers = this.getSpecialSearch(this.tags[0]);
           else
             this.servers = this.getSearchResult(this.tags[0]);
           this.full = true;
           this.mountUrl();
+          this.loadLock = true;
         }
+      },
+      suggest_oneMoreTag() {
+        var tag = this.tags[1], myJson = {}, temp = [], tmp = (tag == 'os') ? 'os_name' : 'name';
+        var funcs = {'server': searchServers, 'client': searchClients,
+        'os': searchOs, 'hoster': searchHosters, 'type': searchTypes,
+        'env': searchEnvs, 'profile': searchProfiles, 'serverUser': searchServerUsers,
+        'dc': searchDcs, 'cred': searchCreds, 'offer': searchOffers,
+        'service': searchServices, 'supplier': searchSuppliers, 'globalVar': searchGlobalVars};
+        myJson[tmp + '_contains'] = this.inputSearch;
+        this.$apollo.mutate({
+          mutation: funcs[tag],
+          variables: {start: 0, where: Object(myJson)}
+        }).then((data) => {
+          for (let y = 0; data['data']['clients'][y]; y++) {
+            if (tag == 'os')
+              temp.push(data['data']['os'][y].os_name);
+            else
+              temp.push(data['data'][tag + 's'][y].name);
+          }
+          this.showSuggest = temp;
+          return;
+        }).catch((error) => {
+          console.log(error);
+          return this.showSuggest = [];
+        })
       },
       getSpecialSearchResult(search, ids) {
         var final = [], start = 0;
@@ -1620,7 +1647,7 @@
         do {
           this.$apollo.mutate({
             mutation: searchServers,
-            variables: {start: start, sort: 'hostname:asc', where: (search == 'client') ? {client: ids} : (search == 'os') ? {os: ids} : {hoster: ids}}
+            variables: {start: start, sort: 'hostname:asc', where: (search == 'client') ? {client: ids} : (search == 'os') ? {os: ids} : (search == 'type') ? {type: ids} : (search == 'hoster') ? {hoster: ids} : ids}
           }).then((data) => {
             for (let y = 0; data['data']['servers'][y]; y++)
               final.push(data['data']['servers'][y])

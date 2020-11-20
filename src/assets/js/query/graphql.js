@@ -335,6 +335,7 @@ query All ($start: Int!, $where: JSON!) {
   }
 }
 `
+
 const ARCHIVED_SERVERS_QUERY = gql`
 query archived ($limit: Int!, $start: Int, $where: JSON!) {
   servers(limit: $limit, start: $start, sort: "id:desc", where: $where) {
@@ -517,6 +518,7 @@ query Hoster($limit: Int!, $start: Int!) {
   }
 }
 `
+
 const searchClients = gql`
 query Clients($start: Int!, $where: JSON!) {
   clients(limit: 50, start: $start, sort: "name:asc", where: $where) {
@@ -544,6 +546,7 @@ query Clients($limit: Int!, $start: Int!) {
   }
 }
 `
+
 const searchOs = gql`
 query Os($start: Int!, $where: JSON!) {
   os(limit: 50, start: $start, sort: "os_name:asc", where: $where) {
@@ -566,6 +569,15 @@ query Os($limit: Int!, $start: Int!) {
 }
 `
 
+const searchTypes = gql`
+query Type($start: Int!, $where: JSON!) {
+  types(limit: 50, start: $start, sort: "name:asc", where: $where) {
+      id,
+      name
+  }
+}
+`
+
 const TYPE_QUERY = gql`
 query Type($limit: Int!, $start: Int!) {
   types(limit: $limit, start: $start, sort: "name:asc") {
@@ -574,6 +586,16 @@ query Type($limit: Int!, $start: Int!) {
   }
 }
 `
+
+const searchEnvs = gql`
+query Env($start: Int!, $where: JSON!) {
+  envs(limit: 50, start: $start, sort: "name:asc", where: $where) {
+      id,
+      name
+  }
+}
+`
+
 const ENV_QUERY = gql`
 query Env($limit: Int!, $start: Int!) {
   envs(limit: $limit, start: $start, sort: "name:asc") {
@@ -582,6 +604,17 @@ query Env($limit: Int!, $start: Int!) {
   }
 }
 `
+
+const searchProfiles = gql`
+query Profile($start: Int!, $where: JSON!) {
+  profiles(limit: 50, start: $start, sort: "name:asc", where: $where) {
+    id,
+    name,
+    infos
+  }
+}
+`
+
 const PROFILE_QUERY = gql`
 query Profile($limit: Int!, $start: Int!) {
   profiles(limit: $limit, start: $start, sort: "name:asc") {
@@ -591,6 +624,16 @@ query Profile($limit: Int!, $start: Int!) {
   }
 }
 `
+
+const searchServerUsers = gql`
+query ServerUser($start: Int!) {
+  serverUsers(limit: 50, start: $start, sort: "name:asc", where: $where) {
+    id,
+    name
+  }
+}
+`
+
 const SERVER_USER_QUERY = gql`
 query ServerUser($limit: Int!, $start: Int!) {
   serverUsers(limit: $limit, start: $start, sort: "name:asc") {
@@ -599,6 +642,7 @@ query ServerUser($limit: Int!, $start: Int!) {
   }
 }
 `
+
 const DC_QUERY = gql`
 query Dc {
 	dcs {
@@ -612,6 +656,21 @@ query Dc {
   }
 }
 `
+
+const searchDcs = gql `
+query Dc($start: Int!, $where: JSON!) {
+  dcs(limit: 50, start: $start, sort: "name:asc", where: $where) {
+    id,
+    name,
+    location,
+    hoster {
+      id,
+      name,
+    }
+  }
+}
+`
+
 const DC_QUERY_ = gql `
 query Dc($limit: Int!, $start: Int!) {
   dcs(limit: $limit, start: $start, sort: "name:asc") {
@@ -622,6 +681,20 @@ query Dc($limit: Int!, $start: Int!) {
       id,
       name,
     }
+  }
+}
+`
+
+const searchCreds = gql`
+query Cred($start: Int!, $where: JSON!) {
+  creds(limit: 50, start: $start, sort: "name:asc", where: $where) {
+    id,
+    name,
+    auth,
+    token_hash,
+    url_admin_custom,
+    login,
+    password_hash,
   }
 }
 `
@@ -640,6 +713,20 @@ query Cred($limit: Int!, $start: Int!) {
 }
 `
 
+const searchOffers = gql`
+query Offer($start: Int!, $where: JSON!) {
+  offers(limit: 50, start: $start, sort: "name:asc", where: $where) {
+    id,
+    name,
+    hoster {
+      id,
+      name,
+      url_admin
+    },
+  }
+}
+`
+
 const OFFER_QUERY = gql`
 query Offer($limit: Int!, $start: Int!) {
   offers(limit: $limit, start: $start, sort: "name:asc") {
@@ -654,9 +741,27 @@ query Offer($limit: Int!, $start: Int!) {
 }
 `
 
+const searchServices = gql`
+query Services($start: Int!, $where: JSON!) {
+  services(limit: 50, start: $start, sort: "name:asc", where: $where) {
+    id,
+    name
+  }
+}
+`
+
 const SERVICES_QUERY = gql`
 query Services($limit: Int!, $start: Int!) {
   services(limit: $limit, start: $start, sort: "name:asc") {
+    id,
+    name
+  }
+}
+`
+
+const searchSuppliers = gql`
+query Suppliers($start: Int!, $where: JSON!) {
+  suppliers(limit: 50, start: $start, sort: "name:asc") {
     id,
     name
   }
@@ -668,6 +773,16 @@ query Suppliers($limit: Int!, $start: Int!) {
   suppliers(limit: $limit, start: $start, sort: "name:asc") {
     id,
     name
+  }
+}
+`
+
+const searchGlobalVars = gql`
+query GlobalVars($start: Int!, $where: JSON!) {
+  globalVars(limit: 50, start: $start, sort: "key:asc", where: $where) {
+    id,
+    key,
+    value
   }
 }
 `
@@ -705,5 +820,15 @@ export {
   searchServers,
   searchHosters,
   searchClients,
-  searchOs
+  searchOs,
+  searchTypes,
+  searchEnvs,
+  searchProfiles,
+  searchServerUsers,
+  searchDcs,
+  searchCreds,
+  searchOffers,
+  searchServices,
+  searchSuppliers,
+  searchGlobalVars
 }
