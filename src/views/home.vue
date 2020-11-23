@@ -267,9 +267,6 @@
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
           </div>
-          <div v-else>
-            <div class="text-center"><h1>No servers found</h1></div>
-          </div>
           <br><br><br><br>
         </div>
       </div>
@@ -1411,6 +1408,7 @@
         this.inputSearch = "";
         this.showSuggest = [];
         this.hide_suggest = false;
+        this.hoverSuggest = '';
         for (y = 0; this.tags[0] && this.suggests.search[y]; y++)
           if (this.tags[0] == this.suggests.search[y] && !this.inputSearch.length)
             return this.getOption();
@@ -1425,6 +1423,7 @@
           this.tags.push(newTag);
         this.inputSearch = "";
         this.showSuggest = [];
+        this.hoverSuggest = '';
         if (key == 'Enter')
           return this.getOption();
         this.suggest_oneTag();
@@ -1710,9 +1709,6 @@
           else this.new_tag(event.key);
           return;
         }
-        // if (event.key != 'Enter')
-        //   this.suggest_gesture();
-        // event.key != ' ' && event.key != ',' && event.key != ':'
         if (event.key != 'Escape' && event.key != 'ArrowLeft' && event.key != 'ArrowRight' && event.key != 'ArrowUp' && event.key != 'ArrowDown') {
           if (event.key != 'Backspace') this.lock = true;
           this.suggest_gesture();

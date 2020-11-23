@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredServerUsers">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addServerUserModal class="add" variant="outline-dark">
@@ -31,8 +31,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredServerUsers">
-          <tr v-for="serverUser in filteredServerUsers" :key="serverUser.id">
+        <tbody v-if="serverUsers">
+          <tr v-for="serverUser in serverUsers" :key="serverUser.id">
             <td v-if="serverUser" class="">{{serverUser.id}}</td>
             <td v-if="serverUser" class="text-left">{{serverUser.name}}</td>
             <td v-if="serverUser"><b-button v-b-modal.editServerUserModal @click="get_serverUser(serverUser)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import {SERVER_USER_QUERY} from '@/assets/js/query/graphql'
+import { SERVER_USER_QUERY, searchServerUsers } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddServerUser from '@/components/serverUser/addServerUserModal.vue'
 import EditServerUser from '@/components/serverUser/editServerUserModal.vue'
@@ -78,6 +78,7 @@ export default {
   data () {
     return {
       serverUsers: [],
+      saveServerUsers: [],
       full: false,
       scrolled: false,
       ServerUser: {
@@ -107,6 +108,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredServerUsers: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.serverUsers = this.saveServerUsers;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.serverUsers = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchServerUsers,
+          variables: {start: start, where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['serverUsers'][y]; y++)
+            tmp.push(data['data']['serverUsers'][y]);
+          if (tmp.length != start + 50)
+            return this.serverUsers = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.serverUsers = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteServerUsers() {
       document.getElementById('selectAll').checked = false;
       this.serverUsers.forEach(serverUser => {
@@ -175,10 +205,10 @@ export default {
       }
       for (let i = 0; tmp['data']['serverUsers'][i]; i++)
         this.serverUsers.push(tmp['data']['serverUsers'][i])
-      if (!tmp['data']['serverUsers'].length || this.serverUsers.length - start < 20) {
+      this.saveServerUsers = this.serverUsers;
+      this.stopLoading()
+      if (!tmp['data']['serverUsers'].length || this.serverUsers.length - start < 20)
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -222,14 +252,6 @@ export default {
       this.ServerUser.id = serverUser.id
       this.ServerUser.name = serverUser.name
     },
-  },
-  computed: {
-    filteredServerUsers: function(){
-      return this.serverUsers.filter((serverUser) => {
-        if (serverUser.name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
   }
 }
 </script>

@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredServices">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addServiceModal class="add" variant="outline-dark">
@@ -31,8 +31,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredServices">
-          <tr v-for="service in filteredServices" :key="service.id">
+        <tbody v-if="services">
+          <tr v-for="service in services" :key="service.id">
             <td v-if="service" class="">{{service.id}}</td>
             <td v-if="service" class="text-left">{{service.name}}</td>
             <td v-if="service"><b-button v-b-modal.editServiceModal @click="get_service(service)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import {SERVICES_QUERY} from '@/assets/js/query/graphql'
+import { SERVICES_QUERY, searchServices} from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddService from '@/components/service/addServiceModal.vue'
 import EditService from '@/components/service/editServiceModal.vue'
@@ -77,6 +77,7 @@ export default {
   data () {
     return {
       services: [],
+      saveServices: [],
       full: false,
       scrolled: false,
       Service: {
@@ -106,6 +107,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredServices: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.services = this.saveServices;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.services = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchServices,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['services'][y]; y++)
+            tmp.push(data['data']['services'][y]);
+          if (tmp.length != start + 50)
+            return this.services = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.services = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteServices() {
       document.getElementById('selectAll').checked = false;
       this.services.forEach(service => {
@@ -174,10 +204,10 @@ export default {
       }
       for (let i = 0; tmp['data']['services'][i]; i++)
         this.services.push(tmp['data']['services'][i])
-      if (!tmp['data']['services'].length || this.services.length - start < 20) {
+      this.saveServices = this.services;
+      this.stopLoading()
+      if (!tmp['data']['services'].length || this.services.length - start < 20)
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -221,14 +251,6 @@ export default {
       this.Service.id = service.id
       this.Service.name = service.name
     },
-  },
-  computed: {
-    filteredServices: function(){
-      return this.services.filter((service) => {
-        if (service.name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
   }
 }
 </script>

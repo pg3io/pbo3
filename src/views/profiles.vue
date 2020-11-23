@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredProfiles">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addProfileModal class="add" variant="outline-dark">
@@ -31,8 +31,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredProfiles">
-          <tr v-for="profile in filteredProfiles" :key="profile.id">
+        <tbody v-if="profiles">
+          <tr v-for="profile in profiles" :key="profile.id">
             <td v-if="profile">{{profile.id}}</td>
             <td v-if="profile" class="text-left">{{profile.name}}</td>
             <td v-if="profile"><b-button v-b-modal.editProfileModal @click="get_profile(profile)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import {PROFILE_QUERY} from '@/assets/js/query/graphql'
+import { PROFILE_QUERY, searchProfiles } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddProfile from '@/components/profile/addProfileModal.vue'
 import EditProfile from '@/components/profile/editProfileModal.vue'
@@ -78,6 +78,7 @@ export default {
   data () {
     return {
       profiles: [],
+      saveProfiles: [],
       full: false,
       scrolled: false,
       Profile: {
@@ -110,6 +111,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredProfiles: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.profiles = this.saveProfiles;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.profiles = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchProfiles,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['profiles'][y]; y++)
+            tmp.push(data['data']['profiles'][y]);
+          if (tmp.length != start + 50)
+            return this.profiles = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.profiles = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteProfiles() {
       document.getElementById('selectAll').checked = false;
       this.profiles.forEach(profile => {
@@ -178,10 +208,10 @@ export default {
       }
       for (let i = 0; tmp['data']['profiles'][i]; i++)
         this.profiles.push(tmp['data']['profiles'][i])
-      if (!tmp['data']['profiles'] || this.profiles.length - start < 20) {
+      this.saveProfiles = this.profiles;
+      this.stopLoading()
+      if (!tmp['data']['profiles'] || this.profiles.length - start < 20)
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -227,14 +257,6 @@ export default {
       this.Profile.name = profile.name
       this.Profile.infos = profile.infos
     },
-  },
-  computed: {
-    filteredProfiles: function(){
-      return this.profiles.filter((profile) => {
-        if (profile.name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
   },
 }
 </script>

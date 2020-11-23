@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredDcs">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addDcModal class="add" variant="outline-dark">
@@ -35,8 +35,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredDcs">
-          <tr v-for="dc in filteredDcs" :key="dc.id">
+        <tbody v-if="dcs">
+          <tr v-for="dc in dcs" :key="dc.id">
             <td v-if="dc">{{dc.id}}</td>
             <td v-if="dc" class="text-left">{{dc.name}}</td>
             <td v-if="dc" class="text-left">{{dc.location}}</td>
@@ -74,7 +74,7 @@ import AddDc from '@/components/dc/addDcModal.vue'
 import EditDc from '@/components/dc/editDcModal.vue'
 import DeleteDc from '@/components/dc/deleteDcModal.vue'
 import Spinner from "@/components/spinner.vue"
-import { DC_QUERY_ } from '@/assets/js/query/graphql'
+import { DC_QUERY_, searchDcs } from '@/assets/js/query/graphql'
 
 export default {
   name: 'Dc',
@@ -87,6 +87,7 @@ export default {
   data () {
     return {
       dcs: [],
+      saveDcs: [],
       full: false,
       scrolled: false,
       search: '',
@@ -122,6 +123,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredDcs: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.dcs = this.saveDcs;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.dcs = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchDcs,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['dcs'][y]; y++)
+            tmp.push(data['data']['dcs'][y]);
+          if (tmp.length != start + 50)
+            return this.dcs = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.dcs = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteDcs() {
       this.dcs.forEach(dc => {
         document.getElementById(dc.id).checked = false;
@@ -190,10 +220,10 @@ export default {
       }
       for (let i = 0; tmp['data']['dcs'][i]; i++)
         this.dcs.push(tmp['data']['dcs'][i])
-      if (!tmp['data']['dcs'].length || this.dcs.length - start < 20) {
+      this.saveDcs = this.dcs;
+      this.stopLoading()
+      if (!tmp['data']['dcs'].length || this.dcs.length - start < 20)
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -251,17 +281,6 @@ export default {
       this.editInfos.name = this.Dc.name = dc.name
       this.editInfos.location = this.Dc.location = dc.location
       this.editInfos.hoster = this.Dc.hoster = dc.hoster
-    },
-  },
-
-  computed: {
-    filteredDcs: function(){
-      return this.dcs.filter((dc) => {
-        if (dc.name.toLowerCase().match(this.search.toLowerCase())
-        || (dc.hoster && dc.hoster.name.toLowerCase().match(this.search.toLowerCase()))
-        || dc.location.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
     },
   },
 }
