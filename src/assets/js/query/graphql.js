@@ -626,7 +626,7 @@ query Profile($limit: Int!, $start: Int!) {
 `
 
 const searchServerUsers = gql`
-query ServerUser($start: Int!) {
+query ServerUser($start: Int!, $where: JSON!) {
   serverUsers(limit: 50, start: $start, sort: "name:asc", where: $where) {
     id,
     name
@@ -761,7 +761,7 @@ query Services($limit: Int!, $start: Int!) {
 
 const searchSuppliers = gql`
 query Suppliers($start: Int!, $where: JSON!) {
-  suppliers(limit: 50, start: $start, sort: "name:asc") {
+  suppliers(limit: 50, start: $start, sort: "name:asc", where: $where) {
     id,
     name
   }

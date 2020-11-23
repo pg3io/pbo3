@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredVars">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addVarModal class="add" variant="outline-dark">
@@ -33,7 +33,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="v in filteredVars" :key="v.id">
+          <tr v-for="v in vars" :key="v.id">
             <td v-if="v">{{v.id}}</td>
             <td v-if="v" class="text-left">{{v.key}}</td>
             <td v-if="v" class="text-left pre-formatted">{{v.value}}</td>
@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { GLOBALVAR_QUERY } from '@/assets/js/query/graphql'
+import { GLOBALVAR_QUERY, searchGlobalVars } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddVar from '@/components/globalVars/addVarModal.vue'
 import EditVar from '@/components/globalVars/editVarModal.vue'
@@ -80,6 +80,7 @@ export default {
   data() {
     return {
       vars: [],
+      saveVars: [],
       full: false,
       scrolled: false,
       var: null,
@@ -108,6 +109,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredVars: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.vars = this.saveVars;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.vars = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchGlobalVars,
+          variables: {start: start, sort: 'key:asc', where: {'key_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['globalVars'][y]; y++)
+            tmp.push(data['data']['globalVars'][y]);
+          if (tmp.length != start + 50)
+            return this.vars = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.vars = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteVars() {
       document.getElementById('selectAll').checked = false;
       this.vars.forEach(v => {
@@ -182,10 +212,10 @@ export default {
       }
       for (let i = 0; tmp['data']['globalVars'][i]; i++)
         this.vars.push(tmp['data']['globalVars'][i])
-      if (!tmp['data']['globalVars'].length || this.vars.length - start < 20) {
+      this.saveVars = this.vars;
+      this.stopLoading()
+      if (!tmp['data']['globalVars'].length || this.vars.length - start < 20)
         this.full = true;
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -221,15 +251,7 @@ export default {
         return order === "desc" ? comparison * -1 : comparison;
       };
     },
-  },
-  computed: {
-    filteredVars: function(){
-      return this.vars.filter((v) => {
-        if (v.key.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    },
-  },
+  }
 }
 </script>
 

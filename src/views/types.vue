@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredTypes">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addTypeModal class="add" variant="outline-dark">
@@ -31,8 +31,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredTypes">
-          <tr v-for="type in filteredTypes" :key="type.id">
+        <tbody v-if="types">
+          <tr v-for="type in types" :key="type.id">
             <td v-if="type" class="">{{type.id}}</td>
             <td v-if="type" class="text-left">{{type.name}}</td>
             <td v-if="type"><b-button v-b-modal.editTypeModal @click="get_type(type)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import {TYPE_QUERY} from '@/assets/js/query/graphql'
+import { TYPE_QUERY, searchTypes } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddType from '@/components/type/addTypeModal.vue'
 import EditType from '@/components/type/editTypeModal.vue'
@@ -78,6 +78,7 @@ export default {
   data () {
     return {
       types: [],
+      saveTypes: [],
       full: false,
       scrolled: false,
       search: '',
@@ -107,6 +108,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredTypes: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.types = this.saveTypes;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.types = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchTypes,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['types'][y]; y++)
+            tmp.push(data['data']['types'][y]);
+          if (tmp.length != start + 50)
+            return this.types = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.types = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteTypes() {
       document.getElementById('selectAll').checked = false;
       this.types.forEach(type => {
@@ -175,10 +205,10 @@ export default {
       }
       for (let i = 0; tmp['data']['types'][i]; i++)
         this.types.push(tmp['data']['types'][i])
-      if (this.types.length - start < 20 || !tmp['data']['types']) {
+      this.saveTypes = this.types;
+      this.stopLoading()
+      if (this.types.length - start < 20 || !tmp['data']['types'])
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -222,14 +252,6 @@ export default {
       this.Type.id = type.id
       this.Type.name = type.name
     },
-  },
-  computed: {
-    filteredTypes: function(){
-      return this.types.filter((type) => {
-        if (type.name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
   }
 }
 </script>

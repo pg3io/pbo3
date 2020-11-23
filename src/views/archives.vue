@@ -4,7 +4,7 @@
         <div class="container-sm">
           <div class="searchBar">
             <b-input-group>
-              <b-form-input type="text" v-model="search" autocomplete="off">
+              <b-form-input type="text" v-model="search" autocomplete="off" @keyup='filteredServers'>
               </b-form-input>
               <b-input-group-addon v-if="selectedCheckBox.length">
                 <b-button variant="outline-dark" @click="deleteServers">
@@ -80,7 +80,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="server in filteredServers" :key="server.id">
+                <tr v-for="server in servers" :key="server.id">
                   <td v-if="server">
                     {{server.id}}
                   </td>
@@ -146,7 +146,7 @@
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="12" @click="getServer(servers.length)" v-if="!full" style="cursor: pointer;">
+                  <td colspan="12" @click="clickGesture" v-if="!full" style="cursor: pointer;">
                     <font-awesome-icon icon="plus"/>
                   </td>
                   <td v-else colspan='12'>
@@ -170,7 +170,7 @@
 </template>
 
 <script>
-import { ALL_SERVER_QUERY } from '@/assets/js/query/graphql'
+import { ALL_SERVER_QUERY, searchServers } from '@/assets/js/query/graphql'
 import DeleteArchived from '@/components/archives/deleteArchivedModal.vue'
 
 export default {
@@ -182,6 +182,7 @@ export default {
     return {
       search: '',
       servers: [],
+      saveServers: [],
       full: false,
       scrolled: false,
       currentSort:'id',
@@ -203,6 +204,39 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    clickGesture() {
+      this.getServer();
+      this.filteredServers();
+    },
+    filteredServers: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.servers = this.saveServers;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.servers = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchServers,
+          variables: {start: start, sort: 'hostname:asc', where: {'hostname_contains': this.search, 'archived': true}}
+        }).then((data) => {
+          for (let y = 0; data['data']['servers'][y]; y++)
+            tmp.push(data['data']['servers'][y]);
+          if (tmp.length != start + 50)
+            return this.servers = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.servers = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     selectAllServers() {
       this.selectedCheckBox = []
       if (document.getElementById('selectAll').checked) {
@@ -237,8 +271,10 @@ export default {
     scroll() {
       this.scrolled = !!(document.scrollingElement.scrollTop)
       if (document.scrollingElement.scrollTop + document.documentElement.clientHeight >= document.scrollingElement.scrollHeight) {
-        if (this.full == false)
-          this.getServer(this.servers.length)
+        if (this.full == false) {
+          this.getServer();
+          this.filteredServers();
+        }
       }
     },
     stopLoading() {
@@ -258,6 +294,7 @@ export default {
     },
     async getServer() {
       var start = this.servers.length, tmp = null
+      this.servers = [];
       try {
         tmp = await this.$apollo.mutate({
           mutation:ALL_SERVER_QUERY,
@@ -269,10 +306,10 @@ export default {
       }
       for (let i = 0; tmp['data']['servers'][i]; i++)
         this.servers.push(tmp['data']['servers'][i])
-      if (!tmp['data']['servers'].length || this.servers.length - start < 50) {
+      this.saveServers = this.servers;
+      this.stopLoading();
+      if ((!tmp['data']['servers'].length || this.servers.length - start < 50) && this.full == false)
         this.full = true;
-        this.stopLoading();
-      }
     },
     icon:function(name){
       return 'fl-' + name
@@ -350,18 +387,6 @@ export default {
         };
       },
   },
-  computed: {
-    filteredServers: function(){
-      return this.servers.filter((server) => {
-        if (server.id.toLowerCase().match(this.search.toLowerCase()) || server.hostname.toLowerCase().match(this.search.toLowerCase())
-        || server.ip.toLowerCase().match(this.search.toLowerCase()) || server.client.name.toLowerCase().match(this.search.toLowerCase())
-        || server.dc.hoster.name.toLowerCase().match(this.search.toLowerCase()) || server.type.name.toLowerCase().match(this.search.toLowerCase())
-        || server.env.name.toLowerCase().match(this.search.toLowerCase()) || server.archiveDate.toLowerCase().match(this.search.toLowerCase())
-        || server.os.os_name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
-  }
 }
 </script>
 

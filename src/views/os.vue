@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredOs">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addOsModal class="add" variant="outline-dark">
@@ -37,7 +37,7 @@
           </tr>
         </thead>
         <tbody v-if="os">
-          <tr v-for="o in filteredOs" :key="o.id">
+          <tr v-for="o in os" :key="o.id">
             <td v-if="o">{{o.id}}</td>
             <td v-if="o" class="text-capitalize">{{o.os_name}}</td>
             <td v-if="o">{{o.os_version}}</td>
@@ -79,7 +79,7 @@ import AddOs from '@/components/os/addOsModal.vue'
 import DeleteOs from '@/components/os/deleteOsModal.vue'
 import EditOs from '@/components/os/editOsModal.vue'
 import Spinner from "@/components/spinner.vue"
-import {OS_QUERY} from '@/assets/js/query/graphql'
+import { OS_QUERY, searchOs } from '@/assets/js/query/graphql'
 
 export default {
   name: 'Os',
@@ -92,6 +92,7 @@ export default {
   data () {
     return {
       os: [],
+      saveOs: [],
       full: false,
       scrolled: false,
       search: '',
@@ -121,6 +122,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredOs: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.os = this.saveOs;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.os = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchOs,
+          variables: {start: start, sort: 'os_name:asc', where: {'os_name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['os'][y]; y++)
+            tmp.push(data['data']['os'][y]);
+          if (tmp.length != start + 50)
+            return this.os = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.os = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteOs() {
       document.getElementById('selectAll').checked = false
       this.os.forEach(os => {
@@ -189,10 +219,10 @@ export default {
       }
       for (let i = 0; tmp['data']['os'][i]; i++)
         this.os.push(tmp['data']['os'][i])
-      if (!tmp['data']['os'].length || this.os.length - start < 20) {
+      this.saveOs = this.os;
+      this.stopLoading()
+      if (!tmp['data']['os'].length || this.os.length - start < 20)
         this.full = true
-        this.stopLoading()
-      }
     },
     icon:function(name){
       return 'fl-' + name
@@ -239,14 +269,6 @@ export default {
       this.editInfos.os_version = os.os_version
       this.editInfos.version_name = os.version_name
     },
-  },
-  computed: {
-    filteredOs: function(){
-      return this.os.filter((o) => {
-        if (o.os_name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
   },
 }
 </script>

@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredSuppliers">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addSupplierModal class="add" variant="outline-dark">
@@ -31,8 +31,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredSuppliers">
-          <tr v-for="supplier in filteredSuppliers" :key="supplier.id">
+        <tbody v-if="suppliers">
+          <tr v-for="supplier in suppliers" :key="supplier.id">
             <td v-if="supplier" class="">{{supplier.id}}</td>
             <td v-if="supplier" class="text-left">{{supplier.name}}</td>
             <td v-if="supplier"><b-button v-b-modal.editSupplierModal @click="get_Supplier(supplier)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import {SUPPLIER_QUERY} from '@/assets/js/query/graphql'
+import { SUPPLIER_QUERY, searchSuppliers } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddSupplier from '@/components/supplier/addSupplierModal.vue'
 import EditSupplier from '@/components/supplier/editSupplierModal.vue'
@@ -78,6 +78,7 @@ export default {
   data () {
     return {
       suppliers: [],
+      saveSuppliers: [],
       full: false,
       scrolled: false,
       search: '',
@@ -107,6 +108,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredSuppliers: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.suppliers = this.saveSuppliers;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.suppliers = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchSuppliers,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['suppliers'][y]; y++)
+            tmp.push(data['data']['suppliers'][y]);
+          if (tmp.length != start + 50)
+            return this.suppliers = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.suppliers = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteSuppliers() {
       document.getElementById('selectAll').checked = false;
       this.suppliers.forEach(supplier => {
@@ -175,10 +205,10 @@ export default {
       }
       for (let i = 0; tmp['data']['suppliers'][i]; i++)
         this.suppliers.push(tmp['data']['suppliers'][i])
-      if (this.suppliers.length - start < 20 || !tmp['data']['suppliers'].length) {
+      this.saveSuppliers = this.suppliers;
+      this.stopLoading();
+      if (this.suppliers.length - start < 20 || !tmp['data']['suppliers'].length)
         this.full = true;
-        this.stopLoading();
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -222,15 +252,7 @@ export default {
       this.Supplier.id = supplier.id
       this.Supplier.name = supplier.name
     },
-  },
-  computed: {
-    filteredSuppliers: function(){
-      return this.suppliers.filter((supplier) => {
-        if (supplier.name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
-  },
+  }
 }
 </script>
 

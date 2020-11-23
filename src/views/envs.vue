@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredEnvs">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addEnvModal class="add" variant="outline-dark">
@@ -31,8 +31,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredEnvs">
-          <tr v-for="env in filteredEnvs" :key="env.id">
+        <tbody v-if="envs">
+          <tr v-for="env in envs" :key="env.id">
             <td v-if="env" class="">{{env.id}}</td>
             <td v-if="env" class="text-left">{{env.name}}</td>
             <td v-if="env"><b-button v-b-modal.editEnvModal @click="get_env(env)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import {ENV_QUERY} from '@/assets/js/query/graphql'
+import { ENV_QUERY, searchEnvs } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddEnv from '@/components/env/addEnvModal.vue'
 import EditEnv from '@/components/env/editEnvModal.vue'
@@ -78,6 +78,7 @@ export default {
   data () {
     return {
       envs: [],
+      saveEnvs: [],
       full: false,
       scrolled: false,
       search: '',
@@ -107,6 +108,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredEnvs: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.envs = this.saveEnvs;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.envs = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchEnvs,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['envs'][y]; y++)
+            tmp.push(data['data']['envs'][y]);
+          if (tmp.length != start + 50)
+            return this.envs = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.envs = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteEnvs() {
       this.envs.forEach(env => {
         document.getElementById(env.id).checked = false;
@@ -175,10 +205,10 @@ export default {
       }
       for (let i = 0; tmp['data']['envs'][i]; i++)
         this.envs.push(tmp['data']['envs'][i])
-      if (!tmp['data']['envs'] || this.envs.length - start < 20) {
+      this.saveEnvs = this.envs;
+      this.stopLoading()
+      if (!tmp['data']['envs'] || this.envs.length - start < 20)
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -222,14 +252,6 @@ export default {
       this.Env.id = env.id
       this.Env.name = env.name
     },
-  },
-  computed: {
-    filteredEnvs: function(){
-      return this.envs.filter((env) => {
-        if (env.name.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    }
   }
 }
 </script>

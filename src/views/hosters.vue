@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredHosters">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addHosterModal class="add" variant="outline-dark">
@@ -33,8 +33,8 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="filteredHosters">
-          <tr v-for="hoster in filteredHosters" :key="hoster.id">
+        <tbody v-if="hosters">
+          <tr v-for="hoster in hosters" :key="hoster.id">
             <td v-if="hoster">{{hoster.id}}</td>
             <td v-if="hoster" class="text-left">{{hoster.name}}</td>
             <td v-if="hoster" class="text-left">{{hoster.url_admin}}</td>
@@ -68,7 +68,7 @@ import AddHoster from "@/components/hosters/addHosterModal.vue"
 import EditHoster from "@/components/hosters/editHosterModal.vue"
 import DeleteHoster from "@/components/hosters/deleteHosterModal.vue"
 import Spinner from "@/components/spinner.vue"
-import {HOSTERS_QUERY} from '@/assets/js/query/graphql'
+import { HOSTERS_QUERY, searchHosters } from '@/assets/js/query/graphql'
 
 export default {
   name: 'Hosters',
@@ -81,6 +81,7 @@ export default {
   data () {
     return {
       hosters: [],
+      saveHosters: [],
       full: false,
       scrolled: false,
       Hoster: {
@@ -113,6 +114,35 @@ export default {
     window.removeEventListener('scroll', this.scroll);
   },
   methods: {
+    filteredHosters: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.hosters = this.saveHosters;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.hosters = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchHosters,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['hosters'][y]; y++)
+            tmp.push(data['data']['hosters'][y]);
+          if (tmp.length != start + 50)
+            return this.hosters = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.hosters = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteHoster() {
       this.hosters.forEach(hoster => {
         document.getElementById(hoster.id).checked = false;
@@ -181,10 +211,10 @@ export default {
       }
         for (let i = 0; tmp['data']['hosters'][i]; i++)
           this.hosters.push(tmp['data']['hosters'][i])
-        if (!tmp['data']['hosters'].length || this.hosters.length - start < 20) {
+        this.saveHosters = this.hosters;
+        this.stopLoading()
+        if (!tmp['data']['hosters'].length || this.hosters.length - start < 20)
           this.full = true
-          this.stopLoading()
-        }
     },
     split: function (string) {
       return string.split(".");
@@ -225,14 +255,6 @@ export default {
       this.Hoster.url_admin = hoster.url_admin
     },
   },
-  computed: {
-    filteredHosters: function(){
-      return this.hosters.filter((hoster) => {
-        if (hoster.name.toLowerCase().match(this.search.toLowerCase()) || hoster.url_admin.toLowerCase().match(this.search.toLowerCase()))
-          return true
-      });
-    },
-  }
 }
 </script>
 

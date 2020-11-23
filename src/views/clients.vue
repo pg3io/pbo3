@@ -4,7 +4,7 @@
       <div class="container-sm">
         <div class="searchBar" style="margin-left: -1.25%; margin-right: -1.25%">
           <b-input-group>
-            <b-form-input type="text" v-model="search" autocomplete="off">
+            <b-form-input type="text" v-model="search" autocomplete="off" @keyup="filteredClients">
             </b-form-input>
             <b-input-group-append>
               <b-button v-b-modal.addClientModal class="add" variant="outline-dark">
@@ -35,8 +35,8 @@
                 </th>
               </tr>
             </thead>
-            <tbody v-if="filteredClients">
-              <tr v-for="client in filteredClients" :key="client.id">
+            <tbody v-if="clients">
+              <tr v-for="client in clients" :key="client.id">
                 <td v-if="client">{{client.id}}</td>
                 <td v-if="client" class="text-">{{client.name}}</td>
                 <td v-if="client" class="text-center">
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import {CLIENTS_QUERY} from '@/assets/js/query/graphql'
+import { CLIENTS_QUERY, searchClients } from '@/assets/js/query/graphql'
 import Spinner from "@/components/spinner.vue"
 import AddClient from '@/components/client/addClientModal.vue'
 import EditClient from '@/components/client/editClientModal.vue'
@@ -87,6 +87,7 @@ export default {
   data () {
     return {
       clients: [],
+      saveClients: [],
       full: false,
       scrolled: false,
       search: '',
@@ -122,6 +123,35 @@ export default {
     this.getClient();
   },
   methods: {
+    filteredClients: function(){
+      var start = 0, tmp = [], verif = /([a-z0-9_.-])/;
+      if (this.search.length < 2) {
+        this.clients = this.saveClients;
+        return this.stopLoading();
+      }
+      for (let i = 0; this.search[i]; i++) {
+        if (!verif.test(this.search[i])) {
+          this.clients = [];
+          return this.stopLoading();
+        }
+      }
+      this.full = true;
+      do {
+        this.$apollo.mutate({
+          mutation: searchClients,
+          variables: {start: start, sort: 'name:asc', where: {'name_contains': this.search}}
+        }).then((data) => {
+          for (let y = 0; data['data']['clients'][y]; y++)
+            tmp.push(data['data']['clients'][y]);
+          if (tmp.length != start + 50)
+            return this.clients = tmp;
+        }).catch((error) => {
+          console.log(error);
+          return this.clients = [];
+        })
+        start += 50;
+      } while (tmp.length == start);
+    },
     deleteClient() {
       document.getElementById('selectAll').checked = false;
       this.clients.forEach(client => {
@@ -190,10 +220,10 @@ export default {
       }
       for (let i = 0; tmp['data']['clients'][i]; i++)
         this.clients.push(tmp['data']['clients'][i])
-      if (!tmp['data']['clients'].length || this.clients.length - start < 20) {
+      this.saveClients = this.clients;
+      this.stopLoading()
+      if (!tmp['data']['clients'].length || this.clients.length - start < 20 && this.full != true)
         this.full = true
-        this.stopLoading()
-      }
     },
     split: function (string) {
       return string.split(".");
@@ -258,14 +288,6 @@ export default {
       this.Client.infos = client.infos
       this.Client.supplier = client.supplier
     },
-  },
-  computed: {
-    filteredClients: function(){
-      return this.clients.filter((client) => {
-        if (client.name.toLowerCase().match(this.search.toLowerCase()) || ((client.supplier) && client.supplier.name.toLowerCase().match(this.search.toLowerCase())))
-          return true
-      });
-    }
   },
 }
 </script>
