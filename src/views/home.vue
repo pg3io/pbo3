@@ -262,10 +262,13 @@
               </table>
             </div>
           </div>
-          <div v-if='!Object.keys(servers).length'>
+          <div v-if='!Object.keys(servers).length && !loadLock'>
               <div id="loader" class="spinner-fast centerDiv">
               </div>
               <div id="message" class="text-center" style="display: none;"><h1>No servers found</h1></div>
+          </div>
+          <div v-else>
+            <div class="text-center"><h1>No servers found</h1></div>
           </div>
           <br><br><br><br>
         </div>
@@ -279,7 +282,10 @@
     /* Querys */
   import { GLOBALVAR_QUERY, SUPPLIER_QUERY, HOSTERS_QUERY, TYPE_QUERY,
   SERVICES_QUERY, OFFER_QUERY, SERVER_USER_QUERY, PROFILE_QUERY, OS_QUERY,
-  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, ALL_SERVER_QUERY }
+  ENV_QUERY, CLIENTS_QUERY, CRED_QUERY, DC_QUERY_, ALL_SERVER_QUERY,
+  searchServers, searchClients, searchOs, searchHosters, searchTypes,
+  searchEnvs, searchProfiles, searchServerUsers, searchDcs, searchCreds,
+  searchOffers, searchServices, searchSuppliers, searchGlobalVars }
   from '@/assets/js/query/graphql'
 
     /* Deletes */
@@ -526,6 +532,7 @@
             'client',
             'os',
             'hoster',
+            'type',
           ]
         },
         show_things: [
@@ -535,13 +542,12 @@
           'Envs',
           'Types',
           'Profiles',
-          'Servers',
           'ServerUsers',
           'Dcs',
           'Services',
           'Suppliers',
           'Vars',
-          'archives'
+          'Archives'
         ],
         hoverSuggest: "",
         hide_suggest: true,
@@ -549,7 +555,8 @@
         boolDelete: true,
         full: false,
         scrolled: false,
-        selectedCheckBox: []
+        selectedCheckBox: [],
+        loadLock: false
       }
     },
     watch: {
@@ -648,10 +655,9 @@
         }
         for (let i = 0; tmp['data']['servers'][i]; i++)
           this.servers.push(tmp['data']['servers'][i])
-        if (this.servers.length - start < 50 || !tmp['data']['servers'].length) {
+        this.stopLoading();
+        if (this.servers.length - start < 50 || !tmp['data']['servers'].length)
           this.full = true
-          this.stopLoading();
-        }
       },
       async getCred() {
         var start = this.creds.length, tmp = null
@@ -862,7 +868,7 @@
         } while(tmp && tmp['data'] && tmp['data']['globalVars'] && tmp['data']['globalVars'].length)
       },
       getSearchByUrl() {
-        var actPath = this.$route.path, savePath = actPath;
+        var actPath = this.$route.path;
         if (!this.servers.length || !actPath || actPath == '/' || !actPath.startsWith('/search='))
           return (!this.servers.length) ? setTimeout(this.getSearchByUrl, 100) : null;
         actPath = actPath.substring(8).split('+');
@@ -871,7 +877,6 @@
         this.inputSearch = (this.tags.length) ? this.tags.pop() : '';
         this.getOption();
         this.hide_suggest = true;
-        this.$router.push(savePath);
       },
       stopLoading() {
         var loader = document.getElementById("loader");
@@ -1036,9 +1041,8 @@
       },
       filteredServer: function(opt, string, mutate = false) {
         var rank = 0, i = -1, result = [];
-        if(!string.length)
+        if(!string || !string.length)
           return this.saveServers
-        alert(this.saveServers.length)
         while (string && this.saveServers[++i])
           if (((opt == "all" || opt == "hostname") && this.saveServers[i].hostname && this.saveServers[i].hostname.toLowerCase() == string.toLowerCase()) ||
           ((opt == "all" || opt =="ip") && this.saveServers[i].ip && this.saveServers[i].ip.toLowerCase() == string.toLowerCase()) ||
@@ -1344,29 +1348,47 @@
         for (let i = 0; this.tags[i]; i++)
           if (this.tags.length >= 1)
             newPath += (newPath.length) ? '+' + this.tags[i] : this.tags[i];
-        if (this.inputSearch.replace(/\s/g, '').length >= 1)
+        if (this.inputSearch.replace(/\s/g, '').length > 0)
           newPath += (newPath.length) ? '+' + this.inputSearch : this.inputSearch;
         if (this.$route.path != '/search=' + newPath)
           this.$router.push('/search=' + newPath);
       },
       makeOption(opt) {
-        var i = 0;
-        if (!opt)
+        var i = 0, start = 0;
+        if (!opt || !opt.length)
           return;
-        this.tags.push(this.inputSearch);
         if (opt == "add" || opt == "edit" || opt == "delete" || opt == "show")
           return this.mutationGraphql(opt);
         for (i = 0; this.suggests.search[i]; i++)
           if (this.suggests.search[i] == opt)
             break;
         if (this.suggests.search[i]) this.servers = this.filteredServer((opt == 'id') ? '_id' : opt, this.tags[1]);
-        else this.servers = this.filteredServer("all", this.tags[0]);
+        else {
+          this.inputSearch = this.inputSearch.replace(/\s/g, '');
+          i = this.servers;
+          this.servers = [];
+          do {
+            this.$apollo.mutate({
+              mutation: searchServers,
+              variables: {start: start, sort: 'hostname:asc', where: {'hostname_contains': this.tags[0]}}
+            }).then((data) => {
+              for (let y = 0; data['data']['servers'][y]; y++)
+                this.servers.push(data['data']['servers'][y]);
+            }).catch((error) => {
+              console.log(error);
+              this.servers = i;
+            })
+            start += 50;
+          } while (this.servers.length == start);
+          this.full = true;
+        }
         if (this.servers != this.saveServers) this.mountUrl();
       },
       getOption() {
         if ((!this.tags || !this.tags.length) && (!this.inputSearch || !this.inputSearch.length)) {
           if (this.servers.length != this.saveServers.length) this.servers = this.saveServers;
           if (this.$route.path != '/') this.$router.push('/');
+          this.showSuggest = this.suggests.func + this.suggests.search
           return this.tags = [];
         }
         this.makeOption(((this.tags[0]) ? this.tags[0] : this.inputSearch).toLowerCase());
@@ -1390,8 +1412,9 @@
         this.showSuggest = [];
         this.hide_suggest = false;
         for (y = 0; this.tags[0] && this.suggests.search[y]; y++)
-          if (this.tags[0] == this.suggests.search[y])
+          if (this.tags[0] == this.suggests.search[y] && !this.inputSearch.length)
             return this.getOption();
+        this.suggest_gesture()
       },
       new_tag: function(key) {
         this.lock = false;
@@ -1404,6 +1427,7 @@
         this.showSuggest = [];
         if (key == 'Enter')
           return this.getOption();
+        this.suggest_oneTag();
       },
       getServersSuggests: function(search) {
         this.showSuggest = [];
@@ -1516,27 +1540,124 @@
         else
           querys[search]();
       },
+      getSpecialSearch(search) {
+        var myJson = {}, final = [], start = 0, tmp = (search == 'os') ? 'os_name' : 'name';
+        var mutationWanted = {'client': searchClients, 'os': searchOs, 'hoster': searchHosters, 'type': searchTypes};
+        myJson[tmp + '_contains'] = this.inputSearch;
+        do {
+          this.$apollo.mutate({
+            mutation: mutationWanted[search],
+            variables: {start: start, where: myJson}
+          }).then((data) => {
+            for (let y = 0; data['data'][(search == 'os') ? search : search + 's'][y]; y++)
+              final.push(parseInt(data['data'][(search == 'os') ? search : search + 's'][y].id));
+            if (final.length !== start + 50) {
+              if (final.length == 0)
+                this.servers = []
+              else
+                this.servers = this.getSpecialSearchResult(search, final);
+            }
+          }).catch((error) => {
+            console.log(error);
+            return [0]
+          })
+          start += 50
+        } while (final.length == start);
+        return final
+      },
+      getSearchResult(search) {
+        var start = 0, tmp = [], myJson = {};
+        myJson[search + '_contains'] = this.inputSearch;
+        do {
+          this.$apollo.mutate({
+            mutation: searchServers,
+            variables: {start: start, sort: 'hostname:asc', where: myJson}
+          }).then((data) => {
+            for (let y = 0; data['data']['servers'][y]; y++)
+              tmp.push(data['data']['servers'][y]);
+          }).catch((error) => {
+            console.log(error);
+            return this.servers;
+          });
+          start += 50;
+        } while (tmp.length == start);
+        return tmp;
+      },
       suggest_oneTag() {
-        var i = -1, tag = this.tags[0], result = this.search_orFunc(tag);
-        if (this.tags[1] && result == 'func') {
-          if (this.tags[0] != 'add' && this.tags[0] != 'show' && this.tags.length < 3) this.getFullSuggests(this.tags[1]);
-          else this.showSuggest = [];
+        var _type = this.search_orFunc(this.tags[0].toLowerCase());
+        if (_type == null)
           return;
+        if (this.tags[1]) {
+          if (_type == 'func' && this.tags[0] == 'edit' && this.inputSearch.length > 1)
+            this.suggest_oneMoreTag();
+          return
         }
-        if (result == 'search')
-          this.getServersSuggests(tag);
-        else if (result == 'func') {
-          result = this.get_funcOptions(this.tags[0]);
-          for (let y = 0; result && result[y]; y++)
-            if (result[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
-              this.showSuggest[++i] = result[y];
-          if (this.tags[0] && this.tags[0] == 'show') {
-            this.showSuggest = []
-            for (let i = 0, a = 0; this.show_things[i]; i++)
-              if (this.show_things[i].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
-                this.showSuggest[a++] = this.show_things[i];
+        if (_type == 'func') {
+          this.showSuggest = [];
+          for (let y = 0; this.tags[0] == 'show' && this.show_things[y]; y++)
+            if (this.show_things[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
+              this.showSuggest.push(this.show_things[y]);
+          for (let y = 0; this.tags[0] != 'show' && this.suggests.funcOptions[y]; y++)
+            if (this.suggests.funcOptions[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
+              this.showSuggest.push(this.suggests.funcOptions[y].toLowerCase())
+          for (let y = 0; this.showSuggest[y]; y++)
+            if (this.showSuggest[y] == this.hoverSuggest)
+              return
+          this.hoverSuggest = this.showSuggest[0];
+        }
+        else if (this.inputSearch.length > 1){
+          this.tags[0] = this.tags[0].toLowerCase();
+          if (this.tags[0] == 'client' || this.tags[0] == 'hoster' || this.tags[0] == 'os' || this.tags[0] == 'type')
+            this.servers = this.getSpecialSearch(this.tags[0]);
+          else
+            this.servers = this.getSearchResult(this.tags[0]);
+          this.full = true;
+          this.mountUrl();
+          this.loadLock = true;
+        }
+      },
+      suggest_oneMoreTag() {
+        var tag = this.tags[1], myJson = {}, temp = [], tmp = (tag == 'os') ? 'os_name' : 'name';
+        var funcs = {'server': searchServers, 'client': searchClients,
+        'os': searchOs, 'hoster': searchHosters, 'type': searchTypes,
+        'env': searchEnvs, 'profile': searchProfiles, 'serverUser': searchServerUsers,
+        'dc': searchDcs, 'cred': searchCreds, 'offer': searchOffers,
+        'service': searchServices, 'supplier': searchSuppliers, 'globalVar': searchGlobalVars};
+        myJson[tmp + '_contains'] = this.inputSearch;
+        this.$apollo.mutate({
+          mutation: funcs[tag],
+          variables: {start: 0, where: Object(myJson)}
+        }).then((data) => {
+          for (let y = 0; data['data']['clients'][y]; y++) {
+            if (tag == 'os')
+              temp.push(data['data']['os'][y].os_name);
+            else
+              temp.push(data['data'][tag + 's'][y].name);
           }
-        }
+          this.showSuggest = temp;
+          return;
+        }).catch((error) => {
+          console.log(error);
+          return this.showSuggest = [];
+        })
+      },
+      getSpecialSearchResult(search, ids) {
+        var final = [], start = 0;
+        void search;
+        do {
+          this.$apollo.mutate({
+            mutation: searchServers,
+            variables: {start: start, sort: 'hostname:asc', where: (search == 'client') ? {client: ids} : (search == 'os') ? {os: ids} : (search == 'type') ? {type: ids} : (search == 'hoster') ? {hoster: ids} : ids}
+          }).then((data) => {
+            for (let y = 0; data['data']['servers'][y]; y++)
+              final.push(data['data']['servers'][y])
+          }).catch((error) => {
+            console.log(error);
+            return this.servers;
+          });
+          start += 50;
+        } while (final.length == start);
+        return final;
       },
       suggest_gesture: function() {
         this.showSuggest = [];
@@ -1549,6 +1670,8 @@
         for (let y = 0; this.suggests.search[y]; y++)
           if (this.suggests.search[y].toLowerCase().startsWith(this.inputSearch.toLowerCase()))
             this.showSuggest[++i] = this.suggests.search[y];
+        if (!this.showSuggest.length && this.inputSearch.length > 1)
+          this.servers = this.getSearchResult('hostname');
       },
       hover_gesture: function(key) {
         var i = -1, max = this.showSuggest.length;
@@ -1569,23 +1692,28 @@
           this.hoverSuggest = this.showSuggest[(key == 'ArrowLeft' || key == 'ArrowUp') ? max - 1 : 0]
       },
       subtag_gesture: function() {
+        this.full = false
+        if (this.$route.path != '/') this.mountUrl();
         if (this.servers.length != this.saveServers.length && this.tags.length < 2)
           this.servers = this.saveServers;
         if (this.inputSearch.length || !this.tags.length)
           return;
         if (this.lock) this.lock = !this.lock;
         else this.tags.pop();
+        if (this.$route.path != '/') this.mountUrl();
       },
       get_keyCode: function(event) {
         if (event.key == 'Backspace') this.subtag_gesture();
         if (event.key == ' ' || event.key == ',' || event.key == ':' || event.key == 'Enter') {
-          if (event.key == 'Enter' && this.hoverSuggest.length && !this.hide_suggest) this.suggest_to_tag();
+          if (!this.hide_suggest && event.key == 'Enter' && this.hoverSuggest.length) this.suggest_to_tag();
           else if (event.key == 'Enter') this.getOption();
           else this.new_tag(event.key);
+          return;
         }
-        if (event.key != 'Enter')
-          this.suggest_gesture();
-        if (event.key != 'Escape' && event.key != ' ' && event.key != ',' && event.key != ':' && event.key != 'ArrowLeft' && event.key != 'ArrowRight' && event.key != 'ArrowUp' && event.key != 'ArrowDown') {
+        // if (event.key != 'Enter')
+        //   this.suggest_gesture();
+        // event.key != ' ' && event.key != ',' && event.key != ':'
+        if (event.key != 'Escape' && event.key != 'ArrowLeft' && event.key != 'ArrowRight' && event.key != 'ArrowUp' && event.key != 'ArrowDown') {
           if (event.key != 'Backspace') this.lock = true;
           this.suggest_gesture();
           this.hoverSuggest = (this.showSuggest.length ? this.showSuggest[0] : "");
