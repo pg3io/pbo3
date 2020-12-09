@@ -39,7 +39,7 @@
         </b-button>
       </div>
     </b-modal>
-    <add-server :addInfos='editAll' :services='services'></add-server>
+    <add-server :addInfos='editAll'></add-server>
     <edit-server :editInfos='editInfos' :server='server' :services='services' :options='options'></edit-server>
     <archive-server :editInfos='selectedCheckBox'></archive-server>
     <add-hoster :addInfos='editAll'></add-hoster>
@@ -1071,7 +1071,12 @@
       },
       addMutations() {
         this.reset_infos();
-        switch (this.tags[1].toLowerCase()) {
+        if (this.inputSearch && this.inputSearch.length) {
+          if (this.inputSearch != this.tags[this.tags.length - 1])
+            this.tags.push(this.inputSearch)
+          this.inputSearch = ""
+        }
+        switch ((!this.tags[1] || !this.tags[1].length) ? '' : this.tags[1].toLowerCase()) {
           case "server":
             this.addInfos.hostname = (this.tags[2]) ? this.tags[2] : '';
             this.addInfos.ip = (this.tags[3]) ? this.tags[3] : '';
@@ -1124,6 +1129,12 @@
             this.$bvModal.show('addVarModal');
             break;
           default:
+            if (this.tags[1] && this.tags[1].length) {
+              var temp = this.tags[1];
+              this.tags[1] = "server";
+              this.tags.push(temp);
+              return this.addMutations();
+            }
             this.$refs["add"].show();
             break;
         }

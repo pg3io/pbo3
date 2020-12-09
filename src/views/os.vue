@@ -39,9 +39,9 @@
         <tbody v-if="os">
           <tr v-for="o in os" :key="o.id">
             <td v-if="o">{{o.id}}</td>
-            <td v-if="o" class="text-capitalize">{{o.os_name}}</td>
-            <td v-if="o">{{o.os_version}}</td>
-            <td v-if="o">{{o.version_name}}</td>
+            <td v-if="o" class="text-left text-capitalize">{{o.os_name}}</td>
+            <td v-if="o" class="text-left">{{o.os_version}}</td>
+            <td v-if="o" class="text-left">{{o.version_name}}</td>
             <td v-if="o && o.os_name === 'windows'">
               <font-awesome-icon :icon="['fab', 'windows']" />
             </td>
@@ -49,7 +49,6 @@
               <span v-if="o" :class="icon(o.os_name)"></span>
             </td>
             <td v-if="o"><b-button v-b-modal.editOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>
-            <!-- <td v-if="o"><b-button v-b-modal.deleteOsModal @click="get_os(o)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="trash-alt"/></b-button></td> -->
             <td v-if="o">
               <input :id="o.id" type='checkbox' @click="changeSelected(o.id)" style="transform: scale(1.5);">
             </td>
