@@ -38,8 +38,8 @@
             <tbody v-if="clients">
               <tr v-for="client in clients" :key="client.id">
                 <td v-if="client">{{client.id}}</td>
-                <td v-if="client" class="text-">{{client.name}}</td>
-                <td v-if="client" class="text-center">
+                <td v-if="client" class="text-left">{{client.name}}</td>
+                <td v-if="client" class="text-left">
                   <p v-if="client.supplier">{{client.supplier.name}}</p>
                 </td>
                 <td v-if="client"><b-button v-b-modal.editClientModal @click="get_client(client)" size="sm" variant="outline-dark" pill><font-awesome-icon icon="pencil-alt"/></b-button></td>

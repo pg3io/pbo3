@@ -198,6 +198,7 @@ import { OFFER_QUERY } from '@/assets/js/query/graphql'
 import { TYPE_QUERY } from '@/assets/js/query/graphql'
 import { DC_QUERY_ } from '@/assets/js/query/graphql'
 import { HOSTERS_QUERY } from '@/assets/js/query/graphql'
+import { SERVICES_QUERY } from '@/assets/js/query/graphql'
 
 import { createServer } from '@/assets/js/createMutations/createServer'
 
@@ -358,12 +359,12 @@ export default {
   },
   props: {
     addInfos: Object,
-    services: Array
   },
   data () {
     return {
       options: [],
       listServices: [],
+      services: [],
       servers: {},
       offer: {},
       offers: {},
@@ -388,7 +389,8 @@ export default {
     }
   },
   mounted() {
-    },
+    this.getService()
+  },
   methods: {
     loadAll() {
       this.getServer();
@@ -402,6 +404,25 @@ export default {
       this.getDc();
       this.getOffer();
       this.getHoster();
+      this.getService();
+      this.fillOptions();
+    },
+    getService() {
+      var start = this.services.length
+      do {
+        this.$apollo.mutate({
+          mutation:SERVICES_QUERY,
+          variables: {limit: 50, start: start}
+        }).then((data) => {
+          for (let i = 0; data['data']['services'][i]; i++)
+            this.services.push(data['data']['services'][i])
+          if (this.services.length != start + 50)
+            return
+        }).catch((error) => {
+          console.log(error)
+        })
+        start += 50
+      } while(this.services.length == start)
     },
     async getServer() {
       this.servers = []
