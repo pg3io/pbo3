@@ -4,10 +4,30 @@ import store from '@/store'
 
 Vue.use(VueRouter)
 
+function guardMyroute(to, from, next)
+{
+  var connecter = false;
+
+  if(sessionStorage.getItem('apollo-token')) {
+    connecter = true;
+  } else {
+    connecter = false;
+  }
+
+  if(connecter == true ) {
+    console.log('validation gaurdroute');
+    next();
+  } else {
+    console.log('Redirection vers login');
+    next('/login');
+  }
+}
+
 const routes = [
   {
     path: '/',
     name: 'Home',
+    beforeEnter : guardMyroute,
     component: () => import('@/views/home.vue'),
     meta: {
       title: 'PBO3',
@@ -18,6 +38,7 @@ const routes = [
   {
     path: '/server/:hostname',
     name: 'Servers',
+    beforeEnter : guardMyroute,
     component: () => import('@/views/infos.vue'),
     meta: {
       requiresAuth: true
@@ -26,6 +47,7 @@ const routes = [
   {
     path: '/suppliers/:name',
     name: 'SuppliersTable',
+    beforeEnter : guardMyroute,
     component: () => import('@/views/suppliersTable.vue'),
     meta: {
       requiresAuth: true
@@ -34,6 +56,7 @@ const routes = [
   {
     path: '/suppliers',
     name: 'Suppliers',
+    beforeEnter : guardMyroute,
     component: () => import('@/views/suppliers.vue'),
     meta: {
       title: 'PBO3 - Suppliers',
@@ -43,6 +66,7 @@ const routes = [
   {
     path: '/globalVars',
     name: 'GlobalVars',
+    beforeEnter : guardMyroute,
     component: () => import('@/views/globalVars.vue'),
     meta: {
       title: 'PBO3 - Global Vars',
@@ -55,6 +79,13 @@ const routes = [
     component: () => import('@/views/login.vue'),
     meta: {
       title: 'PBO3 - Login',
+    },
+    beforeEnter: (to,from, next) => {
+      if (store.getters.isAuthenticated == true) {
+        next("/");
+      } else {
+        next();
+      }
     }
   },
   {
@@ -158,7 +189,6 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // Check if the user is logged in
 const isUserLoggedIn = store.getters.isAuthenticated
 if (to.matched.some(record => record.meta.requiresAuth)) {
   if (!isUserLoggedIn) {
@@ -175,7 +205,7 @@ if (to.matched.some(record => record.meta.requiresAuth)) {
 } else {
   document.title = to.meta.title
   next()
-}
+  }
 })
 
 export default router

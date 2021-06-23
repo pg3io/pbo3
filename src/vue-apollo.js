@@ -6,14 +6,14 @@ import { setContext } from 'apollo-link-context'
 // Install the vue plugin
 Vue.use(VueApollo)
 
-// Name of the localStorage item
+// Name of the sessionStorage item
 const AUTH_TOKEN = 'apollo-token'
 
 // Http endpoint
 const httpEndpoint = process.env.VUE_APP_API_URL || 'http://localhost:1337/graphql'
 const authLink = setContext(async (_, { headers }) => {
   // get the authentication token from local storage if it exists
-  const token = JSON.parse(localStorage.getItem('apollo-token'))
+  const token = JSON.parse(sessionStorage.getItem('apollo-token'))
   // Return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -83,8 +83,8 @@ export function createProvider () {
 
 // Manually call this when user log in
 export async function onLogin (apolloClient, token) {
-  if (typeof localStorage !== 'undefined' && token) {
-    localStorage.setItem(AUTH_TOKEN, token)
+  if (typeof sessionStorage !== 'undefined' && token) {
+    sessionStorage.setItem(AUTH_TOKEN, token)
   }
   if (apolloClient.wsClient) restartWebsockets(apolloClient.wsClient)
   try {
@@ -97,8 +97,8 @@ export async function onLogin (apolloClient, token) {
 
 // Manually call this when user log out
 export async function onLogout (apolloClient) {
-  if (typeof localStorage !== 'undefined') {
-    localStorage.removeItem(AUTH_TOKEN)
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.removeItem(AUTH_TOKEN)
   }
   if (apolloClient.wsClient) restartWebsockets(apolloClient.wsClient)
   try {

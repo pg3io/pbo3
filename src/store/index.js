@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { onLogout, apolloClient } from '@/vue-apollo'
+import { onLogin } from '@/vue-apollo'
 import { LOGGED_IN_USER } from '@/graphql/login'
 import gql from 'graphql-tag'
 import VuexPersistence from 'vuex-persist'
@@ -8,35 +9,43 @@ import VuexPersistence from 'vuex-persist'
 Vue.use(Vuex)
 
 const vuexLocal = new VuexPersistence({
-  storage: window.localStorage
+  storage: window.sessionStorage
 })
 
 export default new Vuex.Store({
   state: {
-    token: null,
     user: {},
-    authStatus: false
+    authStatus: false,
+    token: sessionStorage.getItem('apollo-token') || null,
   },
   getters: {
+    user: state => state.user,
     isAuthenticated: state => !!state.token,
     authStatus: state => state.authStatus,
-    user: state => state.user
   },
   mutations: {
-    SET_TOKEN (state, token) {
-      state.token = token
+    SET_TOKEN (state, payload) {
+      state.token = payload.token;
+      console.log('SET_TOKEN')
     },
-    LOGIN_USER (state, user) {
-      state.authStatus = true
-      state.user = { ...user }
+    LOGIN_USER (state, payload) {
+      console.log('LOGIN_USER');
+      onLogin(apolloClient);
+      state.isAuthenticated = true;
+      state.authStatus = true;
+      state.user = payload.user;
     },
     LOGOUT_USER (state) {
-      state.authStatus = ''
-      state.token = '' && localStorage.removeItem('apollo-token')
+      state.authStatus = '';
+      console.log('LOGOUT_USER');
+      state.isAuthenticated = false;
+      state.authStatus = false;
+      onLogout(apolloClient);
+      state.token = '' && sessionStorage.removeItem('apollo-token');
     }
   },
   actions: {
-    async login ({ commit, dispatch }, authDetails) {
+    async login ({ commit }, authDetails) {
       try {
         var {data} = await apolloClient.mutate({
           mutation: gql`
@@ -49,8 +58,9 @@ export default new Vuex.Store({
         })
         const token = JSON.stringify("Bearer " + data.login.jwt)
         commit('SET_TOKEN', token)
-        localStorage.setItem('apollo-token', token)
-        dispatch('setUser')
+        sessionStorage.setItem('apollo-token', token)
+        commit('LOGIN_USER', authDetails)
+        //dispatch('setUser')
       } catch (e) {
         console.error("POST https://pbo3.pk3.io:1337/graphql 401 (UNAUTHORIZED)")
         console.error(e)
@@ -66,7 +76,6 @@ export default new Vuex.Store({
     },
     async logOut ({ commit }) {
       commit('LOGOUT_USER')
-      onLogout(apolloClient)
     }
   },
   plugins: [vuexLocal.plugin]

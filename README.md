@@ -50,3 +50,4 @@ Ce projet est sous licence [Apache 2.0](https://www.apache.org/licenses/LICENSE-
 
 # Informations sur l'auteur
 Ce projet a été créé par [PG3](https://pg3.io) en septembre 2020.
+ Et Maintenus par [PG3] (https://pg3.io) en 2021.
